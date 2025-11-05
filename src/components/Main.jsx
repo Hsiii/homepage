@@ -1,16 +1,11 @@
 import React, { useEffect } from 'react';
 
 import Cover from 'components/Cover.jsx';
-import setLinks from 'utils/link.jsx';
 
 import 'components/Main.css';
 import 'utils/colorPalette.css';
 
 export default function Main() {
-    useEffect(() => {
-        setLinks();
-    }, []);
-
     return (
         <>
             <main>

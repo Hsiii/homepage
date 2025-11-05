@@ -1,8 +1,13 @@
-import React, { useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import linkList from 'utils/bookmarkLink.jsx';
+import setLinks from 'utils/link.jsx';
 import 'components/Links.css';
 
 export default function Links({ show }) {
+    useEffect(() => {
+        setLinks();
+    }, []);
+
     const calcPadding = useCallback((headerIndex, link) => {
         const windowHeight = window.innerHeight;
         const remToPx = 16;
