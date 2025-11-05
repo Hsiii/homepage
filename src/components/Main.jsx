@@ -11,14 +11,14 @@ export default function Main() {
         setLinks();
     }, []);
 
-    return <>
-        <main>
-            <Cover/>
-        </main>
-        <footer>
-            <a href="http://www.freepik.com">
-                Cover image designed by pikisuperstar / Freepik
-            </a>
-        </footer>
-    </>
+    return (
+        <>
+            <main>
+                <Cover />
+            </main>
+            <footer>
+                <a href='http://www.freepik.com'>Cover image designed by pikisuperstar / Freepik</a>
+            </footer>
+        </>
+    );
 }

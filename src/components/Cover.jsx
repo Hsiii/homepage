@@ -1,12 +1,12 @@
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 
 import Mountains from 'components/Mountains';
 import Links from 'components/Links.jsx';
-import 'components/Cover.css'
+import 'components/Cover.css';
 
 export default function Cover() {
     const input = useRef(null);
-    
+
     const [time, setTime] = useState('');
     const [date, setDate] = useState('');
     const [toggle, setToggle] = useState(false);
@@ -15,7 +15,9 @@ export default function Cover() {
     useEffect(() => {
         const update = () => {
             const d = new Date();
-            setTime(`${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`);
+            const hours = d.getHours().toString().padStart(2, '0');
+            const minutes = d.getMinutes().toString().padStart(2, '0');
+            setTime(`${hours}:${minutes}`);
             setDate(d.getMonth() + 1 + '/' + d.getDate());
         };
         update();
@@ -28,7 +30,7 @@ export default function Cover() {
 
         const handleScroll = () => {
             setShowLinks(window.scrollY == 0);
-        }
+        };
         handleScroll();
 
         const onScroll = () => {
@@ -41,7 +43,7 @@ export default function Cover() {
             }
         };
 
-        const handleKeyDown = e => {
+        const handleKeyDown = (e) => {
             if (e.key == ' ' && document.activeElement !== input.current) {
                 e.preventDefault();
                 input.current.focus();
@@ -57,32 +59,35 @@ export default function Cover() {
         return () => {
             window.removeEventListener('scroll', onScroll);
             window.removeEventListener('keydown', handleKeyDown);
-        }
+        };
     }, []);
 
-    const toggleTime = useCallback(() => setToggle(t => !t), []);
+    const toggleTime = useCallback(() => setToggle((t) => !t), []);
 
     return (
         <section className='cover'>
             <Mountains />
-            <div className="title" onClick={toggleTime}>
+            <div className='title' onClick={toggleTime}>
                 {toggle ? date : time}
             </div>
-            
-            <div className="search">
-                <form method="get" action="https://www.google.com/search">
-                    <input 
-                        className="search-input" 
-                        type="text" name="q" 
-                        placeholder="Search..." 
-                        autoComplete='off' 
+
+            <div className='search'>
+                <form method='get' action='https://www.google.com/search'>
+                    <input
+                        className='search-input'
+                        type='text'
+                        name='q'
+                        placeholder='Search...'
+                        autoComplete='off'
                         ref={input}
                     />
-                    <button><i className="fa fa-search"/></button>
+                    <button>
+                        <i className='fa fa-search' />
+                    </button>
                 </form>
             </div>
 
-            <Links show={showLinks}/>
+            <Links show={showLinks} />
         </section>
     );
 }
