@@ -36,6 +36,7 @@ export default [
             'G-Slide',
             'G-Calendar',
             'Flowchart',
+            'Overleaf',
         ]
     },
     {
@@ -45,6 +46,7 @@ export default [
             'GitHub',
             'LeetCode',
             'Colab',
+            'Squoosh',
             'Haikei',
             'Coolor',
             'Font Awesome',
@@ -53,7 +55,6 @@ export default [
             'Vue dev',
             'SSTM dev',
             'Stylish',
-            'Overleaf',
         ]
     },
     {
