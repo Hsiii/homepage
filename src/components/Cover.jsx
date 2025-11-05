@@ -15,7 +15,7 @@ export default function Cover() {
     useEffect(() => {
         const update = () => {
             const d = new Date();
-            setTime(`${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')}`);
+            setTime(`${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`);
             setDate(d.getMonth() + 1 + '/' + d.getDate());
         };
         update();
