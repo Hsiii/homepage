@@ -1,9 +1,11 @@
 .links {
-    --width: calc(15rem + 3px);
+    --width: 15rem;
+    --indicator-gap: .5rem;
+    --indicator-width: 2rem;
+    --link-height: 3.5rem;
 
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
 
     width: var(--width);
     height: 100%;
@@ -12,7 +14,7 @@
     flex-direction: column;
     justify-content: center;
     
-    translate: calc(3rem - var(--width));
+    translate: calc(-1 * var(--width));
     transition: translate .2s ease-out;
     
     z-index: 20;
@@ -29,48 +31,52 @@
 
     & .indicator {
         position: absolute;
-        top: 50%;
-        left: 100%;
+        left: calc(100% + var(--indicator-gap));
     
-        width: .3rem;
+        width: .25rem;
         height: 16rem;
-    
+
         background-color: var(--clr-btn);
-        border-radius: .5rem;
+        border-radius: .3rem;
         opacity: .5;
     
-        translate: -2rem -50%;
         transition: translate .1s, opacity .4s ease-in;
 
         display: flex;
         align-items: center;
 
         & i {
-            color: var(--clr-btn);
             position: relative;
-            font-size: 1.2rem;
+            width: 2rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
             left: 1rem;
+            font-size: 1.2rem;
+            color: var(--clr-btn);
         }
     }
     
     & .filler {
         position: absolute;
         inset: 0;
-    
-        width: inherit;
-        height: inherit;
+        background-color: var(--clr-link-filler);
     }
     
-    &:hover {
+    &:hover, 
+    & .indicator:hover {
         translate: 0;
 
         & .indicator {
-            translate: -3rem -50%;
+            translate: 
+                calc(
+                    (var(--indicator-width) + var(--indicator-gap)) 
+                    * -1
+                );
             opacity: 0;
         }
 
         & .filler {
-            background-color: var(--clr-link-filler);
             border-right: 1px solid var(--clr-link-filler-border);
             backdrop-filter: blur(1rem);
             z-index: 9;
@@ -80,9 +86,7 @@
 
 .sub-links {
     position: absolute;
-    align-self: start;
-    top: 0;
-    left: 0;
+    inset: 0;
 
     width: var(--width);
     height: 100vh;
@@ -116,37 +120,43 @@
     }
 
     & a {
+        --link-margin: 1rem;
+
         text-decoration: none;
-        position: relative;
-        width: 13rem;
-        height: 3.4rem;
-        padding: .8rem;
-        padding-left: 2rem;
-    
+        width: calc(var(--width) - var(--link-margin));
+        height: var(--link-height);
+        margin: 0 var(--link-margin);
+        padding-left: 1.5rem;
+        border-radius: 1rem;
+
         color: var(--clr-secondary);
         font-size: 1.2rem;
         font-weight: bold;
         transition: .2s;
         z-index: 10;
     
+        display: flex;
+        align-items: center;
+        
         &:hover {
             text-decoration: none;
-            background-color: var(--clr-link-filler);
-            color: var(--clr-title-3);
+            color: var(--clr-title-2);
         }
     }
 }
 
 .link-header {
-    width: 13.5rem;
-    height: 3.4rem;
-    padding: .8rem;
-    border-radius: .2rem;
-
+    width: var(--width);
+    height: var(--link-height);
+    padding: 0 1rem;
+    
     color: var(--clr-secondary);
-    transition: .4s;
+    transition: .25s;
     z-index: 10;
-
+    
+    display: flex;
+    align-items: center;
+    
     &::before {
         content: '';
         position: absolute;
@@ -156,45 +166,37 @@
                 var(--clr-link-grad-1), 
                 var(--clr-link-grad-2)
             );
-        top: 0;
-        left: 0;
+        inset: 0;
         opacity: 0;
-        transition: .3s;
-        width: 13.5rem;
-        height: 3.4rem;
+        transition: .25s;
+        width: var(--width);
+        height: var(--link-height);
+        border-radius: 0 .5rem .5rem 0;
     }
 
     &:hover,
     &:has(+.sub-links:hover) {
-        translate: 1.2rem 0;
-        scale: 1.05;
+        translate: 1rem;
 
         &::before {
-            scale: 1.2 1;
-            translate: -.7rem 0;
+            width: calc(var(--width) + 1rem);
+            translate: -1rem;
             opacity: .3;
         } 
     }    
-
-    .sub-links & {
-        transition: .2s;
-    }
     
     & i {
         position: relative;
         left: 1rem;
         width: 1rem;    
         color: var(--clr-secondary);
-        z-index: 2;
     }
 
     & a {
-        transition: 0s;
         position: relative;
         left: 2.5rem;
         font-size: 1.2rem;
         font-weight: bold;
         color: var(--clr-secondary);
-        z-index: 2;
     } 
 }

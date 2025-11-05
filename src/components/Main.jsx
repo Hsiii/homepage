@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 
 import Cover from 'components/Cover.jsx';
-
 import setLinks from 'utils/link.jsx';
-import 'utils/colorPalette.css';
 
 import 'components/Main.css';
+import 'utils/colorPalette.css';
 
-export default function Main(props) {
+export default function Main() {
     useEffect(() => {
         setLinks();
     }, []);

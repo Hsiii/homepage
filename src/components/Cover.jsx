@@ -3,13 +3,16 @@ import React, {useEffect, useState, useRef, useCallback} from 'react';
 import Links from 'components/Links.jsx';
 import 'components/Cover.css'
 
-export default function Cover(props) {
+export default function Cover() {
     const mtMid = useRef(null);
     const mtBack = useRef(null);
     const input = useRef(null);
     
     const [time, setTime] = useState('');
     const [date, setDate] = useState('');
+    const [toggle, setToggle] = useState(false);
+    const [showLinks, setShowLinks] = useState(true);
+
     useEffect(() => {
         const update = () => {
             const d = new Date();
@@ -21,46 +24,48 @@ export default function Cover(props) {
         return () => clearInterval(id);
     }, []);
 
-    const [toggle, setToggle] = useState(false);
-    const [showLinks, setShowLinks] = useState(true);
-
     useEffect(() => {
         let ticking = false;
+
+        const setTransform = (el, tr) => {
+            el.current.style.transform = `translateY(${tr * window.scrollY}px)`;
+        }
+
+        const handleScroll = () => {
+            setTransform(mtBack, 0.6); 
+            setTransform(mtMid, 0.5);
+            setShowLinks(window.scrollY == 0);
+        }
+        handleScroll();
+
         const onScroll = () => {
             if (!ticking) {
-            window.requestAnimationFrame(() => {
-                handleScroll();
-                ticking = false;
-            });
-            ticking = true;
+                window.requestAnimationFrame(() => {
+                    handleScroll();
+                    ticking = false;
+                });
+                ticking = true;
             }
         };
-        window.addEventListener('scroll', onScroll);
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
 
-    useEffect(() => {
-        handleScroll();
+        const handleKeyDown = e => {
+            if (e.key == ' ' && document.activeElement !== input.current) {
+                e.preventDefault();
+                input.current.focus();
+            }
+            if (e.key === 'Escape' && document.activeElement === input.current) {
+                e.preventDefault();
+                input.current.blur();
+            }
+        };
+
+        window.addEventListener('scroll', onScroll);
         window.addEventListener('keydown', handleKeyDown);
         return () => {
+            window.removeEventListener('scroll', onScroll);
             window.removeEventListener('keydown', handleKeyDown);
-        };
+        }
     }, []);
-
-    const handleScroll = () => {
-        setTransform(mtBack, 0.6); 
-        setTransform(mtMid, 0.5);
-        setShowLinks(window.scrollY == 0);
-    }
-
-    const setTransform = (el, tr) => {
-        el.current.style.transform = `translateY(${tr * window.scrollY}px)`;
-    }
-
-    const handleKeyDown = e => {
-        if (e.key == ' ') 
-            input.current.focus();
-    };
 
     const toggleTime = useCallback(() => setToggle(t => !t), []);
 
@@ -80,10 +85,10 @@ export default function Cover(props) {
             <div className="search">
                 <form method="get" action="https://www.google.com/search">
                     <input 
+                        className="search-input" 
                         type="text" name="q" 
                         placeholder="Search..." 
                         autoComplete='off' 
-                        class="search-input" 
                         ref={input}
                     />
                     <button><i className="fa fa-search"/></button>

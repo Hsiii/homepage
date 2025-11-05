@@ -1,12 +1,8 @@
 .cover {
     --rise_time: 2s;
 
-    position: relative;
-
-    width: 100%;
     height: 100vh;
-
-    z-index: 0;
+    height: 100dvh;
 }
 
 .img-wrap {
@@ -21,33 +17,30 @@
 
     background: 
         linear-gradient(
-            var(--clr-cover-grad-1),
-            var(--clr-cover-grad-2),
+            var(--clr-cover-grad-2) 50%,
             var(--clr-cover-grad-3),
             var(--clr-cover-grad-4)
         );
 }
 
 .cover img {
+    height: inherit;
     position: absolute;
-    height: 100vh;
+    z-index: 3;
+    pointer-events: none;
+    
     animation: 
         rise-mountain 
         var(--rise_time)
         ease-out 1 forwards;
-    z-index: 3;
+    
     filter: hue-rotate(var(--hue));
-    pointer-events: none;
-
+    
     will-change: transform;
-
-    &::last-child {
-        z-index: 5;
-    }
 }
 
 .sky {
-    width: calc(100vh / 722 * 1180 - 1px);
+    width: calc(100vh / 722 * 1180);
     height: 200%;
 
     background: 
@@ -147,18 +140,18 @@
     
     z-index: 2;
 
-    &:has(.search-input:focus) {
+    &:focus-within {
         opacity: 1 !important;
     }
 }
 
 
-.search:has(.search-input:focus), 
+.search:focus-within, 
 .search:hover {
     transition: border-radius .1s;
-    border-radius: 5px;
-    box-shadow: 0 10px 20px var(--clr-search-shadow);
-    opacity: .9;
+    border-radius: 1rem;
+    box-shadow: 0 0 5px var(--clr-search-button);
+    opacity: 1;
 }
 
 .search-input {
@@ -168,14 +161,19 @@
     font-size: 1.2rem;
     text-indent: 1.2rem;
     background-color: #fff;
+    color: var(--clr-primary);
     outline: none;
-
+    
     transition: .5s;
-
+    
     &:focus,
     .search:hover & {
         width: clamp(12rem, 8rem + 10vw, 15rem);
-        transition: .5s;
+        transition: .25s;
+    }
+    
+    &::placeholder {
+        color: var(--clr-search-button-hover);
     }
 }
 
@@ -188,35 +186,19 @@
     cursor: pointer;
     
     transition: 0.2s;
-}
-
-.search:hover button {
-    background-color: var(--clr-search-button-hover);
-}
-
-.search-input:focus + button {
-    background-color: var(--clr-primary-dark);
-
-    &:hover {
-        background-color: var(--clr-title-3);
+    
+    .search:hover & {
+        background-color: var(--clr-search-button-hover);
     }
-}
-
-.search button i {
-    color: var(--clr-secondary);
-    opacity: .4;
-    animation: 
-        rise-button
-        var(--rise_time)
-        ease-out 
-        1 
-        forwards;
-}
-
-.search:has(.search-input:focus) button i,
-.search:hover button i {
-    opacity: 1;
-    color: var(--clr-btn) !important;
+    
+    & i {
+        animation: 
+            rise-button
+            var(--rise_time)
+            ease-out 
+            1 
+            forwards;
+    }
 }
 
 .grad {
@@ -248,7 +230,7 @@
 
 @keyframes rise-button {
     0%, 80% {color: transparent}
-    100% {color: var(--clr-secondary)}
+    100% {color: var(--clr-btn)}
 }
 
 @keyframes rise-title {
