@@ -1,0 +1,63 @@
+.mountains {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+
+    background: 
+        linear-gradient(
+            var(--clr-cover-grad-2) 50%,
+            var(--clr-cover-grad-3),
+            var(--clr-cover-grad-4)
+        );
+}
+
+.mountains img {
+    height: inherit;
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    
+    animation: 
+        rise-mountain 
+        var(--rise-time)
+        ease-out 1 forwards;
+    
+    filter: hue-rotate(var(--hue));
+    
+    will-change: transform;
+}
+
+.sky {
+    width: calc(100vh / 722 * 1180);
+    height: 200%;
+
+    background: 
+        linear-gradient(
+            var(--clr-sky-1) 0%,
+            var(--clr-sky-2) 30%, 
+            var(--clr-sky-3) 50%, 
+            var(--clr-sky-4) 70%
+        );
+
+    animation: 
+        rise-sky 
+        var(--rise-time) 
+        ease-out 
+        1 
+        forwards;
+}
+
+@keyframes rise-sky {
+    from {translate: 0 0;}
+    to {translate: 0 -50%;}
+}
+
+@keyframes rise-mountain {
+    from {filter: hue-rotate(var(--hue)) brightness(var(--from-brightness))}
+    to {filter: hue-rotate(var(--hue)) brightness(var(--to-brightness))}
+}

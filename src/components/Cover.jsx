@@ -1,11 +1,10 @@
 import React, {useEffect, useState, useRef, useCallback} from 'react';
 
+import Mountains from 'components/Mountains';
 import Links from 'components/Links.jsx';
 import 'components/Cover.css'
 
 export default function Cover() {
-    const mtMid = useRef(null);
-    const mtBack = useRef(null);
     const input = useRef(null);
     
     const [time, setTime] = useState('');
@@ -27,13 +26,7 @@ export default function Cover() {
     useEffect(() => {
         let ticking = false;
 
-        const setTransform = (el, tr) => {
-            el.current.style.transform = `translateY(${tr * window.scrollY}px)`;
-        }
-
         const handleScroll = () => {
-            setTransform(mtBack, 0.6); 
-            setTransform(mtMid, 0.5);
             setShowLinks(window.scrollY == 0);
         }
         handleScroll();
@@ -71,13 +64,7 @@ export default function Cover() {
 
     return (
         <section className='cover'>
-            <div className="img-wrap">
-                <div className='sky'/>
-                <img src="images/mountain/back.png" ref={mtBack} loading='lazy'/>
-                <img src="images/mountain/mid.png" ref={mtMid} loading='lazy'/>
-                <img src="images/mountain/front.png"/>
-            </div>
-
+            <Mountains />
             <div className="title" onClick={toggleTime}>
                 {toggle ? date : time}
             </div>
