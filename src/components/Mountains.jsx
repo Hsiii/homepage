@@ -37,9 +37,9 @@ export default function Mountains() {
     return (
         <div className="mountains">
             <div className='sky'/>
-            <img src="images/mountain/back.png" ref={mtBack} loading='lazy'/>
-            <img src="images/mountain/mid.png" ref={mtMid} loading='lazy'/>
-            <img src="images/mountain/front.png"/>
+            <img src="images/mountain/back.png" ref={mtBack} />
+            <img src="images/mountain/mid.png" ref={mtMid} />
+            <img src="images/mountain/front.png" />
         </div>
     );
 }
