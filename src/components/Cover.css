@@ -1,0 +1,262 @@
+.cover {
+    --rise_time: 2s;
+
+    position: relative;
+
+    width: 100%;
+    height: 100vh;
+
+    z-index: 0;
+}
+
+.img-wrap {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+
+    background: 
+        linear-gradient(
+            var(--clr-cover-grad-1),
+            var(--clr-cover-grad-2),
+            var(--clr-cover-grad-3),
+            var(--clr-cover-grad-4)
+        );
+}
+
+.cover img {
+    position: absolute;
+    height: 100vh;
+    animation: 
+        rise-mountain 
+        var(--rise_time)
+        ease-out 1 forwards;
+    z-index: 3;
+    filter: hue-rotate(var(--hue));
+    pointer-events: none;
+
+    will-change: transform;
+
+    &::last-child {
+        z-index: 5;
+    }
+}
+
+.sky {
+    width: calc(100vh / 722 * 1180 - 1px);
+    height: 200%;
+
+    background: 
+        linear-gradient(
+            var(--clr-sky-1) 0%,
+            var(--clr-sky-2) 30%, 
+            var(--clr-sky-3) 50%, 
+            var(--clr-sky-4) 70%
+        );
+
+    animation: 
+        rise-sky 
+        var(--rise_time) 
+        ease-out 
+        1 
+        forwards;
+}
+
+.title {
+    position: sticky;
+    top: 120px;
+    left: 50%;
+
+    width: fit-content;
+    height: fit-content;
+
+    background-image: 
+    linear-gradient(
+        to right, 
+        var(--clr-title-1),
+        var(--clr-title-2)
+    );
+
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    font-size: clamp(5rem, 1rem + 10vw, 7rem);
+    font-weight: 400;
+    font-family: 'Quicksand';
+    text-align: center;
+    text-shadow: -2px -2px var(--clr-title-shadow);
+    letter-spacing: .5rem;
+
+    translate: -50% 0;
+    animation: 
+        rise-title 
+        var(--rise_time) 
+        ease-out 
+        1 
+        forwards;
+    /*title_up_down 2.5s ease-in-out infinite*/
+
+    z-index: 1;
+
+    &:hover {
+        background-image: 
+        linear-gradient(
+            to right, 
+            var(--clr-title-2),
+            var(--clr-title-3)
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}
+
+@keyframes title_up_down {
+    0%, 100% {translate: -50% 1rem;}
+    50% {translate: -50% -1rem;}
+}
+
+.search {
+    position: sticky;
+    top: min(300px, 40vh);
+    left: 50%;
+
+    width: fit-content;
+    height: fit-content;
+    border-radius: 50%;
+
+    translate: -50% 0;
+    transition: border-radius .5s .2s;
+    
+    overflow: hidden;
+    
+    backdrop-filter: blur(20px);
+    opacity: .9;
+
+    animation: 
+        rise 
+        var(--rise_time) 
+        ease-out 
+        1 
+        forwards;
+    
+    z-index: 2;
+
+    &:has(.search-input:focus) {
+        opacity: 1 !important;
+    }
+}
+
+
+.search:has(.search-input:focus), 
+.search:hover {
+    transition: border-radius .1s;
+    border-radius: 5px;
+    box-shadow: 0 10px 20px var(--clr-search-shadow);
+    opacity: .9;
+}
+
+.search-input {
+    width: 0;
+    height: 3rem;
+
+    font-size: 1.2rem;
+    text-indent: 1.2rem;
+    background-color: #fff;
+    outline: none;
+
+    transition: .5s;
+
+    &:focus,
+    .search:hover & {
+        width: clamp(12rem, 8rem + 10vw, 15rem);
+        transition: .5s;
+    }
+}
+
+.search form button {
+    width: 3rem;
+    height: 3rem;
+
+    font-size: 1.2rem;
+    background-color: var(--clr-search-button);
+    cursor: pointer;
+    
+    transition: 0.2s;
+}
+
+.search:hover button {
+    background-color: var(--clr-search-button-hover);
+}
+
+.search-input:focus + button {
+    background-color: var(--clr-primary-dark);
+
+    &:hover {
+        background-color: var(--clr-title-3);
+    }
+}
+
+.search button i {
+    color: var(--clr-secondary);
+    opacity: .4;
+    animation: 
+        rise-button
+        var(--rise_time)
+        ease-out 
+        1 
+        forwards;
+}
+
+.search:has(.search-input:focus) button i,
+.search:hover button i {
+    opacity: 1;
+    color: var(--clr-btn) !important;
+}
+
+.grad {
+    position: absolute;
+    bottom: 0;
+
+    width: 100%;
+    height: 100px;
+
+    background: linear-gradient(transparent, var(--clr-cover-shadow));
+    
+    z-index: 10;
+}
+
+@keyframes rise {
+    from {translate: -50% 25vh;}
+    to {translate: -50%, 0;}
+}
+
+@keyframes rise-sky {
+    from {translate: 0 0;}
+    to {translate: 0 -50%;}
+}
+
+@keyframes rise-mountain {
+    from {filter: hue-rotate(var(--hue)) brightness(var(--from-brightness))}
+    to {filter: hue-rotate(var(--hue)) brightness(var(--to-brightness))}
+}
+
+@keyframes rise-button {
+    0%, 80% {color: transparent}
+    100% {color: var(--clr-secondary)}
+}
+
+@keyframes rise-title {
+    0%, 80% {opacity: 0;}
+    100% {opacity: 1;}
+}
+
+@keyframes rise-toggle {
+    0%, 80% {opacity: 0;}
+    100% {opacity: .4;}
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        
+        <link rel="icon" type="image/x-icon" href="src/assets/images/favicon.png">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900" rel="stylesheet">
+        
+        <title>Hsi Chen</title>
+
+        <style>
+            :root {
+                --clr-primary: #67c1b2;
+                --clr-neutral: #444;
+                --clr-accent: #f5f5ea;
+            }
+            
+            html, body {
+                background: var(--clr-neutral);
+                font-family: 
+                    'Inter',
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    'Segoe UI',
+                    Roboto,
+                    Oxygen,
+                    Ubuntu,
+                    Cantarell,
+                    'Open Sans',
+                    'Helvetica Neue',
+                    sans-serif 
+                    !important;  
+            }
+
+            .notfound {
+                height: 100vh;
+                height: 100svh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                background-color: var(--clr-neutral);
+                color: var(--clr-accent);
+            }
+
+            .notfound h1 {
+                font-size: 8rem;
+                margin-bottom: -.5rem;
+            }
+
+            .notfound h2 {
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .notfound a {
+                all: unset; 
+                color: var(--clr-primary);
+                font-weight: bold;
+                cursor: pointer !important;
+                &:hover {
+                    all: unset;
+                    color: var(--clr-primary);
+                    font-weight: bold;
+                    text-decoration: underline;
+                }
+            }
+        </style>
+    </head>
+    <body>   
+        <main class='notfound'> 
+            <h1>404</h1>
+            <h2>this page could not be found.</h2>
+            <p>Maybe you should <a href='https://hsiii.github.io'>check out my personal page</a> instead.</p>
+        </main>
+    </body>
+</html>
