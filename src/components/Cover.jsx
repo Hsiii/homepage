@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 
 import Mountains from 'components/Mountains';
-import Links from 'components/Links.jsx';
+const Links = React.lazy(() => import('components/Links'));
+
 import 'components/Cover.css';
 
 export default function Cover() {
@@ -13,16 +14,18 @@ export default function Cover() {
     const [showLinks, setShowLinks] = useState(true);
 
     useEffect(() => {
-        const update = () => {
-            const d = new Date();
-            const hours = d.getHours().toString().padStart(2, '0');
-            const minutes = d.getMinutes().toString().padStart(2, '0');
-            setTime(`${hours}:${minutes}`);
-            setDate(d.getMonth() + 1 + '/' + d.getDate());
-        };
-        update();
-        const id = setInterval(update, 1000 * 60);
-        return () => clearInterval(id);
+        requestAnimationFrame(() => {
+            const update = () => {
+                const d = new Date();
+                const hours = d.getHours().toString().padStart(2, '0');
+                const minutes = d.getMinutes().toString().padStart(2, '0');
+                setTime(`${hours}:${minutes}`);
+                setDate(d.getMonth() + 1 + '/' + d.getDate());
+            };
+            update();
+            const id = setInterval(update, 1000 * 60);
+            return () => clearInterval(id);
+        });
     }, []);
 
     useEffect(() => {
@@ -86,8 +89,7 @@ export default function Cover() {
                     </button>
                 </form>
             </div>
-
-            <Links show={showLinks} />
+            <Suspense fallback={null}>{<Links show={showLinks} />}</Suspense>
         </section>
     );
 }
