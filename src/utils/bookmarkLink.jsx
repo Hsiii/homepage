@@ -7,6 +7,7 @@ export default [
             'elearn',
             'eeclass',
             'Past Exam',
+            'Presentation',
             'SSTM'
         ]
     },
