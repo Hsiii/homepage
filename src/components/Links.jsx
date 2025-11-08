@@ -3,15 +3,15 @@ import { linkTree } from 'utils/bookmarkLink.jsx';
 import { links } from 'utils/links.jsx';
 import 'components/Links.css';
 
-export default function Links({ show }) {
+export default function Links({ disabled }) {
     const calcPadding = useCallback(
-        (headerIndex, link) => {
+        (headerIndex, links) => {
             const windowHeight = window.innerHeight;
             const remToPx = 16;
             const linkHeight = 3.5 * remToPx; // rem to px
             const headerPosition =
                 windowHeight / 2 + (headerIndex + 1 - linkTree.length / 2 - 0.5) * linkHeight;
-            const linksHeight = link.child.length * linkHeight;
+            const linksHeight = links.length * linkHeight;
             let padding;
             if (headerPosition + linksHeight / 2 <= windowHeight - remToPx)
                 padding = headerPosition - linksHeight / 2;
@@ -19,27 +19,27 @@ export default function Links({ show }) {
             if (padding < remToPx) padding = remToPx;
             return padding + 'px';
         },
-        [window.innerHeight],
+        [linkTree, window.innerHeight],
     );
 
     return (
         <>
-            <section className={`links ${show ? '' : 'hide'}`}>
-                <div className='indicator'>
+            <section className={`link-tree ${disabled && 'hide'}`}>
+                <div className='trigger'>
                     <i className='fa-solid fa-bookmark' />
                 </div>
-                <div className='filler' />
-                {linkTree.map((link, i) => (
+                <div className='panel' />
+                {linkTree.map((node, i) => (
                     <>
-                        <div className='link-header'>
-                            <i className={'fa-solid fa-' + link.icon} />
-                            <a>{link.class}</a>
+                        <div className='category'>
+                            <i className={'fa-solid fa-' + node.icon} />
+                            <span>{node.category}</span>
                         </div>
-                        <div className='sub-links' style={{ '--padding': calcPadding(i, link) }}>
-                            <div className='filler' />
-                            {link.child.map((sublink) => (
-                                <a id={sublink} href={links.sublink}>
-                                    {sublink}
+                        <div className='links' style={{ '--padding': calcPadding(i, node.links) }}>
+                            <div className='panel' />
+                            {node.links.map((link) => (
+                                <a id={link} href={links[link]}>
+                                    {link}
                                 </a>
                             ))}
                         </div>

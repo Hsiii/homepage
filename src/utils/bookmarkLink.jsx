@@ -1,8 +1,8 @@
 export const linkTree = [
     {
-        class: 'School', 
+        category: 'School', 
         icon: 'book', 
-        child: [
+        links: [
             'eeclass',
             'elearn',
             'ccxp',
@@ -12,9 +12,9 @@ export const linkTree = [
         ]
     },
     {
-        class: 'SNS',
+        category: 'SNS',
         icon: 'message',
-        child: [
+        links: [
             'Twitter',
             'Facebook',
             'Messenger',
@@ -23,9 +23,9 @@ export const linkTree = [
         ]
     },    
     {
-        class: 'Tools', 
+        category: 'Tools', 
         icon: 'toolbox', 
-        child: [
+        links: [
             'HackMD',
             'Mathpix',
             'OJAD',
@@ -41,9 +41,9 @@ export const linkTree = [
         ]
     },
     {
-        class: 'Code',
+        category: 'Code',
         icon: 'code',
-        child: [
+        links: [
             'GitHub',
             'React dev',
             'Colab',
@@ -57,9 +57,9 @@ export const linkTree = [
         ]
     },
     {
-        class: 'Media', 
+        category: 'Media', 
         icon: 'icons', 
-        child: [
+        links: [
             'Anigamer',
             'YouTube',
             'Pinterest',
@@ -71,9 +71,9 @@ export const linkTree = [
         ]
     },
     {
-        class: 'Game',
+        category: 'Game',
         icon: 'gamepad',
-        child: [
+        links: [
             'Tetr.io',
             'maimai',
         ]

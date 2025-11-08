@@ -89,7 +89,7 @@ export default function Cover() {
                     </button>
                 </form>
             </div>
-            <Suspense fallback={null}>{<Links show={showLinks} />}</Suspense>
+            <Suspense fallback={null}>{<Links disabled={!showLinks} />}</Suspense>
         </section>
     );
 }
