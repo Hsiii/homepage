@@ -3,9 +3,9 @@ export default [
         class: 'School', 
         icon: 'book', 
         child: [
-            'ccxp',
-            'elearn',
             'eeclass',
+            'elearn',
+            'ccxp',
             'Past Exam',
             'Presentation',
             'SSTM'
@@ -15,10 +15,10 @@ export default [
         class: 'SNS',
         icon: 'message',
         child: [
+            'Twitter',
             'Facebook',
             'Messenger',
             'Discord',
-            'Twitter',
             'Gmail',
         ]
     },    
@@ -45,17 +45,15 @@ export default [
         icon: 'code',
         child: [
             'GitHub',
-            'LeetCode',
+            'React dev',
             'Colab',
             'Squoosh',
-            'Haikei',
             'Coolor',
+            'Haikei',
             'Font Awesome',
             'G-Font',
-            'React dev',
-            'Vue dev',
-            'SSTM dev',
             'Stylish',
+            'LeetCode',
         ]
     },
     {
