@@ -12,6 +12,7 @@ export default function Cover() {
     const [date, setDate] = useState('');
     const [toggle, setToggle] = useState(false);
     const [showLinks, setShowLinks] = useState(true);
+    const [isNavigating, setIsNavigating] = useState(false);
 
     useEffect(() => {
         requestAnimationFrame(() => {
@@ -55,13 +56,25 @@ export default function Cover() {
                 e.preventDefault();
                 input.current.blur();
             }
+            if (e.key === '1' && document.activeElement !== input.current) {
+                setIsNavigating(true);
+            }
+            if (e.key === 'Escape') {
+                setIsNavigating(false);
+            }
+        };
+
+        const onClick = () => {
+            setIsNavigating(false);
         };
 
         window.addEventListener('scroll', onScroll);
         window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('click', onClick);
         return () => {
             window.removeEventListener('scroll', onScroll);
             window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('click', onClick);
         };
     }, []);
 
@@ -89,7 +102,9 @@ export default function Cover() {
                     </button>
                 </form>
             </div>
-            <Suspense fallback={null}>{<Links disabled={!showLinks} />}</Suspense>
+            <Suspense fallback={null}>
+                {<Links disabled={!showLinks} isNavigating={isNavigating} />}
+            </Suspense>
         </section>
     );
 }

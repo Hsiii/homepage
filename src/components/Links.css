@@ -64,7 +64,8 @@
     }
     
     &:hover, 
-    & .trigger:hover {
+    & .trigger:hover,
+    &.expanded {
         translate: 0;
 
         & .trigger {
@@ -114,7 +115,8 @@
     }
 
     &:hover,
-    &:has(+.links:hover) {
+    &:has(+.links:hover),
+    &.selected {
         translate: 1rem;
 
         &::before {
@@ -160,6 +162,7 @@
     z-index: 8;
     
     .category:hover + &,
+    .category.selected + &,
     &:hover {
         translate: var(--width);
     }

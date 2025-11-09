@@ -1,9 +1,45 @@
-import React, { useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { linkTree } from 'utils/bookmarkLink.jsx';
 import { links } from 'utils/links.jsx';
 import 'components/Links.css';
 
-export default function Links({ disabled }) {
+export default function Links({ disabled, isNavigating }) {
+    const [selectedIdx, setSelectedIdx] = React.useState(null);
+
+    useEffect(() => {
+        const onKeyDown = (e) => {
+            if (!/^[0-9]$/.test(e.key)) return;
+            const key = parseInt(e.key, 10);
+            if (key === 0) {
+                setSelectedIdx(null);
+                return;
+            }
+            if (!isNavigating) return;
+            const idx = key - 1;
+            if (idx >= linkTree.length) return;
+
+            // if nothing selected yet, select category
+            if (selectedIdx === null) {
+                setSelectedIdx(idx);
+                return;
+            }
+
+            window.location.href = links[linkTree[selectedIdx].links[idx]];
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+        };
+    }, [isNavigating, selectedIdx, links]);
+
+    useEffect(() => {
+        if (!isNavigating) {
+            setSelectedIdx(null);
+            return;
+        }
+    }, [isNavigating]);
+
     const calcPadding = useCallback(
         (headerIndex, links) => {
             const windowHeight = window.innerHeight;
@@ -24,14 +60,20 @@ export default function Links({ disabled }) {
 
     return (
         <>
-            <section className={`link-tree ${disabled && 'hide'}`}>
+            <section
+                className={`link-tree ${disabled && 'hide'} ${isNavigating && 'expanded'}`}
+                onMouseEnter={() => setSelectedIdx(null)}
+            >
                 <div className='trigger'>
                     <i className='fa-solid fa-bookmark' />
                 </div>
                 <div className='panel' />
                 {linkTree.map((node, i) => (
                     <>
-                        <div className='category'>
+                        <div
+                            className={`category ${selectedIdx === i && 'selected'}`}
+                            onClick={() => setSelectedIdx(i)}
+                        >
                             <i className={'fa-solid fa-' + node.icon} />
                             <span>{node.category}</span>
                         </div>
