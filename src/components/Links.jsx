@@ -107,7 +107,11 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
                     <>
                         <div className={`category ${selectedIdx === i + 1 && 'selected'}`}>
                             {icons[i]}
-                            <p className={`hint ${(isMouseNavigation || selectedIdx) && 'hide'}`}>
+                            <p
+                                className={`hint ${
+                                    (isMouseNavigation || selectedIdx || i + 1 > 9) && 'hide'
+                                }`}
+                            >
                                 [{i + 1}]
                             </p>
                             <span>{node.category}</span>
@@ -120,7 +124,8 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
                                         {link}
                                         <p
                                             className={`hint ${
-                                                (isMouseNavigation || !selectedIdx) && 'hide'
+                                                (isMouseNavigation || !selectedIdx || j + 1 > 9) &&
+                                                'hide'
                                             }`}
                                         >
                                             [{j + 1}]
