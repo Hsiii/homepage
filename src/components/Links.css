@@ -39,7 +39,7 @@
         background-color: var(--clr-btn);
         border-radius: .3rem;
         opacity: .5;
-    
+        filter: drop-shadow(0 0 .1rem var(--clr-primary));
         transition: translate .1s, opacity .4s ease-in;
 
         display: flex;
