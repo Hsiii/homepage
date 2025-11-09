@@ -30,18 +30,17 @@
     }
 
     & .trigger {
-        --clr-trigger: var(--clr-btn);
+        --clr-trigger: #52a5;
         position: absolute;
         left: calc(100% + var(--indicator-gap));
     
         width: .25rem;
-        height: 16rem;
+        height: 14rem;
 
         background-color: var(--clr-trigger);
+        backdrop-filter: saturate(1.2) blur(.5rem);
         border-radius: .3rem;
-        opacity: .5;
-        /* filter: drop-shadow(0 0 .1rem var(--clr-primary)); */
-        /* backdrop-filter: ; */
+        opacity: 1;
         transition: translate .1s, opacity .4s ease-in;
 
         display: flex;
@@ -50,8 +49,9 @@
         & .icon {
             position: absolute;
             left: 1rem;
-            color: var(--clr-trigger); 
+            color: transparent;
             fill: var(--clr-trigger);
+            backdrop-filter: saturate(1.2) blur(.5rem);
         }
     }
     
