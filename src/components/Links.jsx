@@ -2,10 +2,28 @@ import React, { useEffect, useCallback } from 'react';
 import { linkTree } from 'utils/bookmarkLink.jsx';
 import { links } from 'utils/links.jsx';
 import 'components/Links.css';
+import {
+    BookOpenText,
+    CodeXml,
+    ToolCase,
+    Youtube,
+    Brush,
+    MessageSquare,
+    Gamepad2,
+    Bookmark,
+} from 'lucide-react';
 
 export default function Links({ disabled, isNavigating }) {
     const [selectedIdx, setSelectedIdx] = React.useState(null);
-
+    const icons = [
+        <BookOpenText className='icon' />,
+        <CodeXml className='icon' />,
+        <ToolCase className='icon' />,
+        <Youtube className='icon' />,
+        <Brush className='icon' />,
+        <MessageSquare className='icon' />,
+        <Gamepad2 className='icon' />,
+    ];
     useEffect(() => {
         const onKeyDown = (e) => {
             if (!/^[0-9]$/.test(e.key)) return;
@@ -65,7 +83,7 @@ export default function Links({ disabled, isNavigating }) {
                 onMouseEnter={() => setSelectedIdx(null)}
             >
                 <div className='trigger'>
-                    <i className='fa-solid fa-bookmark' />
+                    <Bookmark className='icon' />
                 </div>
                 <div className='panel' />
                 {linkTree.map((node, i) => (
@@ -74,7 +92,7 @@ export default function Links({ disabled, isNavigating }) {
                             className={`category ${selectedIdx === i && 'selected'}`}
                             onClick={() => setSelectedIdx(i)}
                         >
-                            <i className={'fa-solid fa-' + node.icon} />
+                            {icons[i]}
                             <span>{node.category}</span>
                         </div>
                         <div className='links' style={{ '--padding': calcPadding(i, node.links) }}>

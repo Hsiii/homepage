@@ -62,4 +62,5 @@ export const links = {
     Coolor: 'https://coolors.co/',
     Squoosh: 'https://squoosh.app/',
     Presentation: 'https://hsiii.github.io/Presentation',
+    Spotify: 'https://open.spotify.com/',
 };

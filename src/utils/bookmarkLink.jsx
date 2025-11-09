@@ -1,7 +1,6 @@
 export const linkTree = [
     {
         category: 'School', 
-        icon: 'book', 
         links: [
             'eeclass',
             'elearn',
@@ -10,21 +9,24 @@ export const linkTree = [
             'Presentation',
             'SSTM'
         ]
+    }, 
+     {
+        category: 'Code',
+        links: [
+            'GitHub',
+            'React dev',
+            'Colab',
+            'Squoosh',
+            'Coolor',
+            'Haikei',
+            'Font Awesome',
+            'G-Font',
+            'Stylish',
+            'LeetCode',
+        ]
     },
     {
-        category: 'SNS',
-        icon: 'message',
-        links: [
-            'Twitter',
-            'Facebook',
-            'Messenger',
-            'Discord',
-            'Gmail',
-        ]
-    },    
-    {
         category: 'Tools', 
-        icon: 'toolbox', 
         links: [
             'HackMD',
             'Mathpix',
@@ -41,38 +43,37 @@ export const linkTree = [
         ]
     },
     {
-        category: 'Code',
-        icon: 'code',
-        links: [
-            'GitHub',
-            'React dev',
-            'Colab',
-            'Squoosh',
-            'Coolor',
-            'Haikei',
-            'Font Awesome',
-            'G-Font',
-            'Stylish',
-            'LeetCode',
-        ]
-    },
-    {
         category: 'Media', 
-        icon: 'icons', 
         links: [
             'Anigamer',
             'YouTube',
-            'Pinterest',
-            'Line of Action',
-            'Quickposes',
-            'Hololive',
+            'Spotify',
             'Utaten',
-            'Dam'
+            'Dam',
         ]
     },
     {
+        category: 'Art',
+        links: [
+            'Pinterest',
+            'Pixiv',
+            'Line of Action',
+            'Quickposes',
+            'Hololive'
+        ]
+    },
+    {
+        category: 'SNS',
+        links: [
+            'Twitter',
+            'Facebook',
+            'Messenger',
+            'Discord',
+            'Gmail',
+        ]
+    },   
+    {
         category: 'Game',
-        icon: 'gamepad',
         links: [
             'Tetr.io',
             'maimai',

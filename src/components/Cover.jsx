@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, Suspense } from 'react';
-
+import { Search } from 'lucide-react';
 import Mountains from 'components/Mountains';
 const Links = React.lazy(() => import('components/Links'));
 
@@ -98,7 +98,7 @@ export default function Cover() {
                         ref={input}
                     />
                     <button>
-                        <i className='fa fa-search' />
+                        <Search className='icon' size={24} />
                     </button>
                 </form>
             </div>
