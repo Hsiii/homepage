@@ -2,42 +2,40 @@
     --rise-time: 1.5s;
     height: 100vh;
     height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .title {
     position: sticky;
     top: 120px;
-    left: 50%;
-
-    width: fit-content;
-    height: fit-content;
+    width: 100%;
 
     background-image: 
-    linear-gradient(
-        to right, 
-        var(--clr-title-1),
-        var(--clr-title-2)
-    );
+        linear-gradient(
+            to right, 
+            var(--clr-title-1),
+            var(--clr-title-2)
+        );
 
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 
-    font-size: clamp(5rem, 1rem + 10vw, 7rem);
-    font-weight: 400;
+    font-size: 7.5rem;
     font-family: 'Quicksand';
     text-align: center;
     text-shadow: -2px -2px var(--clr-title-shadow);
-    letter-spacing: .5rem;
+    letter-spacing: .25rem;
 
-    translate: -50% 0;
     animation: 
-        rise-title 
+        rise-show 
         var(--rise-time) 
         ease-out 
         1 
         forwards;
-    /* title_up_down 2.5s ease-in-out infinite */
 
     z-index: 1;
 
@@ -48,33 +46,20 @@
             var(--clr-title-2),
             var(--clr-title-3)
         );
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
     }
-}
-
-@keyframes title_up_down {
-    0%, 100% {translate: -50% 1rem;}
-    50% {translate: -50% -1rem;}
 }
 
 .search {
     position: sticky;
     top: min(300px, 35vh);
-    left: 50%;
 
-    width: fit-content;
-    height: fit-content;
     border-radius: 50%;
-
-    translate: -50% 0;
-    transition: border-radius .5s .2s;
-    
     overflow: hidden;
-    
+
     backdrop-filter: blur(20px);
     opacity: .9;
+
+    transition: border-radius .5s .2s;
 
     animation: 
         rise 
@@ -84,18 +69,23 @@
         forwards;
     
     z-index: 2;
-
-    &:focus-within {
-        opacity: 1 !important;
+    
+    &:focus-within, 
+    &:hover {
+        transition: border-radius .1s;
+        border-radius: 1rem;
+        box-shadow: 0 0 5px var(--clr-search-button);
+        opacity: 1;
     }
 }
 
-.search:focus-within, 
-.search:hover {
-    transition: border-radius .1s;
-    border-radius: 1rem;
-    box-shadow: 0 0 5px var(--clr-search-button);
-    opacity: 1;
+@keyframes rise {
+    from {translate: 0 25vh;}
+}
+
+.search form {
+    display: flex;
+    align-items: center;
 }
 
 .search-input {
@@ -121,14 +111,10 @@
     }
 }
 
-.search form {
-    display: flex;
-    align-items: center;
-}
-
 .search form button {
     width: 3rem;
-    height: 3rem;
+    aspect-ratio: 1 / 1;
+
     display: grid;
     place-items: center;
 
@@ -144,9 +130,9 @@
     }
     
     & .icon {
-        --clr-risen: var(--clr-btn);
+        color: var(--clr-btn);
         animation: 
-            rise-button
+            rise-show
             var(--rise-time)
             ease-out 
             1 
@@ -155,39 +141,35 @@
 }
 
 .search + .hint {
-    --clr-risen: var(--clr-search-button-hover);
+    --opacity: .75;
+
     position: sticky;
     top: min(355px, calc(35vh + 3.5rem));
+    
+    color: var(--clr-search-button-hover);
+    opacity: 0;
+    font-size: .75rem;
     text-align: center;
-    z-index: 2;
+    
+    transition: opacity .3s;
+    
     animation: 
-        rise-button
+        rise-show
         var(--rise-time)
         ease-out 
         1 
         forwards;
     animation-delay: .2s;
-    color: transparent;
-    font-size: .75rem;
-    transition: opacity .3s;
-    opacity: .75;
+    
+    z-index: 2;
+     
     .search:hover + &,
     .search:focus-within + & {
-        opacity: 0;
+        opacity: 0 !important;
     }
 }
 
-@keyframes rise {
-    from {translate: -50% 25vh;}
-    to {translate: -50%, 0;}
-}
-
-@keyframes rise-button {
-    0%, 80% {color: transparent}
-    100% {color: var(--clr-risen)}
-}
-
-@keyframes rise-title {
+@keyframes rise-show {
     0%, 80% {opacity: 0;}
-    100% {opacity: 1;}
+    100% {opacity: var(--opacity, 1);}
 }
