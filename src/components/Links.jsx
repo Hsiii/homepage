@@ -88,10 +88,7 @@ export default function Links({ disabled, isNavigating }) {
                 <div className='panel' />
                 {linkTree.map((node, i) => (
                     <>
-                        <div
-                            className={`category ${selectedIdx === i && 'selected'}`}
-                            onClick={() => setSelectedIdx(i)}
-                        >
+                        <div className={`category ${selectedIdx === i && 'selected'}`}>
                             {icons[i]}
                             <span>{node.category}</span>
                         </div>
