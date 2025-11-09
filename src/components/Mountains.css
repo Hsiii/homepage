@@ -53,5 +53,8 @@
 }
 
 @keyframes parallax {
-    to { translate: 0 calc(var(--move-speed, 0) * 1vh); }
+    to { 
+        scale: 1 calc(1 - var(--move-speed, 0) * 0.01);
+        translate: 0 calc(var(--move-speed, 0) * 1vh); 
+    }
 }
