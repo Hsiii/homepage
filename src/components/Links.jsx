@@ -47,7 +47,7 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
                 return;
             }
 
-            window.location.href = links[linkTree[selectedIdx].links[idx]];
+            window.location.href = links[linkTree[selectedIdx - 1].links[idx - 1]];
         };
 
         window.addEventListener('keydown', onKeyDown);
