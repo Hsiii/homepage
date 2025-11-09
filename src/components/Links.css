@@ -3,6 +3,7 @@
     --indicator-gap: .5rem;
     --indicator-width: 2rem;
     --link-height: 3.5rem;
+    --font-size: 1.2rem;
 
     position: absolute;
     inset: 0;
@@ -95,7 +96,6 @@
     }
 }
 
-
 .category {
     width: var(--width);
     height: var(--link-height);
@@ -138,6 +138,7 @@
     
     & .icon {
         position: relative;
+        size: var(--font-size);
         left: 1rem;
         color: var(--clr-secondary);
     }
@@ -145,7 +146,7 @@
     & span {
         position: relative;
         left: 1.75rem;
-        font-size: 1.2rem;
+        font-size: var(--font-size);
         font-weight: bold;
         color: var(--clr-secondary);
     } 
@@ -197,7 +198,7 @@
         padding-left: calc(2.5rem - var(--link-margin));
 
         color: var(--clr-secondary);
-        font-size: 1.2rem;
+        font-size: var(--font-size);
         font-weight: bold;
         background: transparent;
         transition: .2s;
@@ -229,6 +230,16 @@
     transition: .25s;
 
     &.hide {
+        opacity: 0;
+    }
+}
+
+@media (width < 32rem) {
+    .link-tree {
+        --width: 10rem;
+        --font-size: 1rem;
+    }
+    .link-tree .hint {
         opacity: 0;
     }
 }
