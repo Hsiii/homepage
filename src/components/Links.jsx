@@ -118,7 +118,11 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
                                 <>
                                     <a id={link} href={links[link]}>
                                         {link}
-                                        <p className={`hint ${isMouseNavigation && 'hide'}`}>
+                                        <p
+                                            className={`hint ${
+                                                (isMouseNavigation || !selectedIdx) && 'hide'
+                                            }`}
+                                        >
                                             [{j + 1}]
                                         </p>
                                     </a>
