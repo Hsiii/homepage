@@ -61,11 +61,12 @@
 
 .search {
     position: sticky;
-    top: min(300px, 40vh);
+    top: min(300px, 35vh);
     left: 50%;
 
     width: fit-content;
     height: fit-content;
+    border-radius: 50%;
 
     translate: -50% 0;
     transition: border-radius .5s .2s;
@@ -128,7 +129,6 @@
 .search form button {
     width: 3rem;
     height: 3rem;
-    border-radius: 50%;
     display: grid;
     place-items: center;
 
@@ -136,15 +136,15 @@
     background-color: var(--clr-search-button);
     cursor: pointer;
     
-    transition: 0.2s;
+    transition: background-color 0.2s;
     
     .search:hover &,
     .search:focus-within & {
-        border-radius: 0;
         background-color: var(--clr-search-button-hover);
     }
     
     & .icon {
+        --clr-risen: var(--clr-btn);
         animation: 
             rise-button
             var(--rise-time)
@@ -154,16 +154,27 @@
     }
 }
 
-.grad {
-    position: absolute;
-    bottom: 0;
-
-    width: 100%;
-    height: 100px;
-
-    background: linear-gradient(transparent, var(--clr-cover-shadow));
-    
-    z-index: 10;
+.search + .hint {
+    --clr-risen: var(--clr-search-button-hover);
+    position: sticky;
+    top: min(355px, calc(35vh + 3.5rem));
+    text-align: center;
+    z-index: 2;
+    animation: 
+        rise-button
+        var(--rise-time)
+        ease-out 
+        1 
+        forwards;
+    animation-delay: .2s;
+    color: transparent;
+    font-size: .75rem;
+    transition: opacity .3s;
+    opacity: .75;
+    .search:hover + &,
+    .search:focus-within + & {
+        opacity: 0;
+    }
 }
 
 @keyframes rise {
@@ -173,15 +184,10 @@
 
 @keyframes rise-button {
     0%, 80% {color: transparent}
-    100% {color: var(--clr-btn)}
+    100% {color: var(--clr-risen)}
 }
 
 @keyframes rise-title {
     0%, 80% {opacity: 0;}
     100% {opacity: 1;}
-}
-
-@keyframes rise-toggle {
-    0%, 80% {opacity: 0;}
-    100% {opacity: .4;}
 }

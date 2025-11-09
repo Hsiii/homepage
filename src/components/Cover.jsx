@@ -59,9 +59,6 @@ export default function Cover() {
             if (e.key === '1' && document.activeElement !== input.current) {
                 setIsNavigating(true);
             }
-            if (e.key === 'Escape') {
-                setIsNavigating(false);
-            }
         };
 
         const onClick = () => {
@@ -102,8 +99,15 @@ export default function Cover() {
                     </button>
                 </form>
             </div>
+            <p className='hint'>[SPACE]</p>
             <Suspense fallback={null}>
-                {<Links disabled={!showLinks} isNavigating={isNavigating} />}
+                {
+                    <Links
+                        disabled={!showLinks}
+                        isNavigating={isNavigating}
+                        setIsNavigating={setIsNavigating}
+                    />
+                }
             </Suspense>
         </section>
     );

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { linkTree } from 'utils/bookmarkLink.jsx';
 import { links } from 'utils/links.jsx';
 import 'components/Links.css';
@@ -13,8 +13,10 @@ import {
     Bookmark,
 } from 'lucide-react';
 
-export default function Links({ disabled, isNavigating }) {
-    const [selectedIdx, setSelectedIdx] = React.useState(null);
+export default function Links({ disabled, isNavigating, setIsNavigating }) {
+    const [selectedIdx, setSelectedIdx] = useState(0);
+    const [isMouseNavigation, setIsMouseNavigation] = useState(false);
+
     const icons = [
         <BookOpenText className='icon' />,
         <CodeXml className='icon' />,
@@ -26,18 +28,21 @@ export default function Links({ disabled, isNavigating }) {
     ];
     useEffect(() => {
         const onKeyDown = (e) => {
-            if (!/^[0-9]$/.test(e.key)) return;
-            const key = parseInt(e.key, 10);
-            if (key === 0) {
-                setSelectedIdx(null);
+            if (!isNavigating || isMouseNavigation) return;
+            if (e.key === 'Escape') {
+                if (selectedIdx) {
+                    setSelectedIdx(0);
+                    return;
+                }
+                setIsNavigating(false);
                 return;
             }
-            if (!isNavigating) return;
-            const idx = key - 1;
-            if (idx >= linkTree.length) return;
+            if (!/^[1-9]$/.test(e.key)) return;
+            const idx = parseInt(e.key, 10);
+            if (idx > linkTree.length) return;
 
             // if nothing selected yet, select category
-            if (selectedIdx === null) {
+            if (!selectedIdx) {
                 setSelectedIdx(idx);
                 return;
             }
@@ -49,14 +54,24 @@ export default function Links({ disabled, isNavigating }) {
         return () => {
             window.removeEventListener('keydown', onKeyDown);
         };
-    }, [isNavigating, selectedIdx, links]);
+    }, [isNavigating, isMouseNavigation, selectedIdx, links]);
 
     useEffect(() => {
         if (!isNavigating) {
-            setSelectedIdx(null);
+            setSelectedIdx(0);
             return;
         }
     }, [isNavigating]);
+
+    const startMouseNavigation = () => {
+        setSelectedIdx(0);
+        setIsMouseNavigation(true);
+    };
+
+    const endMouseNavigation = () => {
+        setIsNavigating(false);
+        setIsMouseNavigation(false);
+    };
 
     const paddings = useMemo(() => {
         const windowHeight = window.innerHeight;
@@ -80,24 +95,34 @@ export default function Links({ disabled, isNavigating }) {
         <>
             <section
                 className={`link-tree ${disabled && 'hide'} ${isNavigating && 'expanded'}`}
-                onMouseEnter={() => setSelectedIdx(null)}
+                onMouseMove={startMouseNavigation}
+                onMouseOut={endMouseNavigation}
             >
                 <div className='trigger'>
                     <Bookmark className='icon' />
+                    <p className='hint'>[1]</p>
                 </div>
                 <div className='panel' />
                 {linkTree.map((node, i) => (
                     <>
-                        <div className={`category ${selectedIdx === i && 'selected'}`}>
+                        <div className={`category ${selectedIdx === i + 1 && 'selected'}`}>
                             {icons[i]}
+                            <p className={`hint ${(isMouseNavigation || selectedIdx) && 'hide'}`}>
+                                [{i + 1}]
+                            </p>
                             <span>{node.category}</span>
                         </div>
                         <div className='links' style={{ '--padding': paddings[i] }}>
                             <div className='panel' />
-                            {node.links.map((link) => (
-                                <a id={link} href={links[link]}>
-                                    {link}
-                                </a>
+                            {node.links.map((link, j) => (
+                                <>
+                                    <a id={link} href={links[link]}>
+                                        {link}
+                                        <p className={`hint ${isMouseNavigation && 'hide'}`}>
+                                            [{j + 1}]
+                                        </p>
+                                    </a>
+                                </>
                             ))}
                         </div>
                     </>

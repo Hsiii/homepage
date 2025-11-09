@@ -53,6 +53,17 @@
             fill: var(--clr-trigger);
             backdrop-filter: saturate(1.2) blur(.5rem);
         }
+
+        & .hint {
+            position: absolute;
+            left: 1rem;
+            width: 24px;
+            text-align: center;
+            translate: 0 1.25rem;
+            font-size: .75rem;
+            color: var(--clr-trigger);
+            opacity: .75;
+        }
     }
     
     & .panel {
@@ -67,6 +78,7 @@
         translate: 0;
 
         & .trigger {
+            transition: translate .1s;
             translate: 
                 calc(
                     (var(--indicator-width) + var(--indicator-gap)) 
@@ -203,5 +215,20 @@
                 var(--clr-link-filler)
             );
         }
+    }
+}
+
+.link-tree .hint {
+    position: absolute;
+    right: 2rem;
+    text-align: center;
+    font-size: .75rem;
+    color: var(--clr-secondary);
+    opacity: .75;
+    font-weight: normal;
+    transition: .25s;
+
+    &.hide {
+        opacity: 0;
     }
 }
