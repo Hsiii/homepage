@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { linkTree } from 'utils/bookmarkLink.jsx';
 import { links } from 'utils/links.jsx';
 import 'components/Links.css';
@@ -58,23 +58,23 @@ export default function Links({ disabled, isNavigating }) {
         }
     }, [isNavigating]);
 
-    const calcPadding = useCallback(
-        (headerIndex, links) => {
-            const windowHeight = window.innerHeight;
-            const remToPx = 16;
-            const linkHeight = 3.5 * remToPx; // rem to px
+    const paddings = useMemo(() => {
+        const windowHeight = window.innerHeight;
+        const remToPx = 16;
+        const linkHeight = 3.5 * remToPx;
+
+        return linkTree.map((node, headerIndex) => {
             const headerPosition =
                 windowHeight / 2 + (headerIndex + 1 - linkTree.length / 2 - 0.5) * linkHeight;
-            const linksHeight = links.length * linkHeight;
+            const linksHeight = node.links.length * linkHeight;
             let padding;
             if (headerPosition + linksHeight / 2 <= windowHeight - remToPx)
                 padding = headerPosition - linksHeight / 2;
             else padding = windowHeight - linksHeight - remToPx;
             if (padding < remToPx) padding = remToPx;
             return padding + 'px';
-        },
-        [linkTree, window.innerHeight],
-    );
+        });
+    }, [window.innerHeight, linkTree]);
 
     return (
         <>
@@ -95,7 +95,7 @@ export default function Links({ disabled, isNavigating }) {
                             {icons[i]}
                             <span>{node.category}</span>
                         </div>
-                        <div className='links' style={{ '--padding': calcPadding(i, node.links) }}>
+                        <div className='links' style={{ '--padding': paddings[i] }}>
                             <div className='panel' />
                             {node.links.map((link) => (
                                 <a id={link} href={links[link]}>
