@@ -5,6 +5,7 @@ export const links = {
     ccxp: 'https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/',
     Facebook: 'https://zh-tw.facebook.com/',
     Messenger: 'https://www.messenger.com/',
+    Instagram: 'https://www.instagram.com/',
     Discord: 'https://discord.com/channels/@me',
     Twitter: 'https://twitter.com/home',
     Pixiv: 'https://www.pixiv.net/',
@@ -16,8 +17,7 @@ export const links = {
         'https://hackmd.io/@tropical08842/B1_YN_-kp/https%3A%2F%2Fhackmd.io%2F%40tropical08842%2FHJEHlK-kT%2F%252Fp7Ti7wARSoq9GKGdiLh0xg',
     GitHub: 'https://github.com/',
     HackMD: 'https://hackmd.io/?nav=overview',
-    'Past Exam':
-        'https://drive.google.com/drive/folders/0B9qFeq29tGaLVndza2FqSmttNjQ?resourcekey=0-ktN_SgGqiMEhH009dMuc3g&fbclid=IwAR3n0MchvVMuW2L00QnRu0C_9ot9UmdvFwHbQUsJ1UrEglTLwfTbEZnsupg',
+    'Past Exam': 'https://drive.google.com/drive/folders/1zoRayCwbnTJIZ_WJSXRyR0Z5-BThec8X',
     Colab: 'https://colab.research.google.com/drive/1c56LHV9HmUk_IMPTMROKPGCe-vUsvOGQ',
     'Font Awesome': 'https://fontawesome.com/icons',
     'G-Font': 'https://fonts.google.com/',

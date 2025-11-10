@@ -19,7 +19,6 @@ export const linkTree = [
             'Squoosh',
             'Coolor',
             'Haikei',
-            'Font Awesome',
             'G-Font',
             'Stylish',
             'LeetCode',
@@ -68,6 +67,7 @@ export const linkTree = [
             'Twitter',
             'Facebook',
             'Messenger',
+            'Instagram',
             'Discord',
             'Gmail',
         ]
