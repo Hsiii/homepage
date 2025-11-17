@@ -17,7 +17,8 @@ export const links = {
         'https://hackmd.io/@tropical08842/B1_YN_-kp/https%3A%2F%2Fhackmd.io%2F%40tropical08842%2FHJEHlK-kT%2F%252Fp7Ti7wARSoq9GKGdiLh0xg',
     GitHub: 'https://github.com/',
     HackMD: 'https://hackmd.io/?nav=overview',
-    'Past Exam': 'https://drive.google.com/drive/folders/1zoRayCwbnTJIZ_WJSXRyR0Z5-BThec8X',
+    'Past Exam':
+        'https://drive.google.com/drive/folders/1zoRayCwbnTJIZ_WJSXRyR0Z5-BThec8X',
     Colab: 'https://colab.research.google.com/drive/1c56LHV9HmUk_IMPTMROKPGCe-vUsvOGQ',
     'Font Awesome': 'https://fontawesome.com/icons',
     'G-Font': 'https://fonts.google.com/',
@@ -63,4 +64,6 @@ export const links = {
     Squoosh: 'https://squoosh.app/',
     Presentation: 'https://hsiii.github.io/Presentation',
     Spotify: 'https://open.spotify.com/',
+    'G-Maps': 'https://www.google.com/maps/',
+    Luicide: 'https://lucide.dev/icons/',
 };

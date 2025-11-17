@@ -10,20 +10,17 @@ export const linkTree = [
             'SSTM'
         ]
     }, 
-     {
-        category: 'Code',
+    {
+        category: 'SNS',
         links: [
-            'GitHub',
-            'React dev',
-            'Colab',
-            'Squoosh',
-            'Coolor',
-            'Haikei',
-            'G-Font',
-            'Stylish',
-            'LeetCode',
+            'Twitter',
+            'Facebook',
+            'Messenger',
+            'Instagram',
+            'Discord',
+            'Gmail',
         ]
-    },
+    },  
     {
         category: 'Tools', 
         links: [
@@ -32,6 +29,7 @@ export const linkTree = [
             'OJAD',
             'Famiport',
             'Train',
+            'G-Maps',
             'G-Drive',
             'G-Doc',
             'G-Sheet',
@@ -39,6 +37,21 @@ export const linkTree = [
             'G-Calendar',
             'Flowchart',
             'Overleaf',
+        ]
+    }, 
+    {
+        category: 'Code',
+        links: [
+            'GitHub',
+            'React dev',
+            'Colab',
+            'Luicide',
+            'G-Font',
+            'Squoosh',
+            'Coolor',
+            'Haikei',
+            'Stylish',
+            'LeetCode',
         ]
     },
     {
@@ -61,17 +74,6 @@ export const linkTree = [
             'Hololive'
         ]
     },
-    {
-        category: 'SNS',
-        links: [
-            'Twitter',
-            'Facebook',
-            'Messenger',
-            'Instagram',
-            'Discord',
-            'Gmail',
-        ]
-    },   
     {
         category: 'Game',
         links: [
