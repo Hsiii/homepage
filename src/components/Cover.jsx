@@ -1,7 +1,14 @@
-import React, { useEffect, useState, useRef, useCallback, Suspense } from 'react';
-import { Search } from 'lucide-react';
-import Mountains from 'components/Mountains';
+import React, {
+    useEffect,
+    useState,
+    useRef,
+    useCallback,
+    Suspense,
+} from 'react';
+
+import { Mountains } from 'components';
 const Links = React.lazy(() => import('components/Links'));
+import { Search } from 'lucide-react';
 
 import 'components/Cover.css';
 
@@ -52,7 +59,10 @@ export default function Cover() {
                 e.preventDefault();
                 input.current.focus();
             }
-            if (e.key === 'Escape' && document.activeElement === input.current) {
+            if (
+                e.key === 'Escape' &&
+                document.activeElement === input.current
+            ) {
                 e.preventDefault();
                 input.current.blur();
             }

@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
+
 import { Bookmark } from 'lucide-react';
-import { linkTree } from 'utils/bookmarkLink.jsx';
-import { links } from 'utils/links.jsx';
+import PropTypes from 'prop-types';
+
+import { linkTree, links } from 'constants';
+
 import 'components/Links.css';
+
+Links.propTypes = {
+    disabled: PropTypes.bool,
+    isNavigating: PropTypes.bool.isRequired,
+    setIsNavigating: PropTypes.func.isRequired,
+};
 
 export default function Links({ disabled, isNavigating, setIsNavigating }) {
     const [selectedIdx, setSelectedIdx] = useState(0);

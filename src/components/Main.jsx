@@ -1,9 +1,9 @@
 import React from 'react';
 
-import Cover from 'components/Cover.jsx';
+import { Cover } from 'components';
 
 import 'components/Main.css';
-import 'utils/colorPalette.css';
+import 'constants/colorPalette.css';
 
 export default function Main() {
     return (
