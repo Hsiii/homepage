@@ -1,13 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import Main from 'components/Main.jsx';
+import { createRoot } from 'react-dom/client';
 
 import './index.css';
 
-window.onload = function() {
-    ReactDOM.render(
-        <Main/>,
-        document.getElementById('root')
-    );
-};
+createRoot(document.getElementById('root')).render(<Main />);

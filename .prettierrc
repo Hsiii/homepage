@@ -9,5 +9,6 @@
     "bracketSpacing": true,
     "arrowParens": "always",
     "endOfLine": "lf",
-    "proseWrap": "preserve"
+    "proseWrap": "preserve",
+    "quoteProps": "consistent"
 }
