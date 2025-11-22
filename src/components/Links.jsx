@@ -1,31 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Bookmark } from 'lucide-react';
 import { linkTree } from 'utils/bookmarkLink.jsx';
 import { links } from 'utils/links.jsx';
 import 'components/Links.css';
-import {
-    BookOpenText,
-    CodeXml,
-    ToolCase,
-    Youtube,
-    Brush,
-    MessageSquare,
-    Gamepad2,
-    Bookmark,
-} from 'lucide-react';
 
 export default function Links({ disabled, isNavigating, setIsNavigating }) {
     const [selectedIdx, setSelectedIdx] = useState(0);
     const [isMouseNavigation, setIsMouseNavigation] = useState(false);
 
-    const icons = [
-        <BookOpenText className='icon' />,
-        <CodeXml className='icon' />,
-        <ToolCase className='icon' />,
-        <Youtube className='icon' />,
-        <Brush className='icon' />,
-        <MessageSquare className='icon' />,
-        <Gamepad2 className='icon' />,
-    ];
     useEffect(() => {
         const onKeyDown = (e) => {
             if (!isNavigating || isMouseNavigation) return;
@@ -47,7 +29,8 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
                 return;
             }
 
-            window.location.href = links[linkTree[selectedIdx - 1].links[idx - 1]];
+            window.location.href =
+                links[linkTree[selectedIdx - 1].links[idx - 1]];
         };
 
         window.addEventListener('keydown', onKeyDown);
@@ -80,7 +63,8 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
 
         return linkTree.map((node, headerIndex) => {
             const headerPosition =
-                windowHeight / 2 + (headerIndex + 1 - linkTree.length / 2 - 0.5) * linkHeight;
+                windowHeight / 2 +
+                (headerIndex + 1 - linkTree.length / 2 - 0.5) * linkHeight;
             const linksHeight = node.links.length * linkHeight;
             let padding;
             if (headerPosition + linksHeight / 2 <= windowHeight - remToPx)
@@ -92,51 +76,63 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
     }, [window.innerHeight, linkTree]);
 
     return (
-        <>
-            <section
-                className={`link-tree ${disabled && 'hide'} ${isNavigating && 'expanded'}`}
-                onMouseMove={startMouseNavigation}
-                onMouseOut={endMouseNavigation}
-            >
-                <div className='trigger'>
-                    <Bookmark className='icon' />
-                    <p className='hint'>[1]</p>
-                </div>
-                <div className='panel' />
-                {linkTree.map((node, i) => (
-                    <>
-                        <div className={`category ${selectedIdx === i + 1 && 'selected'}`}>
-                            {icons[i]}
-                            <p
-                                className={`hint ${
-                                    (isMouseNavigation || selectedIdx || i + 1 > 9) && 'hide'
-                                }`}
-                            >
-                                [{i + 1}]
-                            </p>
-                            <span>{node.category}</span>
-                        </div>
-                        <div className='links' style={{ '--padding': paddings[i] }}>
-                            <div className='panel' />
-                            {node.links.map((link, j) => (
-                                <>
-                                    <a id={link} href={links[link]}>
-                                        {link}
-                                        <p
-                                            className={`hint ${
-                                                (isMouseNavigation || !selectedIdx || j + 1 > 9) &&
-                                                'hide'
-                                            }`}
-                                        >
-                                            [{j + 1}]
-                                        </p>
-                                    </a>
-                                </>
-                            ))}
-                        </div>
-                    </>
-                ))}
-            </section>
-        </>
+        <section
+            className={`link-tree ${disabled && 'hide'} ${
+                isNavigating && 'expanded'
+            }`}
+            onMouseMove={startMouseNavigation}
+            onMouseOut={endMouseNavigation}
+        >
+            <div className='trigger'>
+                <Bookmark className='icon' />
+                <p className='hint'>[1]</p>
+            </div>
+            <div className='panel' />
+            {linkTree.map((node, i) => (
+                <>
+                    <div
+                        className={`category ${
+                            selectedIdx === i + 1 && 'selected'
+                        }`}
+                        key={i + '-category'}
+                    >
+                        {node.icon}
+                        <p
+                            className={`hint ${
+                                (isMouseNavigation ||
+                                    selectedIdx ||
+                                    i + 1 > 9) &&
+                                'hide'
+                            }`}
+                        >
+                            [{i + 1}]
+                        </p>
+                        <span>{node.category}</span>
+                    </div>
+                    <div
+                        className='links'
+                        style={{ '--padding': paddings[i] }}
+                        key={i + '-links'}
+                    >
+                        <div className='panel' />
+                        {node.links.map((link, j) => (
+                            <a id={link} href={links[link]} key={j}>
+                                {link}
+                                <p
+                                    className={`hint ${
+                                        (isMouseNavigation ||
+                                            !selectedIdx ||
+                                            j + 1 > 9) &&
+                                        'hide'
+                                    }`}
+                                >
+                                    [{j + 1}]
+                                </p>
+                            </a>
+                        ))}
+                    </div>
+                </>
+            ))}
+        </section>
     );
 }

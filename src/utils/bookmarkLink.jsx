@@ -1,6 +1,18 @@
+import React from 'react';
+import {
+    BookOpenText,
+    CodeXml,
+    ToolCase,
+    Youtube,
+    Brush,
+    MessageSquare,
+    Gamepad2,
+} from 'lucide-react';
+
 export const linkTree = [
     {
         category: 'School', 
+        icon: <BookOpenText className='icon' />,
         links: [
             'eeclass',
             'elearn',
@@ -12,6 +24,7 @@ export const linkTree = [
     }, 
     {
         category: 'SNS',
+        icon: <MessageSquare className='icon' />,
         links: [
             'Twitter',
             'Facebook',
@@ -23,8 +36,10 @@ export const linkTree = [
     },  
     {
         category: 'Tools', 
+        icon: <ToolCase className='icon' />,
         links: [
             'HackMD',
+            'Gemini',
             'Mathpix',
             'OJAD',
             'Famiport',
@@ -41,6 +56,7 @@ export const linkTree = [
     }, 
     {
         category: 'Code',
+        icon: <CodeXml className='icon' />,
         links: [
             'GitHub',
             'React dev',
@@ -56,6 +72,7 @@ export const linkTree = [
     },
     {
         category: 'Media', 
+        icon: <Youtube className='icon' />,
         links: [
             'Anigamer',
             'YouTube',
@@ -66,6 +83,7 @@ export const linkTree = [
     },
     {
         category: 'Art',
+        icon: <Brush className='icon' />,
         links: [
             'Pinterest',
             'Pixiv',
@@ -76,6 +94,7 @@ export const linkTree = [
     },
     {
         category: 'Game',
+        icon: <Gamepad2 className='icon' />,
         links: [
             'Tetr.io',
             'maimai',
