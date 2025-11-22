@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {
     BookOpenText,
     CodeXml,
@@ -7,6 +8,7 @@ import {
     Brush,
     MessageSquare,
     Gamepad2,
+    LoaderCircle
 } from 'lucide-react';
 
 export const linkTree = [
@@ -44,12 +46,6 @@ export const linkTree = [
             'OJAD',
             'Famiport',
             'Train',
-            'G-Maps',
-            'G-Drive',
-            'G-Doc',
-            'G-Sheet',
-            'G-Slide',
-            'G-Calendar',
             'Flowchart',
             'Overleaf',
         ]
@@ -61,8 +57,8 @@ export const linkTree = [
             'GitHub',
             'React dev',
             'Colab',
-            'Luicide',
-            'G-Font',
+            'Lucide',
+            'Font',
             'Squoosh',
             'Coolor',
             'Haikei',
@@ -100,4 +96,18 @@ export const linkTree = [
             'maimai',
         ]
     },
+    {
+        category: 'Google',
+        icon: <LoaderCircle className='icon' />,
+        links: [
+            'Gemini',
+            'Maps',
+            'Drive',
+            'Calendar',
+            'Doc',
+            'Sheet',
+            'Slide',
+            'Gmail',
+        ]
+    }
 ];
