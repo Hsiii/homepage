@@ -42,6 +42,7 @@ export const linkTree = [
         links: [
             'HackMD',
             'Gemini',
+            'NotebookLM',
             'Mathpix',
             'OJAD',
             'Famiport',
