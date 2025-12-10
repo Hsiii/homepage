@@ -5,6 +5,11 @@
     --link-height: 3.5rem;
     --font-size: 1.2rem;
 
+    @media (width < 32rem) {
+        --width: 10rem;
+        --font-size: 1rem;
+    }
+
     position: absolute;
     inset: 0;
 
@@ -30,7 +35,7 @@
         }
     }
 
-    & .trigger {
+    .trigger {
         --clr-trigger: #52a5;
         position: absolute;
         left: calc(100% + var(--indicator-gap));
@@ -47,7 +52,7 @@
         display: flex;
         align-items: center;
 
-        & .icon {
+        .icon {
             position: absolute;
             left: 1rem;
             color: transparent;
@@ -55,7 +60,7 @@
             backdrop-filter: saturate(1.2) blur(.5rem);
         }
 
-        & .hint {
+        .hint {
             position: absolute;
             left: 1rem;
             width: 24px;
@@ -67,18 +72,17 @@
         }
     }
     
-    & .panel {
+    .panel {
         position: absolute;
         inset: 0;
         background-color: var(--clr-link-filler);
     }
     
     &:hover, 
-    & .trigger:hover,
     &.expanded {
         translate: 0;
 
-        & .trigger {
+        .trigger {
             transition: translate .1s;
             translate: 
                 calc(
@@ -88,7 +92,7 @@
             opacity: 0;
         }
 
-        & .panel {
+        .panel {
             border-right: 1px solid var(--clr-link-filler-border);
             backdrop-filter: blur(.75rem);
             z-index: 9;
@@ -125,7 +129,7 @@
     }
 
     &:hover,
-    &:has(+.links:hover),
+    &:has(+ .links:hover),
     &.selected {
         translate: 1rem;
 
@@ -136,14 +140,14 @@
         } 
     }    
     
-    & .icon {
+    .icon {
         position: relative;
         size: var(--font-size);
         left: 1rem;
         color: var(--clr-secondary);
     }
 
-    & span {
+    span {
         position: relative;
         left: 1.75rem;
         font-size: var(--font-size);
@@ -177,7 +181,7 @@
         translate: var(--width);
     }
 
-    & .panel {
+    .panel {
         width: calc(var(--width) * 2);
         height: inherit;
         position: absolute;
@@ -188,7 +192,7 @@
         z-index: 9;
     }
 
-    & a {
+    a {
         --link-margin: 0rem;
 
         text-decoration: none;
@@ -237,14 +241,8 @@
     &.hide {
         opacity: 0;
     }
-}
 
-@media (width < 32rem) {
-    .link-tree {
-        --width: 10rem;
-        --font-size: 1rem;
-    }
-    .link-tree .hint {
+    @media (width < 32rem) {
         opacity: 0;
     }
 }

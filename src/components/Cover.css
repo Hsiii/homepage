@@ -129,7 +129,7 @@
         background-color: var(--clr-search-button-hover);
     }
     
-    & .icon {
+    .icon {
         color: var(--clr-btn);
         animation: 
             rise-show

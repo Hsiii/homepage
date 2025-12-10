@@ -1,6 +1,6 @@
 html {
     background-color: #232323;
-    & ::-webkit-scrollbar {
+    ::-webkit-scrollbar {
         width: 0;
     }
 }
@@ -17,7 +17,7 @@ footer {
     display: grid;
     place-items: center;   
 
-    & a {
+    a {
         text-decoration: none;
         color: #ddd;
         
