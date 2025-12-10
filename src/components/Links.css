@@ -216,6 +216,11 @@
                 var(--clr-link-filler)
             );
         }
+
+        &.disabled {
+            color: gray;
+            cursor: not-allowed;
+        }
     }
 }
 

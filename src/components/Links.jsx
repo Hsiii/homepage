@@ -125,13 +125,19 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
                     >
                         <div className='panel' />
                         {node.links.map((link, j) => (
-                            <a id={link} href={links[link]} key={j}>
+                            <a
+                                id={link}
+                                className={!links[link] && 'disabled'}
+                                href={links[link]}
+                                key={j}
+                            >
                                 {link}
                                 <p
                                     className={`hint ${
                                         (isMouseNavigation ||
                                             !selectedIdx ||
-                                            j + 1 > 9) &&
+                                            j + 1 > 9 ||
+                                            !links[link]) &&
                                         'hide'
                                     }`}
                                 >
