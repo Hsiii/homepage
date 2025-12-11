@@ -1,23 +1,14 @@
 :root {
-    /*main color*/
     --clr-primary:
     hsl(275, 72%, 68%);
-    --clr-primary-dark:
-    hsl(275, 55%, 55%);
     --clr-secondary:
-    hsl(249, 25%, 37%); /*primary - 26*/
-    --clr-accent: 
-    #fff;
-
-    /*cover*/
-    --clr-cover-grad-1:
-    hsl(314, 36%, 83%);
-    --clr-cover-grad-2:
-    hsl(269, 22%, 55%); 
-    --clr-cover-grad-3:
+    hsl(249, 50%, 60%);
+    --clr-neutral:
     hsl(249, 25%, 37%);
-    --clr-cover-grad-4:
-    hsl(246, 40%, 19%);
+    --clr-neutral-light:
+    #fff;
+    --clr-neutral-light-alpha:
+    #fff6;
 
     --clr-sky-1:
     hsl(249, 25%, 37%);
@@ -28,55 +19,6 @@
     --clr-sky-4:
     hsl(185, 38%, 94%);
 
-    --clr-title-1:
-    hsl(275, 72%, 68%);
-    --clr-title-2:
-    hsl(275, 55%, 55%);
-    --clr-title-3:
-    hsl(271, 76%, 53%); /*primary - 4*/
-    --clr-title-shadow:
-    #fff3;
-
     --clr-search-button:
-    hsla(314, 36%, 83%, .5);
-    --clr-search-button-hover:
     hsla(314, 36%, 83%, 1);
-    --clr-search-shadow: 
-    hsla(240, 18%, 33%, 0.2);
-    --clr-cover-shadow: 
-    hsl(240, 26%, 19%);
-    --clr-section-bg:
-    hsl(249, 50%, 60%);
-
-    --clr-link-filler:
-    #fff6;
-    --clr-link-filler-border:
-    #fff7;
-    --clr-link-grad-1:
-    hsl(257, 67%, 61%);
-    --clr-link-grad-2:
-    hsl(275, 100%, 85%);
-
-    /*ball section*/
-    --clr-ball: 
-    #fff;
-    --clr-box-pressed:
-    hsl(275, 100%, 85%);
-    --clr-box-top:
-    hsl(275, 72%, 68%);
-    --clr-box-side: 
-    hsl(269, 67%, 61%); /*primary - 6*/
-    --clr-box-side-shadow: 
-    hsl(257, 67%, 61%); /*primary - 18*/
-
-    /*cube section*/
-    --clr-cube: 
-    #fff;
-
-    /*button*/
-    --clr-btn: 
-    #fff;
-
-    --init-brightness: .8;
-    --init-saturation: 1.2;
 }

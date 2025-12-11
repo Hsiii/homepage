@@ -1,4 +1,7 @@
 .mountains {
+    --init-brightness: .8;
+    --init-saturation: 1.2;
+    
     position: absolute;
 
     width: 100%;

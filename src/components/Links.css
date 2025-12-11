@@ -75,7 +75,7 @@
     .panel {
         position: absolute;
         inset: 0;
-        background-color: var(--clr-link-filler);
+        background-color: var(--clr-neutral-light-alpha);
     }
     
     &:hover, 
@@ -93,7 +93,7 @@
         }
 
         .panel {
-            border-right: 1px solid var(--clr-link-filler-border);
+            border-right: 1px solid var(--clr-neutral-light-alpha);
             backdrop-filter: blur(.75rem);
             z-index: 9;
         }
@@ -117,9 +117,10 @@
         background: 
             linear-gradient(
                 to right, 
-                var(--clr-link-grad-1), 
-                var(--clr-link-grad-2)
+                var(--clr-secondary), 
+                var(--clr-primary)
             );
+        filter: saturate(1.2);
         inset: 0;
         opacity: 0;
         transition: .25s;
@@ -136,7 +137,7 @@
         &::before {
             width: calc(var(--width) + 1rem);
             translate: -1rem;
-            opacity: .3;
+            opacity: .2;
         } 
     }    
     
@@ -144,7 +145,7 @@
         position: relative;
         size: var(--font-size);
         left: 1rem;
-        color: var(--clr-secondary);
+        color: var(--clr-neutral);
     }
 
     span {
@@ -152,7 +153,7 @@
         left: 1.75rem;
         font-size: var(--font-size);
         font-weight: bold;
-        color: var(--clr-secondary);
+        color: var(--clr-neutral);
     } 
 }
 
@@ -186,8 +187,8 @@
         height: inherit;
         position: absolute;
         left: -100%;
-        background-color: var(--clr-link-filler);
-        border-right: 1px solid var(--clr-link-filler-border);
+        background-color: var(--clr-neutral-light-alpha);
+        border-right: 1px solid var(--clr-neutral-light-alpha);
         backdrop-filter: blur(.25rem);
         z-index: 9;
     }
@@ -201,7 +202,7 @@
         margin: 0 var(--link-margin);
         padding-left: calc(2.5rem - var(--link-margin));
 
-        color: var(--clr-secondary);
+        color: var(--clr-neutral);
         font-size: var(--font-size);
         font-weight: bold;
         background: transparent;
@@ -213,11 +214,11 @@
         
         &:hover {
             text-decoration: none;
-            color: var(--clr-title-2);
+            color: var(--clr-secondary);
             background: linear-gradient(
                 to right,
                 transparent,
-                var(--clr-link-filler)
+                var(--clr-neutral-light-alpha)
             );
         }
 
@@ -233,7 +234,7 @@
     right: 2rem;
     text-align: center;
     font-size: .75rem;
-    color: var(--clr-secondary);
+    color: var(--clr-neutral);
     opacity: .75;
     font-weight: normal;
     transition: .25s;

@@ -11,13 +11,12 @@
 .title {
     position: sticky;
     top: 120px;
-    width: 100%;
 
     background-image: 
         linear-gradient(
             to right, 
-            var(--clr-title-1),
-            var(--clr-title-2)
+            var(--clr-primary),
+            var(--clr-secondary)
         );
 
     background-clip: text;
@@ -27,7 +26,6 @@
     font-size: 7.5rem;
     font-family: 'Quicksand';
     text-align: center;
-    text-shadow: -2px -2px var(--clr-title-shadow);
     letter-spacing: .25rem;
 
     animation: 
@@ -38,15 +36,6 @@
         forwards;
 
     z-index: 1;
-
-    &:hover {
-        background-image: 
-        linear-gradient(
-            to right, 
-            var(--clr-title-2),
-            var(--clr-title-3)
-        );
-    }
 }
 
 .search {
@@ -57,7 +46,6 @@
     overflow: hidden;
 
     backdrop-filter: blur(20px);
-    opacity: .9;
 
     transition: border-radius .5s .2s;
 
@@ -75,7 +63,6 @@
         transition: border-radius .1s;
         border-radius: 1rem;
         box-shadow: 0 0 5px var(--clr-search-button);
-        opacity: 1;
     }
 }
 
@@ -107,7 +94,7 @@
     }
     
     &::placeholder {
-        color: var(--clr-search-button-hover);
+        color: var(--clr-search-button);
     }
 }
 
@@ -119,6 +106,7 @@
     place-items: center;
 
     font-size: 1.2rem;
+    opacity: .5;
     background-color: var(--clr-search-button);
     cursor: pointer;
     
@@ -126,11 +114,11 @@
     
     .search:hover &,
     .search:focus-within & {
-        background-color: var(--clr-search-button-hover);
+        opacity: 1;
     }
     
     .icon {
-        color: var(--clr-btn);
+        color: var(--clr-neutral-light);
         animation: 
             rise-show
             var(--rise-time)
@@ -141,12 +129,10 @@
 }
 
 .search + .hint {
-    --opacity: .75;
-
     position: sticky;
     top: min(355px, calc(35vh + 3.5rem));
     
-    color: var(--clr-search-button-hover);
+    color: var(--clr-search-button);
     opacity: 0;
     font-size: .75rem;
     text-align: center;
@@ -171,5 +157,5 @@
 
 @keyframes rise-show {
     0%, 80% {opacity: 0;}
-    100% {opacity: var(--opacity, 1);}
+    100% {opacity: 1;}
 }
