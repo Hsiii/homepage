@@ -93,6 +93,7 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
             onMouseOut={endMouseNavigation}
         >
             <div className='trigger'>
+                <div className='indicator' />
                 <Bookmark className='icon' />
                 <p className='hint'>[1]</p>
             </div>

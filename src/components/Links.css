@@ -38,19 +38,26 @@
     .trigger {
         --clr-trigger: #52a5;
         position: absolute;
-        left: calc(100% + var(--indicator-gap));
+        left: 100%;
+        padding-left: calc(var(--indicator-gap));
     
-        width: .25rem;
-        height: 14rem;
+        width: 2.5rem;
+        height: 100%;
 
-        background-color: var(--clr-trigger);
-        backdrop-filter: saturate(1.2) blur(.5rem);
-        border-radius: .3rem;
         opacity: 1;
         transition: translate .1s, opacity .4s ease-in;
 
         display: flex;
         align-items: center;
+
+        .indicator {    
+            width: .25rem;
+            height: 14rem;
+
+            background-color: var(--clr-trigger);
+            backdrop-filter: saturate(1.2) blur(.5rem);
+            border-radius: .3rem;
+        }
 
         .icon {
             position: absolute;
