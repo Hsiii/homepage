@@ -28,14 +28,33 @@ export const linkTree = [
         category: 'SNS',
         icon: <MessageSquare className='icon' />,
         links: [
-            'Twitter',
-            'Facebook',
             'Messenger',
             'Instagram',
+            'Twitter',
+            'Facebook',
             'Discord',
             'Gmail',
         ]
     },  
+    {
+        category: 'Media', 
+        icon: <Youtube className='icon' />,
+        links: [
+            'YouTube',
+            'Anigamer',
+            'Spotify',
+            'Utaten',
+            'Dam',
+        ]
+    },
+    {
+        category: 'Game',
+        icon: <Gamepad2 className='icon' />,
+        links: [
+            'Tetr.io',
+            'maimai',
+        ]
+    },
     {
         category: 'Tools', 
         icon: <ToolCase className='icon' />,
@@ -68,17 +87,6 @@ export const linkTree = [
         ]
     },
     {
-        category: 'Media', 
-        icon: <Youtube className='icon' />,
-        links: [
-            'Anigamer',
-            'YouTube',
-            'Spotify',
-            'Utaten',
-            'Dam',
-        ]
-    },
-    {
         category: 'Art',
         icon: <Brush className='icon' />,
         links: [
@@ -87,14 +95,6 @@ export const linkTree = [
             'Line of Action',
             'Quickposes',
             'Hololive'
-        ]
-    },
-    {
-        category: 'Game',
-        icon: <Gamepad2 className='icon' />,
-        links: [
-            'Tetr.io',
-            'maimai',
         ]
     },
     {
