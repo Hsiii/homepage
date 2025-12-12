@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
+import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
 import PropTypes from 'prop-types';
 
@@ -8,62 +9,18 @@ import { linkTree, links } from 'constants';
 import 'components/Links.css';
 
 Links.propTypes = {
-    disabled: PropTypes.bool,
-    isNavigating: PropTypes.bool.isRequired,
-    setIsNavigating: PropTypes.func.isRequired,
+    hidden: PropTypes.bool,
+    inputRef: PropTypes.object,
 };
 
-export default function Links({ disabled, isNavigating, setIsNavigating }) {
-    const [selectedIdx, setSelectedIdx] = useState(0);
-    const [isMouseNavigation, setIsMouseNavigation] = useState(false);
-
-    useEffect(() => {
-        const onKeyDown = (e) => {
-            if (!isNavigating || isMouseNavigation) return;
-            if (e.key === 'Escape') {
-                if (selectedIdx) {
-                    setSelectedIdx(0);
-                    return;
-                }
-                setIsNavigating(false);
-                return;
-            }
-            if (!/^[1-9]$/.test(e.key)) return;
-            const idx = parseInt(e.key, 10);
-            if (idx > linkTree.length) return;
-
-            // if nothing selected yet, select category
-            if (!selectedIdx) {
-                setSelectedIdx(idx);
-                return;
-            }
-
-            window.location.href =
-                links[linkTree[selectedIdx - 1].links[idx - 1]];
-        };
-
-        window.addEventListener('keydown', onKeyDown);
-        return () => {
-            window.removeEventListener('keydown', onKeyDown);
-        };
-    }, [isNavigating, isMouseNavigation, selectedIdx, links]);
-
-    useEffect(() => {
-        if (!isNavigating) {
-            setSelectedIdx(0);
-            return;
-        }
-    }, [isNavigating]);
-
-    const startMouseNavigation = () => {
-        setSelectedIdx(0);
-        setIsMouseNavigation(true);
-    };
-
-    const endMouseNavigation = () => {
-        setIsNavigating(false);
-        setIsMouseNavigation(false);
-    };
+export default function Links({ hidden, inputRef }) {
+    const {
+        selectedIdx,
+        isKeyboardNavigating,
+        isMouseNavigating,
+        startMouseNavigation,
+        endMouseNavigation,
+    } = useLinkNavigation(linkTree, links, inputRef);
 
     const paddings = useMemo(() => {
         const windowHeight = window.innerHeight;
@@ -86,8 +43,8 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
 
     return (
         <section
-            className={`link-tree ${disabled && 'hide'} ${
-                isNavigating && 'expanded'
+            className={`link-tree ${hidden && 'hidden'} ${
+                isKeyboardNavigating && 'expanded'
             }`}
             onMouseMove={startMouseNavigation}
             onMouseOut={endMouseNavigation}
@@ -109,10 +66,10 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
                         {node.icon}
                         <p
                             className={`hint ${
-                                (isMouseNavigation ||
+                                (isMouseNavigating ||
                                     selectedIdx ||
                                     i + 1 > 9) &&
-                                'hide'
+                                'hidden'
                             }`}
                         >
                             [{i + 1}]
@@ -135,11 +92,11 @@ export default function Links({ disabled, isNavigating, setIsNavigating }) {
                                 {link}
                                 <p
                                     className={`hint ${
-                                        (isMouseNavigation ||
+                                        (isMouseNavigating ||
                                             !selectedIdx ||
                                             j + 1 > 9 ||
                                             !links[link]) &&
-                                        'hide'
+                                        'hidden'
                                     }`}
                                 >
                                     [{j + 1}]

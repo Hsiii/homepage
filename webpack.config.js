@@ -13,6 +13,7 @@ module.exports = {
         alias: {
             components: path.resolve(srcPath, 'components'),
             constants: path.resolve(srcPath, 'constants'),
+            hooks: path.resolve(srcPath, 'hooks'),
             utils: path.resolve(srcPath, 'utils'),
         },
     },

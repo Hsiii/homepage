@@ -11,9 +11,9 @@
     background: 
         linear-gradient(
             var(--clr-sky-1) 0%,
-            var(--clr-sky-2) 30%, 
+            var(--clr-sky-2) 25%, 
             var(--clr-sky-3) 50%, 
-            var(--clr-sky-4) 70%
+            var(--clr-sky-4) 75%
         );
     background-size: auto 200%;
     background-clip: content-box;

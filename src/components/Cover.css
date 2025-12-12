@@ -70,7 +70,7 @@
     from {translate: 0 25vh;}
 }
 
-.search form {
+.search-form {
     display: flex;
     align-items: center;
 }
@@ -98,7 +98,7 @@
     }
 }
 
-.search form button {
+.search-button {
     width: 3rem;
     aspect-ratio: 1 / 1;
 
@@ -106,7 +106,7 @@
     place-items: center;
 
     font-size: 1.2rem;
-    opacity: .5;
+    opacity: .7;
     background-color: var(--clr-search-button);
     cursor: pointer;
     

@@ -28,7 +28,7 @@
     opacity: 1;
     pointer-events: all;
 
-    &.hide {
+    &.hidden {
         pointer-events: none;
         & .trigger {
             opacity: 0;
@@ -246,7 +246,7 @@
     font-weight: normal;
     transition: .25s;
 
-    &.hide {
+    &.hidden {
         opacity: 0;
     }
 
