@@ -11,10 +11,13 @@ export const useLinkNavigation = (linkTree, links, inputRef) => {
         };
 
         const onKeyDown = (e) => {
+            // for chinese input method editor
+            const key = e.code.slice(-1);
+
             // activate navigation
             if (!isKeyboardNavigating) {
                 if (
-                    e.key === '1' &&
+                    key === '1' &&
                     document.activeElement !== inputRef.current
                 ) {
                     setIsKeyboardNavigating(true);
@@ -36,8 +39,8 @@ export const useLinkNavigation = (linkTree, links, inputRef) => {
             }
 
             // keep valid navigation keys
-            if (!/^[1-9]$/.test(e.key)) return;
-            const idx = parseInt(e.key, 10);
+            if (!/^[1-9]$/.test(key)) return;
+            const idx = parseInt(key);
             if (idx > linkTree.length) return;
 
             // if nothing selected yet, select category
