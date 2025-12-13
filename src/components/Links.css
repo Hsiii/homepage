@@ -230,7 +230,7 @@
         }
 
         &.disabled {
-            color: gray;
+            color: var(--clr-disabled);
             cursor: not-allowed;
         }
     }

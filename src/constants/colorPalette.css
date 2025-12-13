@@ -9,6 +9,8 @@
     #fff;
     --clr-neutral-light-alpha:
     #fff6;
+    --clr-neutral-dark:
+    #222;
 
     --clr-sky-1:
     hsl(249, 25%, 37%);
@@ -20,5 +22,8 @@
     hsl(185, 38%, 94%);
 
     --clr-search-button:
-    hsla(314, 36%, 83%, 1);
+    hsl(314, 36%, 83%);
+
+    --clr-disabled:
+    #888;
 }
