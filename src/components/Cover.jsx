@@ -29,6 +29,7 @@ export default function Cover() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
+            e.preventDefault();
 
     return (
         <section className='cover'>
@@ -40,6 +41,7 @@ export default function Cover() {
                     className='search-form'
                     method='get'
                     action='https://www.google.com/search'
+                    onSubmit={preventEmptySubmit}
                 >
                     <input
                         className='search-input'
