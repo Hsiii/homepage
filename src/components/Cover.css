@@ -39,15 +39,13 @@
 }
 
 .search {
+    --height: 3rem;
+    --expand-duration: .25s;
     position: sticky;
     top: min(300px, 35vh);
 
-    border-radius: 50%;
+    border-radius: calc(var(--height) / 2);
     overflow: hidden;
-
-    backdrop-filter: blur(20px);
-
-    transition: border-radius .5s .2s;
 
     animation: 
         rise 
@@ -57,40 +55,45 @@
         forwards;
     
     z-index: 2;
-    
-    &:focus-within, 
-    &:hover {
-        transition: border-radius .1s;
-        border-radius: 1rem;
-        box-shadow: 0 0 5px var(--clr-search-button);
-    }
 }
 
 @keyframes rise {
-    from {translate: 0 25vh;}
+    from { translate: 0 25vh; }
 }
 
 .search-form {
     display: flex;
     align-items: center;
+    background-color: var(--clr-search-button);
+    transition: calc(var(--expand-duration) * 2);
+    cursor: text;
+    opacity: .75;
+    
+    &:focus-within,
+    .search:hover & {
+        padding-left: calc(var(--height) / 8);
+        padding-right: calc(var(--height) / 2);
+        opacity: 1;
+        transition: var(--expand-duration);
+        background-color: var(--clr-neutral-light);
+    }
 }
 
 .search-input {
     width: 0;
-    height: 3rem;
-
+    height: var(--height);
     font-size: 1.2rem;
-    text-indent: 1.2rem;
-    background-color: #fff;
-    color: var(--clr-primary);
+    background-color: var(--clr-search-button);
+    color: var(--clr-search-button);
     outline: none;
     
-    transition: .5s;
+    transition: calc(var(--expand-duration) * 2);
     
     &:focus,
     .search:hover & {
-        width: clamp(12rem, 8rem + 10vw, 15rem);
-        transition: .25s;
+        background-color: var(--clr-neutral-light);
+        width: 15rem;
+        transition: var(--expand-duration);
     }
     
     &::placeholder {
@@ -98,27 +101,29 @@
     }
 }
 
-.search-button {
-    width: 3rem;
+.search-icon {
+    height: var(--height);
     aspect-ratio: 1 / 1;
-
+    border-radius: 50%;
     display: grid;
     place-items: center;
 
     font-size: 1.2rem;
-    opacity: .7;
-    background-color: var(--clr-search-button);
-    cursor: pointer;
-    
-    transition: background-color 0.2s;
+    opacity: .75;
+    transition: calc(var(--expand-duration) * 2);
     
     .search:hover &,
     .search:focus-within & {
         opacity: 1;
+        transition: var(--expand-duration);
+        .icon {
+            color: var(--clr-search-button);
+        }
     }
     
     .icon {
         color: var(--clr-neutral-light);
+        transition: all calc(var(--expand-duration) * 2);
         animation: 
             rise-show
             var(--rise-time)
@@ -136,8 +141,6 @@
     opacity: 0;
     font-size: .75rem;
     text-align: center;
-    
-    transition: opacity .3s;
     
     animation: 
         rise-show

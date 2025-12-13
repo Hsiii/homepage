@@ -29,7 +29,12 @@ export default function Cover() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
+
+    const preventEmptySubmit = (e) => {
+        if (inputRef.current.value.trim() === '') {
             e.preventDefault();
+        }
+    };
 
     return (
         <section className='cover'>
@@ -43,17 +48,17 @@ export default function Cover() {
                     action='https://www.google.com/search'
                     onSubmit={preventEmptySubmit}
                 >
+                    <div className='search-icon'>
+                        <Search className='icon' size={24} />
+                    </div>
                     <input
                         className='search-input'
                         type='text'
                         name='q'
-                        placeholder='Search...'
+                        placeholder='Search'
                         autoComplete='off'
                         ref={inputRef}
                     />
-                    <button className='search-button'>
-                        <Search className='icon' size={24} />
-                    </button>
                 </form>
             </div>
             <p className='hint'>[SPACE]</p>
