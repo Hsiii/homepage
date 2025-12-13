@@ -66,10 +66,8 @@ export const links = {
     'Vue dev': 'http://localhost:5173/',
     'YouTube': 'https://www.youtube.com/',
     'ccxp': 'https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/',
-    'eeclass':
-        'https://oauth.ccxp.nthu.edu.tw/v1.1/authorize.php?response_type=code&client_id=eeclass&redirect_uri=https%3A%2F%2Feeclass.nthu.edu.tw%2Fservice%2Foauth%2F&scope=lmsid+userid&state=&ui_locales=zh-TW',
-    'elearn':
-        'https://oauth.ccxp.nthu.edu.tw/v1.1/authorize.php?client_id=elearn&response_type=code&redirect_uri=https%3A%2F%2Felearn.nthu.edu.tw%2Fadmin%2Foauth2callback.php&state=%2Fauth%2Foauth2%2Flogin.php%3Fwantsurl%3Dhttps%253A%252F%252Felearn.nthu.edu.tw%252F%26sesskey%3DqqdzzWqh7e%26id%3D5&scope=userid%20name%20email%20lmsid',
+    'eeclass': 'https://eeclass.nthu.edu.tw/',
+    'elearn': 'https://elearn.nthu.edu.tw/',
     'maimai': 'https://maimaidx-eng.com/maimai-mobile/home/',
     'refern': 'https://my.refern.app/',
 };
