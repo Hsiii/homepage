@@ -1,6 +1,14 @@
 :root {
+    accent-color: var(--clr-primary);
+    ::selection {
+        background-color: var(--clr-primary-alpha);
+        color: var(--clr-neutral-light);
+    }
+
     --clr-primary:
     hsl(275, 72%, 68%);
+    --clr-primary-alpha:
+    hsla(275, 72%, 68%, .8);
     --clr-secondary:
     hsl(249, 50%, 60%);
     --clr-neutral:
@@ -22,8 +30,10 @@
     hsl(185, 38%, 94%);
 
     --clr-search-button:
-    hsl(314, 36%, 83%);
+    hsl(316, 47%, 64%);
+    --clr-search-button-light:
+    hsl(316, 47%, 80%);
 
     --clr-disabled:
-    #888;
+    #757575;
 }
