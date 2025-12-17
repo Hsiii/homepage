@@ -22,6 +22,7 @@ export default function Cover() {
                 document.activeElement === inputRef.current
             ) {
                 e.preventDefault();
+                inputRef.current.value = '';
                 inputRef.current.blur();
             }
         };
