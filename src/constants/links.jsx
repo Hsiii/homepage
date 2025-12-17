@@ -56,7 +56,7 @@ export const links = {
     'Stylish': 'https://userstyles.org/',
     'TUCaN':
         'https://www.tucan.tu-darmstadt.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=ACTION&ARGUMENTS=-A6-VkjuH-iRdxtcbUbsSwYyOYZhdqMJDQOCdoK1J-iuohpKVkbk4j6SVfVmPt6fAJu43JVC19q10MMNNT8aOL6-3RWt~L4wVJFuXwGJWSs1kEU6ibMllhU1rWF2sWLrm8XoUsylSK1Mvzv5Z2IPE1U7W6mT90jfDTFoBroshCATeT562F-9B27YdtR27UBEhDGh-GOXqGeeU7PHU_',
-    // 'Tetr.io': 'https://tetr.io',
+    'Tetr.io': 'https://tetr.io',
     'Train':
         'https://tip.railway.gov.tw/tra-tip-web/tip/tip001/tip112/gobytime',
     'Translate': 'https://translate.google.com/',
