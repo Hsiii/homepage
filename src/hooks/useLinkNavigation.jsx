@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 
-export const useLinkNavigation = (linkTree, links, inputRef) => {
+import { linkTree, links } from 'constants';
+
+export const useLinkNavigation = (keyboardNavidationEnabled) => {
     const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
     const [selectedIdx, setSelectedIdx] = useState(0);
     const [isMouseNavigating, setIsMouseNavigating] = useState(false);
@@ -16,10 +18,7 @@ export const useLinkNavigation = (linkTree, links, inputRef) => {
 
             // activate navigation
             if (!isKeyboardNavigating) {
-                if (
-                    key === '1' &&
-                    document.activeElement !== inputRef.current
-                ) {
+                if (key === '1' && keyboardNavidationEnabled) {
                     setIsKeyboardNavigating(true);
                 }
                 return;
@@ -60,7 +59,12 @@ export const useLinkNavigation = (linkTree, links, inputRef) => {
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('click', onClick);
         };
-    }, [isKeyboardNavigating, isMouseNavigating, selectedIdx, links]);
+    }, [
+        isKeyboardNavigating,
+        isMouseNavigating,
+        selectedIdx,
+        keyboardNavidationEnabled,
+    ]);
 
     useEffect(() => {
         if (!isKeyboardNavigating) {

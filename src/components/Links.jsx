@@ -10,17 +10,17 @@ import 'components/Links.css';
 
 Links.propTypes = {
     hidden: PropTypes.bool,
-    inputRef: PropTypes.object,
+    keyboardNavidationEnabled: PropTypes.bool,
 };
 
-export default function Links({ hidden, inputRef }) {
+export default function Links({ hidden, keyboardNavidationEnabled }) {
     const {
         selectedIdx,
         isKeyboardNavigating,
         isMouseNavigating,
         startMouseNavigation,
         endMouseNavigation,
-    } = useLinkNavigation(linkTree, links, inputRef);
+    } = useLinkNavigation(keyboardNavidationEnabled);
 
     const paddings = useMemo(() => {
         const windowHeight = window.innerHeight;

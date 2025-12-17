@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 
 import { Mountains } from 'components';
 const Links = lazy(() => import('components/Links'));
@@ -10,17 +10,15 @@ export default function Cover() {
     const inputRef = useRef(null);
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
+    const [inputFocused, setInputFocused] = useState(false);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key == ' ' && document.activeElement !== inputRef.current) {
+            if (e.key == ' ' && !inputFocused) {
                 e.preventDefault();
                 inputRef.current.focus();
             }
-            if (
-                e.key === 'Escape' &&
-                document.activeElement === inputRef.current
-            ) {
+            if (e.key === 'Escape' && inputFocused) {
                 e.preventDefault();
                 inputRef.current.value = '';
                 inputRef.current.blur();
@@ -59,13 +57,20 @@ export default function Cover() {
                         placeholder='Search'
                         autoComplete='off'
                         ref={inputRef}
+                        onFocus={() => setInputFocused(true)}
+                        onBlur={() => setInputFocused(false)}
                     />
                 </form>
             </div>
             <p className='hint'>[SPACE]</p>
 
             <Suspense fallback={null}>
-                {<Links disabled={hideLinks} inputRef={inputRef} />}
+                {
+                    <Links
+                        disabled={hideLinks}
+                        keyboardNavidationEnabled={!inputFocused}
+                    />
+                }
             </Suspense>
         </section>
     );
