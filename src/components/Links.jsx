@@ -45,7 +45,7 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
         <section
             className={`link-tree ${hidden && 'hidden'} ${
                 isKeyboardNavigating && 'expanded'
-            }`}
+            } ${isMouseNavigating ? 'hoverEffective' : ''}`}
             onMouseMove={startMouseNavigation}
             onMouseOut={endMouseNavigation}
         >
@@ -60,7 +60,7 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                     <div
                         className={`category ${
                             selectedIdx === i + 1 && 'selected'
-                        }`}
+                        } ${isMouseNavigating ? 'hoverEffective' : ''}`}
                         key={i + '-category'}
                     >
                         {node.icon}
@@ -77,7 +77,9 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                         <span>{node.category}</span>
                     </div>
                     <div
-                        className='links'
+                        className={`links ${
+                            isMouseNavigating ? 'hoverEffective' : ''
+                        }`}
                         style={{ '--padding': paddings[i] }}
                         key={i + '-links'}
                     >
@@ -85,7 +87,9 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                         {node.links.map((link, j) => (
                             <a
                                 id={link}
-                                className={!links[link] && 'disabled'}
+                                className={`link ${
+                                    !links[link] ? 'disabled' : ''
+                                } ${isMouseNavigating ? 'hoverEffective' : ''}`}
                                 href={links[link]}
                                 key={j}
                             >

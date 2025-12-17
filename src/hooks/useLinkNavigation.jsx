@@ -5,7 +5,7 @@ import { linkTree, links } from 'constants';
 export const useLinkNavigation = (keyboardNavidationEnabled) => {
     const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
     const [selectedIdx, setSelectedIdx] = useState(0);
-    const [isMouseNavigating, setIsMouseNavigating] = useState(false);
+    const [isMouseNavigating, setIsMouseNavigating] = useState(true);
 
     useEffect(() => {
         const onClick = () => {
@@ -20,6 +20,7 @@ export const useLinkNavigation = (keyboardNavidationEnabled) => {
             if (!isKeyboardNavigating) {
                 if (key === '1' && keyboardNavidationEnabled) {
                     setIsKeyboardNavigating(true);
+                    setIsMouseNavigating(false);
                 }
                 return;
             }
