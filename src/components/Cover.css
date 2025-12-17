@@ -1,5 +1,6 @@
 .cover {
     --rise-time: 1.5s;
+    --rise-show-time: 1.75s;
     height: 100vh;
     height: 100dvh;
 
@@ -24,14 +25,13 @@
     -webkit-text-fill-color: transparent;
 
     font-size: 7.5rem;
-    font-family: 'Quicksand';
     text-align: center;
     letter-spacing: .25rem;
 
     animation: 
         rise-show 
-        var(--rise-time) 
-        ease-out 
+        var(--rise-show-time) 
+        ease-in 
         1 
         forwards;
 
@@ -64,10 +64,9 @@
 .search-form {
     display: flex;
     align-items: center;
-    background-color: var(--clr-search-button);
+    background-color: var(--clr-search-button-light);
     transition: calc(var(--expand-duration) * 2);
     cursor: text;
-    opacity: .75;
     
     &:focus-within,
     .search:hover & {
@@ -80,11 +79,12 @@
 }
 
 .search-input {
+    --clr-text: var(--clr-disabled);
     width: 0;
     height: var(--height);
     font-size: 1.2rem;
-    background-color: var(--clr-search-button);
-    color: var(--clr-search-button);
+    background-color: var(--clr-search-button-light);
+    color: var(--clr-text);
     outline: none;
     
     transition: calc(var(--expand-duration) * 2);
@@ -92,12 +92,17 @@
     &:focus,
     .search:hover & {
         background-color: var(--clr-neutral-light);
+        color: var(--clr-text);
         width: 15rem;
         transition: var(--expand-duration);
+        &::placeholder {
+            opacity: 1;
+        }
     }
     
     &::placeholder {
-        color: var(--clr-search-button);
+        color: var(--clr-text);
+        opacity: 0;
     }
 }
 
@@ -107,29 +112,29 @@
     border-radius: 50%;
     display: grid;
     place-items: center;
+    opacity: .75;
 
     font-size: 1.2rem;
-    opacity: .75;
-    transition: calc(var(--expand-duration) * 2);
     
+    .icon {
+        color: var(--clr-neutral-light);
+        transition: var(--expand-duration);
+        animation: 
+            rise-show
+            var(--rise-show-time)
+            ease-in 
+            1 
+            forwards;
+    }
+
     .search:hover &,
     .search:focus-within & {
         opacity: 1;
         transition: var(--expand-duration);
         .icon {
-            color: var(--clr-search-button);
+            color: var(--clr-disabled);
+            opacity: 1;
         }
-    }
-    
-    .icon {
-        color: var(--clr-neutral-light);
-        transition: all calc(var(--expand-duration) * 2);
-        animation: 
-            rise-show
-            var(--rise-time)
-            ease-out 
-            1 
-            forwards;
     }
 }
 
@@ -144,11 +149,10 @@
     
     animation: 
         rise-show
-        var(--rise-time)
-        ease-out 
+        var(--rise-show-time)
+        ease-in 
         1 
         forwards;
-    animation-delay: .2s;
     
     z-index: 2;
      

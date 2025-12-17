@@ -39,7 +39,7 @@ export default function Cover() {
     return (
         <section className='cover'>
             <Mountains />
-            <div className='title'>{time}</div>
+            <span className='title'>{time}</span>
 
             <div className='search'>
                 <form
