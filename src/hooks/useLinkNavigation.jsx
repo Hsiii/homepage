@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { linkTree, links } from 'constants';
 
 export const useLinkNavigation = (keyboardNavidationEnabled) => {
-    const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
     const [selectedIdx, setSelectedIdx] = useState(0);
+    const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
     const [isMouseNavigating, setIsMouseNavigating] = useState(true);
 
     useEffect(() => {
@@ -80,7 +80,9 @@ export const useLinkNavigation = (keyboardNavidationEnabled) => {
     };
 
     const endMouseNavigation = () => {
-        setIsKeyboardNavigating(false);
+        if (isMouseNavigating) {
+            setIsKeyboardNavigating(false);
+        }
         setIsMouseNavigating(false);
     };
 
