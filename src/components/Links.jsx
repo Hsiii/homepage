@@ -1,10 +1,11 @@
-import React, { useMemo, Fragment } from 'react';
+import React, { useMemo, Fragment, useEffect } from 'react';
 
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { triggerPrerender } from 'utils/prerender';
 
-import { linkTree, links } from 'constants';
+import { linkTree, links, mostUsedLinks } from 'constants';
 
 import 'components/Links.css';
 
@@ -40,6 +41,15 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
             return padding + 'px';
         });
     }, [window.innerHeight, linkTree]);
+
+    useEffect(() => {
+        mostUsedLinks.forEach((linkName) => {
+            const url = links[linkName];
+            if (url) {
+                triggerPrerender(url);
+            }
+        });
+    }, []);
 
     return (
         <section

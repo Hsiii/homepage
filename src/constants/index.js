@@ -1,3 +1,2 @@
-export { linkTree } from './linkTree';
-export { links } from './links';
+export * from './links';
 export { footerLink, footerCredit } from './footer';
