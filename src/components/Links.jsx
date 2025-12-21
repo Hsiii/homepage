@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, Fragment } from 'react';
 
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
@@ -43,11 +43,14 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
 
     return (
         <section
+            role='navigation'
             className={`link-tree ${hidden && 'hidden'} ${
                 isKeyboardNavigating && 'expanded'
             } ${isMouseNavigating ? 'hoverEffective' : ''}`}
             onMouseMove={startMouseNavigation}
             onMouseOut={endMouseNavigation}
+            aria-hidden={hidden}
+            aria-expanded={isKeyboardNavigating}
         >
             <div className='trigger'>
                 <div className='indicator' />
@@ -56,12 +59,11 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
             </div>
             <div className='panel' />
             {linkTree.map((node, i) => (
-                <>
+                <Fragment key={node.category}>
                     <div
                         className={`category ${
                             selectedIdx === i + 1 && 'selected'
                         } ${isMouseNavigating ? 'hoverEffective' : ''}`}
-                        key={i + '-category'}
                     >
                         {node.icon}
                         <p
@@ -81,7 +83,6 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                             isMouseNavigating ? 'hoverEffective' : ''
                         }`}
                         style={{ '--padding': paddings[i] }}
-                        key={i + '-links'}
                     >
                         <div className='panel' />
                         {node.links.map((link, j) => (
@@ -91,7 +92,7 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                                     !links[link] ? 'disabled' : ''
                                 } ${isMouseNavigating ? 'hoverEffective' : ''}`}
                                 href={links[link]}
-                                key={j}
+                                key={link}
                             >
                                 {link}
                                 <p
@@ -108,7 +109,7 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                             </a>
                         ))}
                     </div>
-                </>
+                </Fragment>
             ))}
         </section>
     );
