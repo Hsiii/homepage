@@ -4,7 +4,7 @@ const srcPath = path.resolve(__dirname, 'src');
 const distPath = path.resolve(__dirname, 'dist');
 
 module.exports = {
-    context: srcPath,
+    context: __dirname,
 
     mode: 'development',
 
@@ -19,7 +19,7 @@ module.exports = {
     },
 
     entry: {
-        index: './index.jsx',
+        index: './src/index.jsx',
     },
 
     output: {
@@ -38,10 +38,6 @@ module.exports = {
                         presets: [
                             ['@babel/preset-env', { modules: false }],
                             '@babel/preset-react',
-                        ],
-                        plugins: [
-                            '@babel/plugin-proposal-class-properties',
-                            '@babel/plugin-proposal-object-rest-spread',
                         ],
                     },
                 },
