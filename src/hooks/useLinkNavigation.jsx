@@ -2,39 +2,42 @@ import { useState, useEffect } from 'react';
 
 import { linkTree, links } from 'constants';
 
-export const useLinkNavigation = (keyboardNavidationEnabled) => {
-    const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
+export const useLinkNavigation = (keyboardNavidationEnabled, ref) => {
     const [selectedIdx, setSelectedIdx] = useState(0);
+    const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
     const [isMouseNavigating, setIsMouseNavigating] = useState(true);
 
     useEffect(() => {
-        const onClick = () => {
-            setIsKeyboardNavigating(false);
+        const onClick = (e) => {
+            if (ref.current?.contains(e.target)) return;
+            endNavigation();
         };
 
         const onKeyDown = (e) => {
+            if (!keyboardNavidationEnabled) return;
+
             // for chinese input method editor
             const key = e.code.slice(-1);
 
             // activate navigation
             if (!isKeyboardNavigating) {
-                if (key === '1' && keyboardNavidationEnabled) {
+                if (key === '1') {
                     setIsKeyboardNavigating(true);
                     setIsMouseNavigating(false);
+                    return;
                 }
                 return;
             }
 
-            // disable when mouse navigation is active
-            if (isMouseNavigating) return;
-
             // go to previous layer on escape
             if (e.key === 'Escape') {
                 if (selectedIdx) {
+                    setIsKeyboardNavigating(true);
+                    setIsMouseNavigating(false);
                     setSelectedIdx(0);
                     return;
                 }
-                setIsKeyboardNavigating(false);
+                endNavigation();
                 return;
             }
 
@@ -65,30 +68,29 @@ export const useLinkNavigation = (keyboardNavidationEnabled) => {
         isMouseNavigating,
         selectedIdx,
         keyboardNavidationEnabled,
+        ref,
     ]);
 
-    useEffect(() => {
-        if (!isKeyboardNavigating) {
-            setSelectedIdx(0);
-            return;
-        }
-    }, [isKeyboardNavigating]);
-
-    const startMouseNavigation = () => {
-        setSelectedIdx(0);
+    const startNavigation = () => {
         setIsMouseNavigating(true);
+        setIsKeyboardNavigating(true);
     };
 
-    const endMouseNavigation = () => {
-        setIsKeyboardNavigating(false);
-        setIsMouseNavigating(false);
+    const endNavigation = () => {
+        if (selectedIdx === 0) {
+            setIsMouseNavigating(false);
+            setIsKeyboardNavigating(false);
+        } else {
+            setSelectedIdx(0);
+        }
     };
 
     return {
         selectedIdx,
+        setSelectedIdx,
         isKeyboardNavigating,
         isMouseNavigating,
-        startMouseNavigation,
-        endMouseNavigation,
+        startNavigation,
+        endNavigation,
     };
 };

@@ -1,11 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 import { linkTree, links } from 'constants';
-
 import 'components/Links.css';
 
 Links.propTypes = {
@@ -14,13 +13,15 @@ Links.propTypes = {
 };
 
 export default function Links({ hidden, keyboardNavidationEnabled }) {
+    const linkTreeRef = useRef(null);
     const {
         selectedIdx,
+        setSelectedIdx,
         isKeyboardNavigating,
         isMouseNavigating,
-        startMouseNavigation,
-        endMouseNavigation,
-    } = useLinkNavigation(keyboardNavidationEnabled);
+        startNavigation,
+        endNavigation,
+    } = useLinkNavigation(keyboardNavidationEnabled, linkTreeRef);
 
     const paddings = useMemo(() => {
         const windowHeight = window.innerHeight;
@@ -46,15 +47,16 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
             className={`link-tree ${hidden && 'hidden'} ${
                 isKeyboardNavigating && 'expanded'
             } ${isMouseNavigating ? 'hoverEffective' : ''}`}
-            onMouseMove={startMouseNavigation}
-            onMouseOut={endMouseNavigation}
+            onMouseMove={startNavigation}
+            onMouseLeave={endNavigation}
+            ref={linkTreeRef}
         >
             <div className='trigger'>
                 <div className='indicator' />
                 <Bookmark className='icon' />
                 <p className='hint'>[1]</p>
             </div>
-            <div className='panel' />
+            <div className='panel' onMouseEnter={() => setSelectedIdx(0)} />
             {linkTree.map((node, i) => (
                 <>
                     <div
@@ -62,14 +64,12 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                             selectedIdx === i + 1 && 'selected'
                         } ${isMouseNavigating ? 'hoverEffective' : ''}`}
                         key={i + '-category'}
+                        onMouseMove={() => setSelectedIdx(i + 1)}
                     >
                         {node.icon}
                         <p
                             className={`hint ${
-                                (isMouseNavigating ||
-                                    selectedIdx ||
-                                    i + 1 > 9) &&
-                                'hidden'
+                                (selectedIdx || i + 1 > 9) && 'hidden'
                             }`}
                         >
                             [{i + 1}]
@@ -82,6 +82,10 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                         }`}
                         style={{ '--padding': paddings[i] }}
                         key={i + '-links'}
+                        onMouseMove={() => setSelectedIdx(i + 1)}
+                        onMouseLeave={() => {
+                            if (selectedIdx === i + 1) setSelectedIdx(0);
+                        }}
                     >
                         <div className='panel' />
                         {node.links.map((link, j) => (
@@ -96,8 +100,7 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                                 {link}
                                 <p
                                     className={`hint ${
-                                        (isMouseNavigating ||
-                                            !selectedIdx ||
+                                        (!selectedIdx ||
                                             j + 1 > 9 ||
                                             !links[link]) &&
                                         'hidden'
