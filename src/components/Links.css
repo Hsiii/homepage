@@ -64,7 +64,6 @@
             left: 1rem;
             color: transparent;
             fill: var(--clr-trigger);
-            backdrop-filter: saturate(1.2) blur(.5rem);
         }
 
         .hint {

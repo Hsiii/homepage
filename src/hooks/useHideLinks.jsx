@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export const useHideLinks = () => {
-    let ticking = false;
+    const ticking = useRef(false);
     const [hideLinks, setHideLinks] = useState(false);
 
     const handleScroll = useCallback(() => {
@@ -9,20 +9,20 @@ export const useHideLinks = () => {
     }, []);
 
     const onScroll = useCallback(() => {
-        if (!ticking) {
+        if (!ticking.current) {
             window.requestAnimationFrame(() => {
                 handleScroll();
-                ticking = false;
+                ticking.current = false;
             });
-            ticking = true;
+            ticking.current = true;
         }
-    }, []);
+    }, [handleScroll]);
 
     useEffect(() => {
         handleScroll();
         window.addEventListener('scroll', onScroll);
         return () => window.removeEventListener('scroll', onScroll);
-    }, []);
+    }, [handleScroll, onScroll]);
 
     return { hideLinks };
 };

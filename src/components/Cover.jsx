@@ -67,7 +67,7 @@ export default function Cover() {
             <Suspense fallback={null}>
                 {
                     <Links
-                        disabled={hideLinks}
+                        hidden={hideLinks}
                         keyboardNavidationEnabled={!inputFocused}
                     />
                 }
