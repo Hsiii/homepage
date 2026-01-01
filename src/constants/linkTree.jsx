@@ -8,12 +8,12 @@ import {
     Brush,
     MessageSquare,
     Gamepad2,
-    LoaderCircle
+    LoaderCircle,
 } from 'lucide-react';
 
 export const linkTree = [
     {
-        category: 'School', 
+        category: 'School',
         icon: <BookOpenText className='icon' />,
         links: [
             'eeclass',
@@ -21,9 +21,9 @@ export const linkTree = [
             'ccxp',
             'Past Exam',
             'Presentation',
-            'SSTM'
-        ]
-    }, 
+            'SSTM',
+        ],
+    },
     {
         category: 'SNS',
         icon: <MessageSquare className='icon' />,
@@ -34,29 +34,20 @@ export const linkTree = [
             'Facebook',
             'Discord',
             'Gmail',
-        ]
-    },  
+        ],
+    },
     {
-        category: 'Media', 
+        category: 'Media',
         icon: <Youtube className='icon' />,
-        links: [
-            'YouTube',
-            'Anigamer',
-            'Spotify',
-            'Utaten',
-            'Dam',
-        ]
+        links: ['YouTube', 'Anigamer', 'Spotify', 'Utaten', 'Dam'],
     },
     {
         category: 'Game',
         icon: <Gamepad2 className='icon' />,
-        links: [
-            'Tetr.io',
-            'maimai',
-        ]
+        links: ['Tetr.io', 'maimai'],
     },
     {
-        category: 'Tools', 
+        category: 'Tools',
         icon: <ToolCase className='icon' />,
         links: [
             'HackMD',
@@ -68,8 +59,8 @@ export const linkTree = [
             'Train',
             'Flowchart',
             'Overleaf',
-        ]
-    }, 
+        ],
+    },
     {
         category: 'Code',
         icon: <CodeXml className='icon' />,
@@ -84,7 +75,7 @@ export const linkTree = [
             'Haikei',
             'Stylish',
             'LeetCode',
-        ]
+        ],
     },
     {
         category: 'Art',
@@ -94,11 +85,11 @@ export const linkTree = [
             'Pixiv',
             'Line of Action',
             'Quickposes',
-            'Hololive'
-        ]
+            'Hololive',
+        ],
     },
     {
-        category: 'Google',
+        category: 'GSuite',
         icon: <LoaderCircle className='icon' />,
         links: [
             'Gemini',
@@ -109,6 +100,6 @@ export const linkTree = [
             'Sheet',
             'Slide',
             'Gmail',
-        ]
-    }
+        ],
+    },
 ];
