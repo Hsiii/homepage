@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { links, linkTree } from 'constants';
 import { Help, Mountains } from 'components';
+import Fuse from 'fuse.js';
 import { useHideLinks, useTime } from 'hooks';
 import { Search } from 'lucide-react';
 
@@ -24,22 +25,27 @@ export default function Cover() {
 
     const [searchValue, setSearchValue] = useState('');
 
+    const flattenedLinks = useMemo(() => {
+        return linkTree.flatMap((category, categoryIndex) =>
+            category.links.map((link) => ({
+                link,
+                categoryIndex: categoryIndex + 1,
+            })),
+        );
+    }, []);
+
+    const fuse = useMemo(() => {
+        return new Fuse(flattenedLinks, {
+            keys: ['link'],
+            threshold: 0.4,
+        });
+    }, [flattenedLinks]);
+
     const match = useMemo(() => {
         if (!searchValue) return null;
-        let currentSearch = searchValue.toLowerCase();
-        while (currentSearch.length > 0) {
-            for (let i = 0; i < linkTree.length; i++) {
-                const category = linkTree[i];
-                for (const link of category.links) {
-                    if (link.toLowerCase().startsWith(currentSearch)) {
-                        return { link, categoryIndex: i + 1 };
-                    }
-                }
-            }
-            currentSearch = currentSearch.slice(0, -1);
-        }
-        return null;
-    }, [searchValue]);
+        const results = fuse.search(searchValue);
+        return results.length > 0 ? results[0].item : null;
+    }, [searchValue, fuse]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {

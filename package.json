@@ -11,6 +11,7 @@
     "author": "",
     "license": "MIT",
     "dependencies": {
+        "fuse.js": "^7.1.0",
         "lucide-react": "^0.553.0",
         "prop-types": "^15.7.2",
         "react": "^19.0.0",
