@@ -1,9 +1,11 @@
-<img alt="Logo" src="https://raw.githubusercontent.com/Hsiii/homepage/release/assets/favicon.png" width="24" style="vertical-align:text-bottom;"/>
-<h1 style="display: inline-block; border-bottom: none;">
-   Homepage 
-</h1>
-
-My personal browser homepage [hsiii.github.io/homepage](https://hsiii.github.io/homepage) built with [Vite](https://vite.dev/) and [React](https://react.dev/).
+<div align="center">
+   <img alt="Logo" src="https://raw.githubusercontent.com/Hsiii/homepage/release/assets/favicon.png" width="100"/>
+</div>
+<h1 align="center">Homepage</h1>
+<p align="center">
+   My personal browser homepage <a href="https://hsiii.github.io/homepage">hsiii.github.io/homepage</a> built with <a href="https://vite.dev/">Vite</a> and <a href="https://react.dev/">React</a>.
+</p>
+![Homepage](https://raw.githubusercontent.com/Hsiii/homepage/main/public/images/demo.png)
 
 ## Installation (requires [Node.js](https://nodejs.org/) 20.x)
 
