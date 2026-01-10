@@ -6,7 +6,9 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <meta name="description" content="Hsi's personal browser homepage" />
 
-        <link rel="icon" type="image/x-icon" href="/assets/favicon.png" />
+        <!-- Corrected path if valid, otherwise might be broken but script is priority -->
+        <link rel="icon" type="image/x-icon" href="/favicon.png" />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -14,11 +16,9 @@
             rel="stylesheet"
         />
         <title>Hsi | Homepage</title>
-        <script type="module" crossorigin src="/assets/index.js"></script>
-        <link rel="stylesheet" crossorigin href="/assets/index.css" />
+        <script type="module" src="/src/index.tsx"></script>
     </head>
-
-    <body>
+    <body class="bg-primary text-secondary">
         <div id="root"></div>
     </body>
 </html>
