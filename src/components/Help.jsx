@@ -3,14 +3,9 @@ import { HelpCircle } from 'lucide-react';
 
 import 'components/Help.css';
 
+import { keyboardNavInfo } from 'constants';
+
 export default function Help() {
-    const keyboardNavInfo = [
-        ['Open bookmark search bar', 'SPACE'],
-        ['Close bookmark search bar', 'ESC'],
-        ['Open bookmark panel', '1'],
-        ['Close bookmark panel', 'ESC'],
-        ['Select bookmark', '1-9'],
-    ];
     return (
         <div className='help'>
             <button className='help-icon-btn' aria-label='Help'>
