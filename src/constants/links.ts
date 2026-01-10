@@ -1,4 +1,4 @@
-export const links = {
+export const links: Record<string, string> = {
     'AQI TW': 'https://airtw.moenv.gov.tw/',
     'Algo Ans': 'https://walkccc.me/CLRS/',
     'Anigamer': 'https://ani.gamer.com.tw/',

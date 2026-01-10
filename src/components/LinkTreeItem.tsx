@@ -1,5 +1,15 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { ElementType, ReactElement, ReactNode } from 'react';
+
+interface LinkTreeItemProps extends React.HTMLAttributes<HTMLElement> {
+    as?: ElementType;
+    className?: string;
+    children: ReactNode;
+    icon?: ReactElement | null;
+    hotkey: string | number;
+    isHotkeyHidden?: boolean;
+    modifiers?: (string | boolean | undefined | null)[];
+    href?: string;
+}
 
 export default function LinkTreeItem({
     as: Component = 'div',
@@ -10,7 +20,7 @@ export default function LinkTreeItem({
     isHotkeyHidden = false,
     modifiers = [],
     ...props
-}) {
+}: LinkTreeItemProps) {
     const modifierClasses = modifiers.filter(Boolean).join(' ');
     const finalClassName = `${className} ${modifierClasses}`.trim();
 
@@ -24,14 +34,3 @@ export default function LinkTreeItem({
         </Component>
     );
 }
-
-LinkTreeItem.propTypes = {
-    as: PropTypes.elementType,
-    className: PropTypes.string,
-    children: PropTypes.node.isRequired,
-    icon: PropTypes.element,
-    hotkey: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-        .isRequired,
-    isHotkeyHidden: PropTypes.bool,
-    modifiers: PropTypes.arrayOf(PropTypes.string),
-};

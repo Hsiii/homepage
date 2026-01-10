@@ -1,5 +1,3 @@
-import React from 'react';
-
 import 'components/Mountains.css';
 
 export default function Mountains() {

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {
     BookOpenText,
     CodeXml,
@@ -10,8 +8,15 @@ import {
     Gamepad2,
     LoaderCircle,
 } from 'lucide-react';
+import { ReactElement } from 'react';
 
-export const linkTree = [
+export type CategoryData = {
+    category: string;
+    icon?: ReactElement;
+    links: string[];
+};
+
+export const linkTree: CategoryData[] = [
     {
         category: 'School',
         icon: <BookOpenText className='icon' />,

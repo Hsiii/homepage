@@ -12,20 +12,26 @@ import { Help, Mountains } from 'components';
 import Fuse from 'fuse.js';
 import { useHideLinks, useTime } from 'hooks';
 import { Search } from 'lucide-react';
+import { CategoryData } from 'constants';
 
 import 'components/Cover.css';
 
 const Links = lazy(() => import('components/Links'));
 
+interface LinkItem {
+    link: string;
+    categoryIndex: number;
+}
+
 export default function Cover() {
-    const inputRef = useRef(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
     const [inputFocused, setInputFocused] = useState(false);
 
     const [searchValue, setSearchValue] = useState('');
 
-    const flattenedLinks = useMemo(() => {
+    const flattenedLinks = useMemo<LinkItem[]>(() => {
         return linkTree.flatMap((category, categoryIndex) =>
             category.links.map((link) => ({
                 link,
@@ -48,15 +54,17 @@ export default function Cover() {
     }, [searchValue, fuse]);
 
     useEffect(() => {
-        const handleKeyDown = (e) => {
+        const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key == ' ' && !inputFocused) {
                 e.preventDefault();
-                inputRef.current.focus();
+                inputRef.current?.focus();
             }
             if (e.key === 'Escape' && inputFocused) {
                 e.preventDefault();
-                inputRef.current.value = '';
-                inputRef.current.blur();
+                if (inputRef.current) {
+                    inputRef.current.value = '';
+                    inputRef.current.blur();
+                }
             }
         };
 
@@ -64,7 +72,7 @@ export default function Cover() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [inputFocused]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (match?.link && links[match.link]) {
             window.location.href = links[match.link];
@@ -99,7 +107,9 @@ export default function Cover() {
                         onBlur={() => {
                             setInputFocused(false);
                             setSearchValue('');
-                            inputRef.current.value = '';
+                            if (inputRef.current) {
+                                inputRef.current.value = '';
+                            }
                         }}
                     />
                 </form>

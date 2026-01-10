@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { links, linkTree } from 'constants';
 
-export const useLinkNavigation = (keyboardNavEnabled) => {
+export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
     const [selectedCategory, setSelectedCategory] = useState(0);
     const [isKeyboardNav, setIsKeyboardNav] = useState(false);
     const [isMouseNav, setIsMouseNav] = useState(true);
@@ -11,7 +11,7 @@ export const useLinkNavigation = (keyboardNavEnabled) => {
             setIsKeyboardNav(false);
         };
 
-        const onKeyDown = (e) => {
+        const onKeyDown = (e: KeyboardEvent) => {
             // for chinese input method editor
             const key = e.code.slice(-1);
 

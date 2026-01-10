@@ -1,27 +1,27 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { linkTree } from 'constants';
 import LinkCategory from 'components/LinkCategory';
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
-import PropTypes from 'prop-types';
+import { CategoryData } from 'constants';
 
 import 'components/Links.css';
 
-Links.propTypes = {
-    hidden: PropTypes.bool,
-    keyboardNavEnabled: PropTypes.bool,
-    highlightedLink: PropTypes.string,
-    highlightedCategoryIdx: PropTypes.number,
-    onClearSearch: PropTypes.func.isRequired,
-};
+interface LinksProps {
+    hidden?: boolean;
+    keyboardNavEnabled?: boolean;
+    highlightedLink?: string;
+    highlightedCategoryIdx?: number;
+    onClearSearch: () => void;
+}
 
 export default function Links({
     hidden,
-    keyboardNavEnabled,
+    keyboardNavEnabled = true,
     highlightedLink,
     highlightedCategoryIdx,
     onClearSearch,
-}) {
+}: LinksProps) {
     const {
         selectedCategory,
         setSelectedCategory,
@@ -64,8 +64,8 @@ export default function Links({
             className={`link-tree ${hidden && 'hidden'} ${
                 (isKeyboardNav || selectedCategory) && 'expanded'
             } ${isMouseNav ? 'hoverEffective' : ''}`}
-            onMouseMove={(e) => {
-                startMouseNav(e);
+            onMouseMove={() => {
+                startMouseNav();
                 onClearSearch();
             }}
             onMouseOut={endMouseNav}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { footerCredit, footerLink } from 'constants';
 import { Cover } from 'components';
 

@@ -1,7 +1,17 @@
 import React, { Fragment } from 'react';
 import { links } from 'constants';
 import LinkTreeItem from 'components/LinkTreeItem';
-import PropTypes from 'prop-types';
+import { CategoryData } from 'constants';
+
+interface LinkCategoryProps {
+    categoryData: CategoryData;
+    index: number;
+    selectedCategory?: number;
+    isMouseNav: boolean;
+    keyboardNavEnabled: boolean;
+    padding: string;
+    highlightedLink?: string;
+}
 
 export default function LinkCategory({
     categoryData,
@@ -11,7 +21,7 @@ export default function LinkCategory({
     keyboardNavEnabled,
     padding,
     highlightedLink,
-}) {
+}: LinkCategoryProps) {
     const isCategorySelected = selectedCategory === index + 1;
 
     // Hint visibility logic for Category
@@ -29,14 +39,14 @@ export default function LinkCategory({
                 className='category'
                 icon={categoryData.icon}
                 hotkey={index + 1}
-                isHotkeyHidden={isCategoryHotkeyHidden}
+                isHotkeyHidden={!!isCategoryHotkeyHidden}
                 modifiers={categoryModifiers}
             >
                 {categoryData.category}
             </LinkTreeItem>
             <div
                 className={`links ${isMouseNav ? 'hoverEffective' : ''}`}
-                style={{ '--padding': padding }}
+                style={{ '--padding': padding } as React.CSSProperties}
             >
                 <div className='panel' />
                 {categoryData.links.map((link, j) => {
@@ -65,7 +75,7 @@ export default function LinkCategory({
                             href={links[link]}
                             className='link'
                             hotkey={j + 1}
-                            isHotkeyHidden={isLinkHotkeyHidden}
+                            isHotkeyHidden={!!isLinkHotkeyHidden}
                             modifiers={linkModifiers}
                         >
                             {link}
@@ -76,17 +86,3 @@ export default function LinkCategory({
         </Fragment>
     );
 }
-
-LinkCategory.propTypes = {
-    categoryData: PropTypes.shape({
-        category: PropTypes.string.isRequired,
-        icon: PropTypes.element,
-        links: PropTypes.arrayOf(PropTypes.string).isRequired,
-    }).isRequired,
-    index: PropTypes.number.isRequired,
-    selectedCategory: PropTypes.number,
-    isMouseNav: PropTypes.bool.isRequired,
-    keyboardNavEnabled: PropTypes.bool.isRequired,
-    padding: PropTypes.string.isRequired,
-    highlightedLink: PropTypes.string,
-};
