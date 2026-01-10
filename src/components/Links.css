@@ -218,7 +218,8 @@
         display: flex;
         align-items: center;
         
-        &.hoverEffective:hover {
+        &.hoverEffective:hover,
+        &.highlighted {
             text-decoration: none;
             color: var(--clr-secondary);
             background: linear-gradient(

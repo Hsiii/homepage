@@ -68,11 +68,12 @@ export const useLinkNavigation = (keyboardNavidationEnabled) => {
     ]);
 
     useEffect(() => {
-        if (!isKeyboardNavigating) {
+        if (!keyboardNavidationEnabled) {
+            setIsKeyboardNavigating(false);
+            setIsMouseNavigating(false);
             setSelectedIdx(0);
-            return;
         }
-    }, [isKeyboardNavigating]);
+    }, [keyboardNavidationEnabled]);
 
     const startMouseNavigation = () => {
         setSelectedIdx(0);
@@ -88,6 +89,7 @@ export const useLinkNavigation = (keyboardNavidationEnabled) => {
 
     return {
         selectedIdx,
+        setSelectedIdx,
         isKeyboardNavigating,
         isMouseNavigating,
         startMouseNavigation,

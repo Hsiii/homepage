@@ -1,4 +1,4 @@
-import React, { useMemo, Fragment } from 'react';
+import React, { useMemo, useEffect, Fragment } from 'react';
 
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
@@ -11,16 +11,34 @@ import 'components/Links.css';
 Links.propTypes = {
     hidden: PropTypes.bool,
     keyboardNavidationEnabled: PropTypes.bool,
+    highlightedLink: PropTypes.string,
+    highlightedCategoryIdx: PropTypes.number,
+    onClearSearch: PropTypes.func.isRequired,
 };
 
-export default function Links({ hidden, keyboardNavidationEnabled }) {
+export default function Links({
+    hidden,
+    keyboardNavidationEnabled,
+    highlightedLink,
+    highlightedCategoryIdx,
+    onClearSearch,
+}) {
     const {
         selectedIdx,
+        setSelectedIdx,
         isKeyboardNavigating,
         isMouseNavigating,
         startMouseNavigation,
         endMouseNavigation,
     } = useLinkNavigation(keyboardNavidationEnabled);
+
+    useEffect(() => {
+        if (highlightedCategoryIdx) {
+            setSelectedIdx(highlightedCategoryIdx);
+        } else {
+            setSelectedIdx(0);
+        }
+    }, [highlightedCategoryIdx, setSelectedIdx]);
 
     const paddings = useMemo(() => {
         const windowHeight = window.innerHeight;
@@ -45,9 +63,12 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
         <section
             role='navigation'
             className={`link-tree ${hidden && 'hidden'} ${
-                isKeyboardNavigating && 'expanded'
+                (isKeyboardNavigating || selectedIdx) && 'expanded'
             } ${isMouseNavigating ? 'hoverEffective' : ''}`}
-            onMouseMove={startMouseNavigation}
+            onMouseMove={(e) => {
+                startMouseNavigation(e);
+                onClearSearch();
+            }}
             onMouseOut={endMouseNavigation}
             aria-hidden={hidden}
             aria-expanded={isKeyboardNavigating}
@@ -70,7 +91,8 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                             className={`hint ${
                                 (isMouseNavigating ||
                                     selectedIdx ||
-                                    i + 1 > 9) &&
+                                    i + 1 > 9 ||
+                                    !keyboardNavidationEnabled) &&
                                 'hidden'
                             }`}
                         >
@@ -90,7 +112,13 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                                 id={link}
                                 className={`link ${
                                     !links[link] ? 'disabled' : ''
-                                } ${isMouseNavigating ? 'hoverEffective' : ''}`}
+                                } ${
+                                    isMouseNavigating ? 'hoverEffective' : ''
+                                } ${
+                                    highlightedLink === link
+                                        ? 'highlighted'
+                                        : ''
+                                }`}
                                 href={links[link]}
                                 key={link}
                             >
@@ -100,7 +128,8 @@ export default function Links({ hidden, keyboardNavidationEnabled }) {
                                         (isMouseNavigating ||
                                             !selectedIdx ||
                                             j + 1 > 9 ||
-                                            !links[link]) &&
+                                            !links[link] ||
+                                            !keyboardNavidationEnabled) &&
                                         'hidden'
                                     }`}
                                 >

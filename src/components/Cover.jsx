@@ -1,9 +1,19 @@
-import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
+import React, {
+    useState,
+    useEffect,
+    useRef,
+    Suspense,
+    lazy,
+    useMemo,
+    useCallback,
+} from 'react';
 
 import { Mountains } from 'components';
 const Links = lazy(() => import('components/Links'));
 import { useTime, useHideLinks } from 'hooks';
 import { Search } from 'lucide-react';
+
+import { linkTree, links } from 'constants';
 import 'components/Cover.css';
 
 export default function Cover() {
@@ -11,6 +21,25 @@ export default function Cover() {
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
     const [inputFocused, setInputFocused] = useState(false);
+
+    const [searchValue, setSearchValue] = useState('');
+
+    const match = useMemo(() => {
+        if (!searchValue) return null;
+        let currentSearch = searchValue.toLowerCase();
+        while (currentSearch.length > 0) {
+            for (let i = 0; i < linkTree.length; i++) {
+                const category = linkTree[i];
+                for (const link of category.links) {
+                    if (link.toLowerCase().startsWith(currentSearch)) {
+                        return { link, categoryIndex: i + 1 };
+                    }
+                }
+            }
+            currentSearch = currentSearch.slice(0, -1);
+        }
+        return null;
+    }, [searchValue]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -27,13 +56,20 @@ export default function Cover() {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    }, [inputFocused]);
 
-    const preventEmptySubmit = (e) => {
-        if (inputRef.current.value.trim() === '') {
-            e.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (match?.link && links[match.link]) {
+            window.location.href = links[match.link];
         }
     };
+
+    const handleClearSearch = useCallback(() => {
+        if (inputRef.current) {
+            inputRef.current.blur();
+        }
+    }, []);
 
     return (
         <section className='cover'>
@@ -41,24 +77,23 @@ export default function Cover() {
             <span className='title'>{time}</span>
 
             <div className='search'>
-                <form
-                    className='search-form'
-                    method='get'
-                    action='https://www.google.com/search'
-                    onSubmit={preventEmptySubmit}
-                >
+                <form className='search-form' onSubmit={handleSubmit}>
                     <div className='search-icon'>
                         <Search className='icon' size={24} />
                     </div>
                     <input
                         className='search-input'
                         type='text'
-                        name='q'
-                        placeholder='Search'
+                        placeholder='Search bookmarks'
                         autoComplete='off'
                         ref={inputRef}
+                        onChange={(e) => setSearchValue(e.target.value)}
                         onFocus={() => setInputFocused(true)}
-                        onBlur={() => setInputFocused(false)}
+                        onBlur={() => {
+                            setInputFocused(false);
+                            setSearchValue('');
+                            inputRef.current.value = '';
+                        }}
                     />
                 </form>
             </div>
@@ -69,6 +104,9 @@ export default function Cover() {
                     <Links
                         hidden={hideLinks}
                         keyboardNavidationEnabled={!inputFocused}
+                        highlightedLink={match?.link}
+                        highlightedCategoryIdx={match?.categoryIndex}
+                        onClearSearch={handleClearSearch}
                     />
                 }
             </Suspense>
