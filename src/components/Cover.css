@@ -138,29 +138,7 @@
     }
 }
 
-.search + .hint {
-    position: sticky;
-    top: min(355px, calc(35vh + 3.5rem));
-    
-    color: var(--clr-search-button);
-    opacity: 0;
-    font-size: .75rem;
-    text-align: center;
-    
-    animation: 
-        rise-show
-        var(--rise-show-time)
-        ease-in 
-        1 
-        forwards;
-    
-    z-index: 2;
-     
-    .search:hover + &,
-    .search:focus-within + & {
-        opacity: 0 !important;
-    }
-}
+
 
 @keyframes rise-show {
     0%, 80% {opacity: 0;}

@@ -66,16 +66,7 @@
             fill: var(--clr-trigger);
         }
 
-        .hint {
-            position: absolute;
-            left: 1rem;
-            width: 24px;
-            text-align: center;
-            translate: 0 1.25rem;
-            font-size: .75rem;
-            color: var(--clr-trigger);
-            opacity: .75;
-        }
+
     }
     
     .panel {

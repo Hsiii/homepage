@@ -75,7 +75,6 @@ export default function Links({
             <div className='trigger'>
                 <div className='indicator' />
                 <Bookmark className='icon' />
-                <p className='hint'>[1]</p>
             </div>
             <div className='panel' />
             {linkTree.map((categoryData, i) => (

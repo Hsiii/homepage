@@ -36,4 +36,5 @@
 
     --clr-disabled:
     #757575;
+    --clr-text: var(--clr-disabled)
 }

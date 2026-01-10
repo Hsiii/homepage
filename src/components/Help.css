@@ -1,0 +1,79 @@
+.help {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+
+    @media (width < 600px) {
+        display: none;
+    }
+}
+
+.help-icon-btn {
+    background: transparent;
+    color: var(--clr-text);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    
+    &:hover {
+        color: var(--clr-primary);
+    }
+}
+
+.help-dialog {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: max-content;
+    max-width: 400px;
+    background-color: var(--clr-neutral-light); /* Assuming this variable exists for panel bg */
+    padding: 1.5rem;
+    border-radius: 1rem;
+    
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: 
+        opacity 0.2s ease-out,
+        transform 0.2s ease-out,
+        visibility 0.2s ease-out;
+}
+
+.help:hover .help-dialog {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.help-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    min-width: 200px;
+}
+
+.help-row {
+    display: grid;
+    grid-template-columns: 1fr 5ch;
+    gap: 1.5rem;
+}
+
+.help-desc {
+    color: var(--clr-text);
+    white-space: nowrap;
+}
+
+.key {
+    display: inline-block;
+    padding: 0.1em 0.4em;
+    margin: 0;
+    font-size: 0.85em;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    background-color: var(--clr-neutral-light);
+    border-radius: 4px;
+    color: var(--clr-primary);
+    border: 1px solid var(--clr-neutral-light-alpha);
+}

@@ -8,7 +8,7 @@ import React, {
     useState,
 } from 'react';
 import { links, linkTree } from 'constants';
-import { Mountains } from 'components';
+import { Help, Mountains } from 'components';
 import { useHideLinks, useTime } from 'hooks';
 import { Search } from 'lucide-react';
 
@@ -76,6 +76,7 @@ export default function Cover() {
             <Mountains />
             <span className='title'>{time}</span>
 
+            <Help />
             <div className='search'>
                 <form className='search-form' onSubmit={handleSubmit}>
                     <div className='search-icon'>
@@ -97,7 +98,6 @@ export default function Cover() {
                     />
                 </form>
             </div>
-            <p className='hint'>[SPACE]</p>
 
             <Suspense fallback={null}>
                 {
