@@ -10,7 +10,7 @@
 
 .help-icon-btn {
     background: transparent;
-    color: var(--clr-text);
+    color: var(--clr-primary-alpha);
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 50%;
@@ -20,6 +20,8 @@
     &:hover {
         color: var(--clr-primary);
     }
+
+    animation: rise-show var(--rise-show-time) ease-out;
 }
 
 .help-dialog {
