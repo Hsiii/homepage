@@ -1,2 +1,3 @@
-*.css
 bookmarkLink.jsx
+dist
+node_modules
