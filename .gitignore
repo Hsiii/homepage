@@ -3,3 +3,4 @@ node_modules
 
 # Build output
 .DS_Store
+dist
