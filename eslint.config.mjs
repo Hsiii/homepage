@@ -1,8 +1,8 @@
 import js from '@eslint/js';
-import { defineConfig } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
 import pluginReact from 'eslint-plugin-react';
 import sortKeys from 'eslint-plugin-sort-keys';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 
 export default defineConfig([
@@ -24,41 +24,7 @@ export default defineConfig([
         plugins: { import: importPlugin },
         rules: {
             'import/no-duplicates': ['error', { considerQueryString: true }],
-            'import/order': [
-                'error',
-                {
-                    'groups': [
-                        'builtin',
-                        'external',
-                        'internal',
-                        'parent',
-                        'sibling',
-                        'index',
-                        'object',
-                        'type',
-                    ],
-                    'pathGroups': [
-                        {
-                            pattern: 'react{,-*}',
-                            group: 'external',
-                            position: 'before',
-                        },
-                        {
-                            pattern: '**/*.css',
-                            group: 'index',
-                            position: 'after',
-                        },
-                        {
-                            pattern: 'constants',
-                            group: 'internal',
-                            position: 'after',
-                        },
-                    ],
-                    'pathGroupsExcludedImportTypes': ['react'],
-                    'alphabetize': { order: 'asc', caseInsensitive: true },
-                    'newlines-between': 'always',
-                },
-            ],
+            'import/order': 'off',
         },
     },
     {

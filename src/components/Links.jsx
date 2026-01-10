@@ -1,11 +1,9 @@
-import React, { useMemo, useEffect } from 'react';
-
+import React, { useEffect, useMemo } from 'react';
+import { linkTree } from 'constants';
 import LinkCategory from 'components/LinkCategory';
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
 import PropTypes from 'prop-types';
-
-import { linkTree } from 'constants';
 
 import 'components/Links.css';
 

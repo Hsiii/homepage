@@ -1,8 +1,7 @@
 import React from 'react';
-
+import { footerCredit, footerLink } from 'constants';
 import { Cover } from 'components';
 
-import { footerLink, footerCredit } from 'constants';
 import 'components/Main.css';
 import 'constants/colorPalette.css';
 

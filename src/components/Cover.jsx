@@ -1,20 +1,20 @@
 import React, {
-    useState,
-    useEffect,
-    useRef,
-    Suspense,
     lazy,
-    useMemo,
+    Suspense,
     useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
 } from 'react';
-
+import { links, linkTree } from 'constants';
 import { Mountains } from 'components';
-const Links = lazy(() => import('components/Links'));
-import { useTime, useHideLinks } from 'hooks';
+import { useHideLinks, useTime } from 'hooks';
 import { Search } from 'lucide-react';
 
-import { linkTree, links } from 'constants';
 import 'components/Cover.css';
+
+const Links = lazy(() => import('components/Links'));
 
 export default function Cover() {
     const inputRef = useRef(null);

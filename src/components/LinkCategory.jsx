@@ -1,9 +1,7 @@
 import React, { Fragment } from 'react';
-
+import { links } from 'constants';
 import LinkTreeItem from 'components/LinkTreeItem';
 import PropTypes from 'prop-types';
-
-import { links } from 'constants';
 
 export default function LinkCategory({
     node,
