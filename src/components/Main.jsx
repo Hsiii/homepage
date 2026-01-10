@@ -3,7 +3,6 @@ import { footerCredit, footerLink } from 'constants';
 import { Cover } from 'components';
 
 import 'components/Main.css';
-import 'constants/colorPalette.css';
 
 export default function Main() {
     return (
