@@ -103,7 +103,7 @@ export default function Cover() {
                 {
                     <Links
                         hidden={hideLinks}
-                        keyboardNavidationEnabled={!inputFocused}
+                        keyboardNavEnabled={!inputFocused}
                         highlightedLink={match?.link}
                         highlightedCategoryIdx={match?.categoryIndex}
                         onClearSearch={handleClearSearch}

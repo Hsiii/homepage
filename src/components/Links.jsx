@@ -9,7 +9,7 @@ import 'components/Links.css';
 
 Links.propTypes = {
     hidden: PropTypes.bool,
-    keyboardNavidationEnabled: PropTypes.bool,
+    keyboardNavEnabled: PropTypes.bool,
     highlightedLink: PropTypes.string,
     highlightedCategoryIdx: PropTypes.number,
     onClearSearch: PropTypes.func.isRequired,
@@ -17,38 +17,38 @@ Links.propTypes = {
 
 export default function Links({
     hidden,
-    keyboardNavidationEnabled,
+    keyboardNavEnabled,
     highlightedLink,
     highlightedCategoryIdx,
     onClearSearch,
 }) {
     const {
-        selectedIdx,
-        setSelectedIdx,
-        isKeyboardNavigating,
-        isMouseNavigating,
-        startMouseNavigation,
-        endMouseNavigation,
-    } = useLinkNavigation(keyboardNavidationEnabled);
+        selectedCategory,
+        setSelectedCategory,
+        isKeyboardNav,
+        isMouseNav,
+        startMouseNav,
+        endMouseNav,
+    } = useLinkNavigation(keyboardNavEnabled);
 
     useEffect(() => {
         if (highlightedCategoryIdx) {
-            setSelectedIdx(highlightedCategoryIdx);
+            setSelectedCategory(highlightedCategoryIdx);
         } else {
-            setSelectedIdx(0);
+            setSelectedCategory(0);
         }
-    }, [highlightedCategoryIdx, setSelectedIdx]);
+    }, [highlightedCategoryIdx, setSelectedCategory]);
 
-    const paddings = useMemo(() => {
+    const panelPaddings = useMemo(() => {
         const windowHeight = window.innerHeight;
         const remToPx = 16;
         const linkHeight = 3.5 * remToPx;
 
-        return linkTree.map((node, headerIndex) => {
+        return linkTree.map((categoryData, categoryIndex) => {
             const headerPosition =
                 windowHeight / 2 +
-                (headerIndex + 1 - linkTree.length / 2 - 0.5) * linkHeight;
-            const linksHeight = node.links.length * linkHeight;
+                (categoryIndex + 1 - linkTree.length / 2 - 0.5) * linkHeight;
+            const linksHeight = categoryData.links.length * linkHeight;
             let padding;
             if (headerPosition + linksHeight / 2 <= windowHeight - remToPx)
                 padding = headerPosition - linksHeight / 2;
@@ -62,15 +62,15 @@ export default function Links({
         <section
             role='navigation'
             className={`link-tree ${hidden && 'hidden'} ${
-                (isKeyboardNavigating || selectedIdx) && 'expanded'
-            } ${isMouseNavigating ? 'hoverEffective' : ''}`}
+                (isKeyboardNav || selectedCategory) && 'expanded'
+            } ${isMouseNav ? 'hoverEffective' : ''}`}
             onMouseMove={(e) => {
-                startMouseNavigation(e);
+                startMouseNav(e);
                 onClearSearch();
             }}
-            onMouseOut={endMouseNavigation}
+            onMouseOut={endMouseNav}
             aria-hidden={hidden}
-            aria-expanded={isKeyboardNavigating}
+            aria-expanded={isKeyboardNav}
         >
             <div className='trigger'>
                 <div className='indicator' />
@@ -78,15 +78,15 @@ export default function Links({
                 <p className='hint'>[1]</p>
             </div>
             <div className='panel' />
-            {linkTree.map((node, i) => (
+            {linkTree.map((categoryData, i) => (
                 <LinkCategory
-                    key={node.category}
-                    node={node}
+                    key={categoryData.category}
+                    categoryData={categoryData}
                     index={i}
-                    selectedIdx={selectedIdx}
-                    isMouseNavigating={isMouseNavigating}
-                    keyboardNavigationEnabled={keyboardNavidationEnabled}
-                    padding={paddings[i]}
+                    selectedCategory={selectedCategory}
+                    isMouseNav={isMouseNav}
+                    keyboardNavEnabled={keyboardNavEnabled}
+                    padding={panelPaddings[i]}
                     highlightedLink={highlightedLink}
                 />
             ))}

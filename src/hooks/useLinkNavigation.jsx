@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { links, linkTree } from 'constants';
 
-import { linkTree, links } from 'constants';
-
-export const useLinkNavigation = (keyboardNavidationEnabled) => {
-    const [selectedIdx, setSelectedIdx] = useState(0);
-    const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
-    const [isMouseNavigating, setIsMouseNavigating] = useState(true);
+export const useLinkNavigation = (keyboardNavEnabled) => {
+    const [selectedCategory, setSelectedCategory] = useState(0);
+    const [isKeyboardNav, setIsKeyboardNav] = useState(false);
+    const [isMouseNav, setIsMouseNav] = useState(true);
 
     useEffect(() => {
         const onClick = () => {
-            setIsKeyboardNavigating(false);
+            setIsKeyboardNav(false);
         };
 
         const onKeyDown = (e) => {
@@ -17,24 +16,24 @@ export const useLinkNavigation = (keyboardNavidationEnabled) => {
             const key = e.code.slice(-1);
 
             // activate navigation
-            if (!isKeyboardNavigating) {
-                if (key === '1' && keyboardNavidationEnabled) {
-                    setIsKeyboardNavigating(true);
-                    setIsMouseNavigating(false);
+            if (!isKeyboardNav) {
+                if (key === '1' && keyboardNavEnabled) {
+                    setIsKeyboardNav(true);
+                    setIsMouseNav(false);
                 }
                 return;
             }
 
             // disable when mouse navigation is active
-            if (isMouseNavigating) return;
+            if (isMouseNav) return;
 
             // go to previous layer on escape
             if (e.key === 'Escape') {
-                if (selectedIdx) {
-                    setSelectedIdx(0);
+                if (selectedCategory) {
+                    setSelectedCategory(0);
                     return;
                 }
-                setIsKeyboardNavigating(false);
+                setIsKeyboardNav(false);
                 return;
             }
 
@@ -44,14 +43,14 @@ export const useLinkNavigation = (keyboardNavidationEnabled) => {
             if (idx > linkTree.length) return;
 
             // if nothing selected yet, select category
-            if (!selectedIdx) {
-                setSelectedIdx(idx);
+            if (!selectedCategory) {
+                setSelectedCategory(idx);
                 return;
             }
 
             // else go to link
             window.location.href =
-                links[linkTree[selectedIdx - 1].links[idx - 1]];
+                links[linkTree[selectedCategory - 1].links[idx - 1]];
         };
 
         window.addEventListener('keydown', onKeyDown);
@@ -60,39 +59,34 @@ export const useLinkNavigation = (keyboardNavidationEnabled) => {
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('click', onClick);
         };
-    }, [
-        isKeyboardNavigating,
-        isMouseNavigating,
-        selectedIdx,
-        keyboardNavidationEnabled,
-    ]);
+    }, [isKeyboardNav, isMouseNav, selectedCategory, keyboardNavEnabled]);
 
     useEffect(() => {
-        if (!keyboardNavidationEnabled) {
-            setIsKeyboardNavigating(false);
-            setIsMouseNavigating(false);
-            setSelectedIdx(0);
+        if (!keyboardNavEnabled) {
+            setIsKeyboardNav(false);
+            setIsMouseNav(false);
+            setSelectedCategory(0);
         }
-    }, [keyboardNavidationEnabled]);
+    }, [keyboardNavEnabled]);
 
-    const startMouseNavigation = () => {
-        setSelectedIdx(0);
-        setIsMouseNavigating(true);
+    const startMouseNav = () => {
+        setSelectedCategory(0);
+        setIsMouseNav(true);
     };
 
-    const endMouseNavigation = () => {
-        if (isMouseNavigating) {
-            setIsKeyboardNavigating(false);
+    const endMouseNav = () => {
+        if (isMouseNav) {
+            setIsKeyboardNav(false);
         }
-        setIsMouseNavigating(false);
+        setIsMouseNav(false);
     };
 
     return {
-        selectedIdx,
-        setSelectedIdx,
-        isKeyboardNavigating,
-        isMouseNavigating,
-        startMouseNavigation,
-        endMouseNavigation,
+        selectedCategory,
+        setSelectedCategory,
+        isKeyboardNav,
+        isMouseNav,
+        startMouseNav,
+        endMouseNav,
     };
 };

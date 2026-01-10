@@ -6,8 +6,8 @@ export default function LinkTreeItem({
     className = '',
     children,
     icon = null,
-    hint,
-    hideHint = false,
+    hotkey,
+    isHotkeyHidden = false,
     modifiers = [],
     ...props
 }) {
@@ -17,7 +17,9 @@ export default function LinkTreeItem({
     return (
         <Component className={finalClassName} {...props}>
             {icon && icon}
-            <p className={`hint ${hideHint ? 'hidden' : ''}`}>[{hint}]</p>
+            <p className={`hint ${isHotkeyHidden ? 'hidden' : ''}`}>
+                [{hotkey}]
+            </p>
             <span>{children}</span>
         </Component>
     );
@@ -28,7 +30,8 @@ LinkTreeItem.propTypes = {
     className: PropTypes.string,
     children: PropTypes.node.isRequired,
     icon: PropTypes.element,
-    hint: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    hideHint: PropTypes.bool,
+    hotkey: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+    isHotkeyHidden: PropTypes.bool,
     modifiers: PropTypes.arrayOf(PropTypes.string),
 };

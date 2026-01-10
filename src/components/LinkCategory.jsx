@@ -4,59 +4,56 @@ import LinkTreeItem from 'components/LinkTreeItem';
 import PropTypes from 'prop-types';
 
 export default function LinkCategory({
-    node,
+    categoryData,
     index,
-    selectedIdx,
-    isMouseNavigating,
-    keyboardNavigationEnabled,
+    selectedCategory,
+    isMouseNav,
+    keyboardNavEnabled,
     padding,
     highlightedLink,
 }) {
-    const isCategorySelected = selectedIdx === index + 1;
+    const isCategorySelected = selectedCategory === index + 1;
 
     // Hint visibility logic for Category
-    const hideCategoryHint =
-        isMouseNavigating ||
-        selectedIdx ||
-        index + 1 > 9 ||
-        !keyboardNavigationEnabled;
+    const isCategoryHotkeyHidden =
+        isMouseNav || selectedCategory || index + 1 > 9 || !keyboardNavEnabled;
 
     const categoryModifiers = [
         isCategorySelected && 'selected',
-        isMouseNavigating && 'hoverEffective',
+        isMouseNav && 'hoverEffective',
     ];
 
     return (
         <Fragment>
             <LinkTreeItem
                 className='category'
-                icon={node.icon}
-                hint={index + 1}
-                hideHint={hideCategoryHint}
+                icon={categoryData.icon}
+                hotkey={index + 1}
+                isHotkeyHidden={isCategoryHotkeyHidden}
                 modifiers={categoryModifiers}
             >
-                {node.category}
+                {categoryData.category}
             </LinkTreeItem>
             <div
-                className={`links ${isMouseNavigating ? 'hoverEffective' : ''}`}
+                className={`links ${isMouseNav ? 'hoverEffective' : ''}`}
                 style={{ '--padding': padding }}
             >
                 <div className='panel' />
-                {node.links.map((link, j) => {
+                {categoryData.links.map((link, j) => {
                     const isDisabled = !links[link];
                     const isHighlighted = highlightedLink === link;
 
                     // Hint visibility logic for Link
-                    const hideLinkHint =
-                        isMouseNavigating ||
-                        !selectedIdx ||
+                    const isLinkHotkeyHidden =
+                        isMouseNav ||
+                        !selectedCategory ||
                         j + 1 > 9 ||
                         isDisabled ||
-                        !keyboardNavigationEnabled;
+                        !keyboardNavEnabled;
 
                     const linkModifiers = [
                         isDisabled && 'disabled',
-                        isMouseNavigating && 'hoverEffective',
+                        isMouseNav && 'hoverEffective',
                         isHighlighted && 'highlighted',
                     ];
 
@@ -67,8 +64,8 @@ export default function LinkCategory({
                             id={link}
                             href={links[link]}
                             className='link'
-                            hint={j + 1}
-                            hideHint={hideLinkHint}
+                            hotkey={j + 1}
+                            isHotkeyHidden={isLinkHotkeyHidden}
                             modifiers={linkModifiers}
                         >
                             {link}
@@ -81,15 +78,15 @@ export default function LinkCategory({
 }
 
 LinkCategory.propTypes = {
-    node: PropTypes.shape({
+    categoryData: PropTypes.shape({
         category: PropTypes.string.isRequired,
         icon: PropTypes.element,
         links: PropTypes.arrayOf(PropTypes.string).isRequired,
     }).isRequired,
     index: PropTypes.number.isRequired,
-    selectedIdx: PropTypes.number,
-    isMouseNavigating: PropTypes.bool.isRequired,
-    keyboardNavigationEnabled: PropTypes.bool.isRequired,
+    selectedCategory: PropTypes.number,
+    isMouseNav: PropTypes.bool.isRequired,
+    keyboardNavEnabled: PropTypes.bool.isRequired,
     padding: PropTypes.string.isRequired,
     highlightedLink: PropTypes.string,
 };
