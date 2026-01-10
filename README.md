@@ -34,7 +34,7 @@ My personal browser homepage [hsiii.github.io/homepage](https://hsiii.github.io/
     ```bash
     npm run preview
     ```
-3. Deploy to GitHub Pages (requires [gh-pages](https://github.com/tschaub/gh-pages), default deploy to `release` branch):
+3. Deploy to GitHub Pages (deploy to `release` branch):
     ```bash
     npm run deploy
     ```
