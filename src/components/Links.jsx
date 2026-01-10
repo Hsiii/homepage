@@ -1,10 +1,11 @@
-import React, { useMemo, useEffect, Fragment } from 'react';
+import React, { useMemo, useEffect } from 'react';
 
+import LinkCategory from 'components/LinkCategory';
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-import { linkTree, links } from 'constants';
+import { linkTree } from 'constants';
 
 import 'components/Links.css';
 
@@ -80,65 +81,16 @@ export default function Links({
             </div>
             <div className='panel' />
             {linkTree.map((node, i) => (
-                <Fragment key={node.category}>
-                    <div
-                        className={`category ${
-                            selectedIdx === i + 1 && 'selected'
-                        } ${isMouseNavigating ? 'hoverEffective' : ''}`}
-                    >
-                        {node.icon}
-                        <p
-                            className={`hint ${
-                                (isMouseNavigating ||
-                                    selectedIdx ||
-                                    i + 1 > 9 ||
-                                    !keyboardNavidationEnabled) &&
-                                'hidden'
-                            }`}
-                        >
-                            [{i + 1}]
-                        </p>
-                        <span>{node.category}</span>
-                    </div>
-                    <div
-                        className={`links ${
-                            isMouseNavigating ? 'hoverEffective' : ''
-                        }`}
-                        style={{ '--padding': paddings[i] }}
-                    >
-                        <div className='panel' />
-                        {node.links.map((link, j) => (
-                            <a
-                                id={link}
-                                className={`link ${
-                                    !links[link] ? 'disabled' : ''
-                                } ${
-                                    isMouseNavigating ? 'hoverEffective' : ''
-                                } ${
-                                    highlightedLink === link
-                                        ? 'highlighted'
-                                        : ''
-                                }`}
-                                href={links[link]}
-                                key={link}
-                            >
-                                {link}
-                                <p
-                                    className={`hint ${
-                                        (isMouseNavigating ||
-                                            !selectedIdx ||
-                                            j + 1 > 9 ||
-                                            !links[link] ||
-                                            !keyboardNavidationEnabled) &&
-                                        'hidden'
-                                    }`}
-                                >
-                                    [{j + 1}]
-                                </p>
-                            </a>
-                        ))}
-                    </div>
-                </Fragment>
+                <LinkCategory
+                    key={node.category}
+                    node={node}
+                    index={i}
+                    selectedIdx={selectedIdx}
+                    isMouseNavigating={isMouseNavigating}
+                    keyboardNavigationEnabled={keyboardNavidationEnabled}
+                    padding={paddings[i]}
+                    highlightedLink={highlightedLink}
+                />
             ))}
         </section>
     );
