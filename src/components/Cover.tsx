@@ -12,7 +12,6 @@ import { Help, Mountains } from 'components';
 import Fuse from 'fuse.js';
 import { useHideLinks, useTime } from 'hooks';
 import { Search } from 'lucide-react';
-import { CategoryData } from 'constants';
 
 import 'components/Cover.css';
 
@@ -79,40 +78,43 @@ export default function Cover() {
         }
     };
 
-    const handleClearSearch = useCallback(() => {
+    const handleClearSearch = () => {
         if (inputRef.current) {
             inputRef.current.blur();
         }
-    }, []);
+    };
+
+    const handleSearchBlur = () => {
+        setInputFocused(false);
+        setSearchValue('');
+        if (inputRef.current) {
+            inputRef.current.value = '';
+        }
+    };
 
     return (
         <section className='cover'>
             <Mountains />
-            <span className='title'>{time}</span>
-
             <Help />
-            <div className='search'>
-                <form className='search-form' onSubmit={handleSubmit}>
-                    <div className='search-icon'>
-                        <Search className='icon' size={24} />
-                    </div>
-                    <input
-                        className='search-input'
-                        type='text'
-                        placeholder='Search bookmarks'
-                        autoComplete='off'
-                        ref={inputRef}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                        onFocus={() => setInputFocused(true)}
-                        onBlur={() => {
-                            setInputFocused(false);
-                            setSearchValue('');
-                            if (inputRef.current) {
-                                inputRef.current.value = '';
-                            }
-                        }}
-                    />
-                </form>
+            <div className='cover-content'>
+                <span className='title'>{time}</span>
+                <div className='search'>
+                    <form className='search-form' onSubmit={handleSubmit}>
+                        <div className='search-icon'>
+                            <Search className='icon' size={24} />
+                        </div>
+                        <input
+                            className='search-input'
+                            type='text'
+                            placeholder='Search bookmarks'
+                            autoComplete='off'
+                            ref={inputRef}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onFocus={() => setInputFocused(true)}
+                            onBlur={handleSearchBlur}
+                        />
+                    </form>
+                </div>
             </div>
 
             <Suspense fallback={null}>
