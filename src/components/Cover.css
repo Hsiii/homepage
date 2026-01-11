@@ -2,13 +2,13 @@
     --rise-time: 1.5s;
     --rise-show-time: 1.75s;
     height: 100vh;
-    height: 100dvh;
+    height: 100svh;
 }
 
 .cover-content {
     width: 100%;
     height: 50vh;
-    height: 50dvh;
+    height: 50svh;
     position: fixed;
 
     display: flex;
@@ -52,7 +52,7 @@
 @keyframes rise {
     from {
         translate: 0 25vh;
-        translate: 0 25dvh;
+        translate: 0 25svh;
     }
 }
 

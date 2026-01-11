@@ -26,7 +26,7 @@ html {
         left: 0;
         width: 100vw;
         height: 50vh;
-        height: 50dvh;
+        height: 50svh;
         background-color: var(--clr-neutral-dark);
         z-index: -1;
     }

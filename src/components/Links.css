@@ -157,7 +157,7 @@
 
     width: var(--width);
     height: 100vh;
-    height: 100dvh;
+    height: 100svh;
     padding: 1rem 0;
     padding-top: var(--padding, 1rem);
 
