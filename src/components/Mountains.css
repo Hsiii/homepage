@@ -60,6 +60,7 @@
     to {
         scale: 1 calc(1 - var(--move-speed, 0) * 0.01);
         translate: 0 calc(var(--move-speed, 0) * 1vh);
+        translate: 0 calc(var(--move-speed, 0) * 1dvh);
     }
 }
 
@@ -69,6 +70,7 @@
     left: 0;
     width: 100%;
     height: 40vh; /* Approximate mountain height */
+    height: 40dvh;
     background-color: var(--clr-secondary);
     z-index: 10;
     pointer-events: none;

@@ -1,3 +1,5 @@
+@import './constants/color.css';
+
 * {
     margin: 0;
     padding: 0;
@@ -13,7 +15,7 @@ html {
     ::-webkit-scrollbar {
         width: 0;
     }
-    
+
     /* html background for over scroll */
     background-color: var(--clr-sky-3);
 
@@ -24,13 +26,14 @@ html {
         left: 0;
         width: 100vw;
         height: 50vh;
+        height: 50dvh;
         background-color: var(--clr-neutral-dark);
         z-index: -1;
     }
 }
 
 body {
-    font-family: 
+    font-family:
         'Quicksand',
         system-ui,
         -apple-system,
@@ -42,47 +45,5 @@ body {
         Cantarell,
         'Open Sans',
         'Helvetica Neue',
-        sans-serif 
-}
-
-:root {
-    accent-color: var(--clr-primary);
-    ::selection {
-        background-color: var(--clr-primary-alpha);
-        color: var(--clr-neutral-light);
-    }
-
-    --clr-primary:
-    hsl(275, 72%, 68%);
-    --clr-primary-alpha:
-    hsla(275, 72%, 68%, .8);
-    --clr-secondary:
-    hsl(249, 50%, 60%);
-    --clr-neutral:
-    hsl(249, 25%, 37%);
-    --clr-neutral-light:
-    #fff;
-    --clr-neutral-light-alpha:
-    #fff6;
-    --clr-neutral-dark:
-    #222;
-
-    --clr-sky-1:
-    hsl(249, 25%, 37%);
-    --clr-sky-2:
-    hsl(269, 22%, 55%); 
-    --clr-sky-3:
-    hsl(316, 42%, 82%); 
-    --clr-sky-4:
-    hsl(185, 38%, 94%);
-
-    --clr-search-button:
-    hsl(316, 47%, 64%);
-    --clr-search-button-light:
-    hsl(316, 47%, 80%);
-
-    --clr-disabled:
-    #757575;
-    --clr-text: 
-    #777;
+        sans-serif;
 }
