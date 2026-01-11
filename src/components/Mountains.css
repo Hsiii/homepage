@@ -42,11 +42,15 @@
         --move-speed: 5;
     }
 
-    animation-name: rise-mountain, parallax;
-    animation-duration: var(--rise-time), auto;
-    animation-timing-function: ease-out, linear;
-    animation-timeline: auto, scroll(root);
-    animation-range: auto, exit;
+    animation: rise-mountain var(--rise-time) ease-out;
+
+    @media (width > 600px) {
+        animation-name: rise-mountain, parallax;
+        animation-duration: var(--rise-time), auto;
+        animation-timing-function: ease-out, linear;
+        animation-timeline: auto, scroll(root);
+        animation-range: auto, exit;
+    }
 }
 
 @keyframes rise-mountain {
