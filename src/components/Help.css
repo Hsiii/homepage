@@ -52,6 +52,13 @@
     transform: translateY(0);
 }
 
+.help-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--clr-secondary);
+    margin-bottom: 0.5rem;
+}
+
 .help-content {
     display: flex;
     flex-direction: column;

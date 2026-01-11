@@ -13,6 +13,9 @@ export default function Help() {
 
             <div className='help-dialog'>
                 <div className='help-content'>
+                    <h2 className='help-title'>
+                        If you like keyboard navigation...
+                    </h2>
                     {keyboardNavInfo.map((info, index) => (
                         <div className='help-row' key={index}>
                             <span className='help-desc'>{info[0]}</span>
