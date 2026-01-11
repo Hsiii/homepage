@@ -1,11 +1,12 @@
 import { footerCredit, footerLink } from 'constants';
-import { Cover } from 'components';
+import { Cover, MobileWarning } from 'components';
 
 import 'components/Main.css';
 
 export default function Main() {
     return (
         <>
+            <MobileWarning />
             <main>
                 <Cover />
             </main>
