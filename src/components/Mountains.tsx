@@ -1,28 +1,33 @@
 import { useState } from 'react';
 
+import mountainsSrc from '../assets/images/mountain/mountains.webp';
+
 import 'components/Mountains.css';
 
 export default function Mountains() {
-    const [loadedCount, setLoadedCount] = useState(0);
-    const handleLoad = () => setLoadedCount((p) => p + 1);
+    const [loaded, setLoaded] = useState(false);
 
     return (
         <div className='mountains'>
-            <div className={`placeholder ${loadedCount > 0 ? 'hidden' : ''}`} />
             <img
-                src='assets/images/mountain/back.svg'
-                alt='a flat-color mountain in the background'
-                onLoad={handleLoad}
+                src={mountainsSrc}
+                alt='placeholder mountains'
+                className={`placeholder ${loaded ? 'hidden' : ''}`}
             />
             <img
+                className='parallax-back'
+                src='assets/images/mountain/back.svg'
+                alt='a flat-color mountain in the background'
+                onLoad={() => setLoaded(true)}
+            />
+            <img
+                className='parallax-mid'
                 src='assets/images/mountain/mid.svg'
                 alt='a flat-color mountain in the middle'
-                onLoad={handleLoad}
             />
             <img
                 src='assets/images/mountain/front.svg'
                 alt='a flat-color mountain in the foreground'
-                onLoad={handleLoad}
             />
         </div>
     );
