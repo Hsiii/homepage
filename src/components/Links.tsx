@@ -68,6 +68,14 @@ export default function Links({
                 startMouseNav();
                 onClearSearch();
             }}
+            onClick={() => {
+                startMouseNav();
+                onClearSearch();
+            }}
+            onTouchStart={() => {
+                startMouseNav();
+                onClearSearch();
+            }}
             onMouseOut={endMouseNav}
             aria-hidden={hidden}
             aria-expanded={isKeyboardNav}
