@@ -139,3 +139,15 @@
         opacity: 1;
     }
 }
+
+@media (width < 32rem) {
+    .cover-content.focused {
+        justify-content: flex-start;
+        padding-top: 1rem;
+        transition: 0.2s;
+        z-index: 1000;
+    }
+    .cover-content.focused .title {
+        display: none;
+    }
+}

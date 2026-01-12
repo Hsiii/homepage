@@ -1,7 +1,6 @@
 import React, {
     lazy,
     Suspense,
-    useCallback,
     useEffect,
     useMemo,
     useRef,
@@ -96,7 +95,7 @@ export default function Cover() {
         <section className='cover'>
             <Mountains />
             <Help />
-            <div className='cover-content'>
+            <div className={`cover-content ${match ? 'focused' : ''}`}>
                 <span className='title'>{time}</span>
                 <div className='search'>
                     <form className='search-form' onSubmit={handleSubmit}>
