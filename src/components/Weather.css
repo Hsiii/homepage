@@ -9,7 +9,7 @@
 
     /* Animation consistent with other elements */
     animation: rise-show var(--rise-show-time) ease-in;
-    z-index: 1;
+    z-index: 1000;
 
     margin-bottom: -2rem; /* Pull it slightly closer to title if needed */
 }
@@ -19,13 +19,38 @@
     align-items: center;
 }
 
-.weather-icon {
+.weather-info {
     color: var(--clr-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 @media (max-width: 600px) {
     .weather-container {
         font-size: 1rem;
         gap: 0.5rem;
+    }
+}
+
+.weather-refresh {
+    background: transparent;
+    border: none;
+    color: var(--clr-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: 50%;
+
+    &.loading {
+        animation: spin 1s infinite;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }
