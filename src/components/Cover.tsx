@@ -7,7 +7,7 @@ import React, {
     useState,
 } from 'react';
 import { links, linkTree } from '@constants';
-import { Help, Mountains } from 'components';
+import { Help, Mountains, Weather } from 'components';
 import Fuse from 'fuse.js';
 import { useHideLinks, useTime } from 'hooks';
 import { Search } from 'lucide-react';
@@ -96,6 +96,7 @@ export default function Cover() {
             <Mountains />
             <Help />
             <div className={`cover-content ${match ? 'focused' : ''}`}>
+                <Weather />
                 <span className='title'>{time}</span>
                 <div className='search'>
                     <form className='search-form' onSubmit={handleSubmit}>
