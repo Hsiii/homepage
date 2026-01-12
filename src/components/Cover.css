@@ -90,6 +90,7 @@
         background-color: var(--clr-neutral-light);
         color: var(--clr-text);
         width: 15rem;
+        max-width: 75vw;
         transition: var(--expand-duration);
         &::placeholder {
             opacity: 1;
