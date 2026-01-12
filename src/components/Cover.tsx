@@ -96,8 +96,10 @@ export default function Cover() {
             <Mountains />
             <Help />
             <div className={`cover-content ${match ? 'focused' : ''}`}>
-                <Weather />
-                <span className='title'>{time}</span>
+                <div className='title-container'>
+                    <Weather />
+                    <span className='title'>{time}</span>
+                </div>
                 <div className='search'>
                     <form className='search-form' onSubmit={handleSubmit}>
                         <div className='search-icon'>

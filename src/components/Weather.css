@@ -11,7 +11,7 @@
     animation: rise-show var(--rise-show-time) ease-in;
     z-index: 1;
 
-    margin-bottom: -1rem; /* Pull it slightly closer to title if needed */
+    margin-bottom: -2rem; /* Pull it slightly closer to title if needed */
 }
 
 .weather-container span {

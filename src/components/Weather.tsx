@@ -86,8 +86,8 @@ export default function Weather() {
     const dateStr = date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
+        weekday: 'short',
     });
-    const dayStr = date.toLocaleDateString('en-US', { weekday: 'long' });
 
     const getIcon = (main: string) => {
         switch (main) {
@@ -108,14 +108,16 @@ export default function Weather() {
         }
     };
 
-    return error || loading || !weather ? (
-        <div className='weather-placeholder'></div>
-    ) : (
-        <div className='weather-container'>
-            <span className='weather-date'>{dateStr}</span>
-            <span className='weather-day'>{dayStr}</span>
-            <span className='weather-icon'>{getIcon(weather.main)}</span>
-            <span className='weather-temp'>{Math.round(weather.temp)}°C</span>
-        </div>
+    return (
+        !error &&
+        !loading &&
+        weather && (
+            <div className='weather-container'>
+                <span className='weather-date'>{dateStr}</span>
+                <span className='weather-icon'>
+                    {getIcon(weather.main)} {Math.round(weather.temp)}°C
+                </span>
+            </div>
+        )
     );
 }
