@@ -10,17 +10,17 @@ export default function Mountains() {
         <div className='mountains'>
             <div className={`placeholder ${loadedCount > 0 ? 'hidden' : ''}`} />
             <img
-                src='images/mountain/back.svg'
+                src='assets/images/mountain/back.svg'
                 alt='a flat-color mountain in the background'
                 onLoad={handleLoad}
             />
             <img
-                src='images/mountain/mid.svg'
+                src='assets/images/mountain/mid.svg'
                 alt='a flat-color mountain in the middle'
                 onLoad={handleLoad}
             />
             <img
-                src='images/mountain/front.svg'
+                src='assets/images/mountain/front.svg'
                 alt='a flat-color mountain in the foreground'
                 onLoad={handleLoad}
             />
