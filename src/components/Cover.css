@@ -32,7 +32,7 @@
     font-size: 7.5rem;
     letter-spacing: 0.25rem;
 
-    animation: rise-show var(--rise-show-time) ease-in 1 forwards;
+    animation: rise-show var(--rise-show-time) ease-in;
 
     z-index: 1;
 }
@@ -116,7 +116,7 @@
     .icon {
         color: var(--clr-neutral-light);
         transition: var(--expand-duration);
-        animation: rise-show var(--rise-show-time) ease-in 1 forwards;
+        animation: rise-show var(--rise-show-time) ease-in 1;
     }
 
     .search:hover &,

@@ -8,7 +8,7 @@
     opacity: 0.8;
 
     /* Animation consistent with other elements */
-    animation: rise-show var(--rise-show-time) ease-in 1 forwards;
+    animation: rise-show var(--rise-show-time) ease-in;
     z-index: 1;
 
     margin-bottom: -1rem; /* Pull it slightly closer to title if needed */
