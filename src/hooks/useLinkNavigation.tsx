@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { links, linkTree } from 'constants';
+import { links, linkTree } from '@constants';
 
 export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
     const [selectedCategory, setSelectedCategory] = useState(0);

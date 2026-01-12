@@ -6,7 +6,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { links, linkTree } from 'constants';
+import { links, linkTree } from '@constants';
 import { Help, Mountains } from 'components';
 import Fuse from 'fuse.js';
 import { useHideLinks, useTime } from 'hooks';

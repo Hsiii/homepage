@@ -2,7 +2,7 @@ import { HelpCircle } from 'lucide-react';
 
 import 'components/Help.css';
 
-import { keyboardNavInfo } from 'constants';
+import { keyboardNavInfo } from '@constants';
 
 export default function Help() {
     return (

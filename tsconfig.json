@@ -23,8 +23,8 @@
         "paths": {
             "components/*": ["components/*"],
             "components": ["components"],
-            "constants/*": ["constants/*"],
-            "constants": ["constants"],
+            "@constants/*": ["constants/*"],
+            "@constants": ["constants"],
             "hooks/*": ["hooks/*"],
             "hooks": ["hooks"],
             "types": ["types"]

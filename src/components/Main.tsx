@@ -1,4 +1,4 @@
-import { footerCredit, footerLink } from 'constants';
+import { footerCredit, footerLink } from '@constants';
 import { Cover, MobileWarning } from 'components';
 
 import 'components/Main.css';
