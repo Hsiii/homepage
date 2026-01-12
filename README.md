@@ -1,12 +1,12 @@
 <div align="center">
-   <img alt="Logo" src="https://raw.githubusercontent.com/Hsiii/homepage/release/assets/favicon.png" width="100"/>
+   <img alt="Logo" src="https://raw.githubusercontent.com/Hsiii/homepage/release/assets/images/favicon.png" width="100"/>
 </div>
 <h1 align="center">Homepage</h1>
 <p align="center">
    My personal browser homepage <a href="https://hsiii.github.io/homepage">hsiii.github.io/homepage</a> built with <a href="https://vite.dev/">Vite</a> and <a href="https://react.dev/">React</a>.
 </p>
 
-![Homepage](https://raw.githubusercontent.com/Hsiii/homepage/main/public/images/demo.png)
+![Homepage](https://raw.githubusercontent.com/Hsiii/homepage/main/public/assets/images/demo.png)
 
 ## Installation (requires [Node.js](https://nodejs.org/) 20.x)
 
