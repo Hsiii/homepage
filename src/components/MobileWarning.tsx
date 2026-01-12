@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
 
 import 'components/MobileWarning.css';
 
@@ -9,17 +8,11 @@ export default function MobileWarning() {
     useEffect(() => {
         // Check if device is mobile (< 600px) on initial mount
         const isMobile = window.innerWidth < 600;
-        const dismissed = localStorage.getItem('mobile-warning-dismissed');
 
-        if (isMobile && !dismissed) {
+        if (isMobile) {
             setIsVisible(true);
         }
     }, []);
-
-    const handleDontShowAgain = () => {
-        localStorage.setItem('mobile-warning-dismissed', 'true');
-        setIsVisible(false);
-    };
 
     if (!isVisible) return null;
 
@@ -34,34 +27,16 @@ export default function MobileWarning() {
                 role='dialog'
                 aria-modal='true'
             >
-                <div className='mobile-warning-header'>
-                    <h3 className='mobile-warning-title'>Work in progress</h3>
-                    <button
-                        className='mobile-warning-close-btn'
-                        onClick={() => setIsVisible(false)}
-                        aria-label='Close warning'
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
                 <p>
-                    The mobile version of this site is still under development,
-                    please view on desktop for the best experience.
+                    This site is optimized for a desktop browser homepage. For
+                    the best experience, please visit on a computer.
                 </p>
-                <div className='mobile-warning-actions'>
-                    <button
-                        className='mobile-warning-action-btn'
-                        onClick={() => setIsVisible(false)}
-                    >
-                        Got it
-                    </button>
-                    <button
-                        className='mobile-warning-action-btn'
-                        onClick={handleDontShowAgain}
-                    >
-                        Don't show again
-                    </button>
-                </div>
+                <button
+                    className='mobile-warning-action-btn'
+                    onClick={() => setIsVisible(false)}
+                >
+                    Continue anyway
+                </button>
             </div>
         </div>
     );
