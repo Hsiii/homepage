@@ -36,17 +36,18 @@ export default function Weather() {
     const [error, setError] = useState(false);
 
     useEffect(() => {
-        // Only fetch if not already cached (could add simple caching later if needed, but for now fetch on mount)
-        // Actually, simple caching to sessionStorage might be good to avoid spamming calls on reloads
-        // But let's start simple.
-
-        const fetchWeather = async () => {
-            // Check local storage/session storage? Maybe not needed for MVP.
+        const fetchWeather = async (lat?: string, lon?: string) => {
             try {
                 // Use environment variable for API URL (needed for GitHub Pages + Vercel backend)
                 // Fallback to local /api/weather for local/Vercel deployments
-                const apiUrl =
+                let apiUrl =
                     import.meta.env.VITE_WEATHER_API_URL || '/api/weather';
+
+                if (lat && lon) {
+                    const separator = apiUrl.includes('?') ? '&' : '?';
+                    apiUrl += `${separator}lat=${lat}&lon=${lon}`;
+                }
+
                 const res = await fetch(apiUrl);
                 if (!res.ok) throw new Error('Failed to fetch');
                 const data = await res.json();
@@ -54,14 +55,31 @@ export default function Weather() {
             } catch (err) {
                 console.error(err);
                 setError(true);
-                // Fallback for demo/no-api-key scenarios?
-                // For now just show error state or nothing.
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchWeather();
+        const getCoordinates = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toString();
+                        const lon = position.coords.longitude.toString();
+                        fetchWeather(lat, lon);
+                    },
+                    (error) => {
+                        console.warn('Geolocation denied or failed:', error);
+                        // Fallback to default (handled by API)
+                        fetchWeather();
+                    },
+                );
+            } else {
+                fetchWeather();
+            }
+        };
+
+        getCoordinates();
     }, []);
 
     const date = new Date();
