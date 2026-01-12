@@ -109,7 +109,7 @@ export default function Weather() {
     };
 
     return error || loading || !weather ? (
-        <div className='weather-placeholder'>Weather data not available</div>
+        <div className='weather-placeholder'></div>
     ) : (
         <div className='weather-container'>
             <span className='weather-date'>{dateStr}</span>
