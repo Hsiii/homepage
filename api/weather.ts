@@ -24,7 +24,7 @@ export default async function handler(
     }
 
     const { lat = '25.0330', lon = '121.5654' } = request.query;
-    const apiKey = process.env.OPENWEATHER_API_KEY;
+    const apiKey = process.env.OPENWEATHERMAP_API_KEY;
 
     if (!apiKey) {
         return response.status(500).json({
