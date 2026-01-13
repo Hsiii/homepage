@@ -35,11 +35,41 @@ interface WeatherData {
 const DEFAULT_LAT = '25.0330';
 const DEFAULT_LON = '121.5654';
 
+const CACHE_KEY = 'weather_cache';
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+interface CachedWeather {
+    data: WeatherData;
+    isLocal: boolean;
+    timestamp: number;
+}
+
 export default function Weather() {
-    const [weather, setWeather] = useState<WeatherData | null>(null);
+    const [weather, setWeather] = useState<WeatherData | null>(() => {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            try {
+                const { data }: CachedWeather = JSON.parse(cached);
+                return data;
+            } catch {
+                return null;
+            }
+        }
+        return null;
+    });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
-    const [isLocal, setIsLocal] = useState(false);
+    const [isLocal, setIsLocal] = useState(() => {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            try {
+                const { isLocal }: CachedWeather = JSON.parse(cached);
+                return isLocal;
+            } catch {
+                return false;
+            }
+        }
+        return false;
+    });
 
     const fetchWeather = async (lat?: string, lon?: string) => {
         setLoading(true);
@@ -55,9 +85,18 @@ export default function Weather() {
             if (!res.ok) throw new Error('Failed to fetch');
             const data = await res.json();
             setWeather(data);
+            const isLocalUpdate = !!(lat && lon);
+            setIsLocal(isLocalUpdate);
+
+            // Update Cache
+            const cache: CachedWeather = {
+                data,
+                isLocal: isLocalUpdate,
+                timestamp: Date.now(),
+            };
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
         } catch (err) {
             console.error(err);
-            setError(true);
         } finally {
             setLoading(false);
         }
@@ -70,23 +109,33 @@ export default function Weather() {
                     const lat = position.coords.latitude.toString();
                     const lon = position.coords.longitude.toString();
                     fetchWeather(lat, lon);
-                    setIsLocal(true);
                 },
                 (error) => {
                     console.warn('Geolocation denied or failed:', error);
                     // Fallback to default (Taipei)
                     fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-                    setIsLocal(false);
                 },
             );
         } else {
             fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-            setIsLocal(false);
         }
     };
 
     useEffect(() => {
         const initWeather = async () => {
+            // Check if cache is still valid
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                try {
+                    const { timestamp }: CachedWeather = JSON.parse(cached);
+                    if (Date.now() - timestamp < CACHE_TTL) {
+                        return; // Cache is fresh, skip background update
+                    }
+                } catch {
+                    // Ignore cache error
+                }
+            }
+
             if (navigator.permissions && navigator.permissions.query) {
                 try {
                     const result = await navigator.permissions.query({
@@ -94,25 +143,22 @@ export default function Weather() {
                     });
                     if (result.state === 'granted') {
                         getCoordinates();
-                    } else {
-                        // Default to Taipei
+                    } else if (
+                        result.state === 'prompt' ||
+                        result.state === 'denied'
+                    ) {
                         fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-                        setIsLocal(false);
                     }
-                } catch (e) {
-                    console.error('Error checking permissions:', e);
-                    // Default to Taipei
+                } catch {
                     fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-                    setIsLocal(false);
                 }
             } else {
                 fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-                setIsLocal(false);
             }
         };
 
         initWeather();
-    }, []);
+    }, [fetchWeather, getCoordinates]);
 
     const handleRefresh = () => {
         getCoordinates();
@@ -145,7 +191,6 @@ export default function Weather() {
     };
 
     return (
-        !error &&
         weather && (
             <div className='weather-container'>
                 <span className='weather-date'>{dateStr}</span>
