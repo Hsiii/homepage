@@ -1,6 +1,10 @@
 # Project dependencies
 node_modules
 
+# Environment variables
+.env*
+!.env.example
+
 # Build output
 .DS_Store
 dist
