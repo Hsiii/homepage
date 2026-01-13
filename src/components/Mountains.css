@@ -67,11 +67,3 @@
         translate: 0 calc(var(--move-speed, 0) * 1svh);
     }
 }
-
-.placeholder {
-    position: absolute;
-
-    &.hidden {
-        display: none;
-    }
-}
