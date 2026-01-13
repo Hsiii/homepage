@@ -1,38 +1,68 @@
+import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 import js from '@eslint/js';
 import importPlugin from 'eslint-plugin-import';
 import pluginReact from 'eslint-plugin-react';
+import pluginReactHooks from 'eslint-plugin-react-hooks';
 import sortKeys from 'eslint-plugin-sort-keys';
-import { defineConfig } from 'eslint/config';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default defineConfig([
-    { ignores: ['dist/'] },
-    pluginReact.configs.flat.recommended,
+export default tseslint.config(
     {
-        files: ['**/*.{js,mjs,cjs,jsx}'],
-        plugins: { js },
-        extends: ['js/recommended'],
+        ignores: ['dist/'],
+    },
+    js.configs.recommended,
+    ...tseslint.configs.recommended,
+    ...fixupConfigRules(pluginReact.configs.flat.recommended),
+    {
+        plugins: {
+            'react-hooks': fixupPluginRules(pluginReactHooks),
+        },
+        rules: {
+            ...pluginReactHooks.configs.recommended.rules,
+        },
+    },
+    {
+        settings: {
+            react: {
+                version: 'detect',
+            },
+        },
+    },
+    {
+        files: ['**/*.{ts,tsx}'],
         languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+                project: './tsconfig.json',
+                tsconfigRootDir: import.meta.dirname,
+            },
             globals: {
                 ...globals.browser,
                 ...globals.node,
                 webpack: 'readonly',
             },
         },
+        rules: {
+            'react/react-in-jsx-scope': 'off',
+        },
     },
     {
-        files: ['**/*.{js,jsx,mjs,cjs}'],
-        plugins: { import: importPlugin },
+        plugins: {
+            import: fixupPluginRules(importPlugin),
+        },
         rules: {
             'import/no-duplicates': ['error', { considerQueryString: true }],
             'import/order': 'off',
         },
     },
     {
-        files: ['**/links.jsx'],
-        plugins: { 'sort-keys': sortKeys },
+        files: ['**/links.ts'],
+        plugins: {
+            'sort-keys': sortKeys,
+        },
         rules: {
             'sort-keys/sort-keys-fix': 'error',
         },
     },
-]);
+);

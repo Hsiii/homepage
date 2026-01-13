@@ -71,6 +71,7 @@ export const linkTree: CategoryData[] = [
         icon: <CodeXml className='icon' />,
         links: [
             'GitHub',
+            'Vercel',
             'React dev',
             'Colab',
             'Lucide',

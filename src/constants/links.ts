@@ -63,6 +63,7 @@ export const links: Record<string, string> = {
     'Twitter': 'https://twitter.com/home',
     'Unix': 'https://hackmd.io/@Koios/ryGcbe3R2/%2F%40Koios%2F3YUbrErzRt-xYy--2Pd_Hg',
     'Utaten': 'https://utaten.com/search',
+    'Vercel': 'https://vercel.com/',
     'Vue dev': 'http://localhost:5173/',
     'YouTube': 'https://www.youtube.com/',
     'ccxp': 'https://www.ccxp.nthu.edu.tw/ccxp/INQUIRE/',
