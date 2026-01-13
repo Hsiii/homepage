@@ -4,11 +4,24 @@ export default async function handler(
     request: VercelRequest,
     response: VercelResponse,
 ) {
-    // Enable CORS
+    const allowedOrigins = [
+        'https://hsiii.github.io',
+        'http://localhost:4173',
+        'http://localhost:5173',
+    ];
+    const origin = request.headers.origin;
+
+    if (origin && allowedOrigins.includes(origin)) {
+        response.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+        // Fallback or restrictive default
+        response.setHeader(
+            'Access-Control-Allow-Origin',
+            'https://hsiii.github.io',
+        );
+    }
+
     response.setHeader('Access-Control-Allow-Credentials', 'true');
-    response.setHeader('Access-Control-Allow-Origin', '*');
-    // Note: In production, you might want to replace '*' with your specific GitHub Pages domain
-    // e.g., 'https://yourname.github.io' for better security.
     response.setHeader(
         'Access-Control-Allow-Methods',
         'GET,OPTIONS,PATCH,DELETE,POST,PUT',

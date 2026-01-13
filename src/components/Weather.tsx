@@ -44,9 +44,7 @@ export default function Weather() {
     const fetchWeather = async (lat?: string, lon?: string) => {
         setLoading(true);
         try {
-            // Use environment variable for API URL (needed for GitHub Pages + Vercel backend)
-            // Fallback to local /api/weather for local/Vercel deployments
-            let apiUrl = import.meta.env.VITE_WEATHER_API_URL || '/api/weather';
+            let apiUrl = 'https://hsi-homepage.vercel.app/api/weather';
 
             if (lat && lon) {
                 const separator = apiUrl.includes('?') ? '&' : '?';
