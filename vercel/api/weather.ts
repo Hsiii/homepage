@@ -8,13 +8,19 @@ export default async function handler(
         'https://hsiii.github.io',
         'http://localhost:4173',
         'http://localhost:5173',
+        'http://127.0.0.1:4173',
+        'http://127.0.0.1:5173',
     ];
     const origin = request.headers.origin;
+
+    // Critical for Vercel/CDN caching: tell the cache that the response
+    // depends on the Origin header.
+    response.setHeader('Vary', 'Origin');
 
     if (origin && allowedOrigins.includes(origin)) {
         response.setHeader('Access-Control-Allow-Origin', origin);
     } else {
-        // Fallback or restrictive default
+        // Fallback to primary production domain
         response.setHeader(
             'Access-Control-Allow-Origin',
             'https://hsiii.github.io',
@@ -28,7 +34,7 @@ export default async function handler(
     );
     response.setHeader(
         'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Origin',
     );
 
     // Handle OPTIONS request for preflight
