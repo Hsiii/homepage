@@ -1,5 +1,5 @@
 <div align="center">
-   <img alt="Logo" src="https://raw.githubusercontent.com/Hsiii/homepage/gh-pages/assets/favicon.ico" width="100"/>
+   <img alt="Logo" src="https://raw.githubusercontent.com/Hsiii/homepage/gh-pages/assets/favicon.ico"/>
 </div>
 <h1 align="center">Homepage</h1>
 <p align="center">
