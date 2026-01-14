@@ -1,5 +1,5 @@
 # Project dependencies
-node_modules
+node_modules/
 
 # Environment variables
 .env*
@@ -7,4 +7,4 @@ node_modules
 
 # Build output
 .DS_Store
-dist
+dist/
