@@ -53,8 +53,8 @@
 }
 
 .help-title {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font: var(--fontBoldLg);
+
     color: var(--clr-secondary);
     margin-bottom: 0.5rem;
 }
@@ -82,15 +82,8 @@
     display: inline-block;
     padding: 0.1em 0.4em;
     margin: 0;
-    font-size: 0.85em;
-    font-family:
-        ui-monospace,
-        SFMono-Regular,
-        SF Mono,
-        Menlo,
-        Consolas,
-        Liberation Mono,
-        monospace;
+    font-size: var(--fs-sm);
+
     background-color: var(--clr-neutral-light);
     border-radius: 4px;
     color: var(--clr-primary);

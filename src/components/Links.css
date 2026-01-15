@@ -3,11 +3,11 @@
     --indicator-gap: 0.5rem;
     --indicator-width: 2rem;
     --link-height: 3.5rem;
-    --font-size: 1.2rem;
+    --font-size: var(--fs-lg);
 
     @media (width < 32rem) {
         --width: 10rem;
-        --font-size: 1rem;
+        --font-size: var(--fs-base);
     }
 
     position: absolute;
@@ -146,7 +146,7 @@
         position: relative;
         left: 1.75rem;
         font-size: var(--font-size);
-        font-weight: bold;
+        font-weight: var(--fw-bold);
         color: var(--clr-neutral);
     }
 }
@@ -199,8 +199,9 @@
 
         color: var(--clr-neutral);
         font-size: var(--font-size);
-        font-weight: bold;
+        font-weight: var(--fw-bold);
         background: transparent;
+
         transition: 0.2s;
         z-index: 10;
 
@@ -229,10 +230,10 @@
     position: absolute;
     right: 2rem;
     text-align: center;
-    font-size: 0.75rem;
+    font-size: var(--fs-sm);
     color: var(--clr-neutral);
     opacity: 0.75;
-    font-weight: normal;
+
     transition: 0.25s;
 
     &.hidden {
