@@ -35,7 +35,8 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 
-    font-size: 7.5rem;
+    font-size: var(--fs-huge);
+
     letter-spacing: 0.25rem;
 
     animation: rise-show var(--rise-show-time) ease-in;
@@ -80,11 +81,10 @@
 }
 
 .search-input {
-    font-family: inherit;
-    font-weight: 500;
+    font: var(--fontRegularLg);
     width: 0;
     height: var(--height);
-    font-size: 1.2rem;
+
     background-color: var(--clr-search-button-light);
     color: var(--clr-text);
     outline: none;
@@ -117,7 +117,7 @@
     place-items: center;
     opacity: 0.75;
 
-    font-size: 1.2rem;
+    font-size: var(--fs-lg);
 
     .icon {
         color: var(--clr-neutral-light);
