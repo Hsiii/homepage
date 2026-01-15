@@ -1,4 +1,12 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE files
+.vscode/
+
+# Others
 bookmarkLink.jsx
-dist
-node_modules
 color.css
