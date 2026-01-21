@@ -44,20 +44,7 @@ export const linkTree: CategoryData[] = [
         icon: <Gamepad2 className='icon' />,
         links: ['Tetr.io', 'maimai'],
     },
-    {
-        category: 'Tools',
-        icon: <ToolCase className='icon' />,
-        links: [
-            'HackMD',
-            'Gemini',
-            'Mathpix',
-            'OJAD',
-            'Famiport',
-            'Train',
-            'Flowchart',
-            'Overleaf',
-        ],
-    },
+
     {
         category: 'Dev',
         icon: <CodeXml className='icon' />,
@@ -84,6 +71,20 @@ export const linkTree: CategoryData[] = [
             'Line of Action',
             'Quickposes',
             'Hololive',
+        ],
+    },
+    {
+        category: 'Tools',
+        icon: <ToolCase className='icon' />,
+        links: [
+            'HackMD',
+            'Gemini',
+            'Mathpix',
+            'OJAD',
+            'Famiport',
+            'Train',
+            'Flowchart',
+            'Overleaf',
         ],
     },
     {
