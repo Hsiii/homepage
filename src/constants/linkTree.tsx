@@ -2,11 +2,11 @@ import {
     BookOpenText,
     CodeXml,
     ToolCase,
-    Youtube,
+    MonitorPlay,
     Brush,
-    MessageSquare,
+    MessagesSquare,
     Gamepad2,
-    LoaderCircle,
+    LayoutGrid,
 } from 'lucide-react';
 import { ReactElement } from 'react';
 
@@ -18,7 +18,7 @@ export type CategoryData = {
 
 export const linkTree: CategoryData[] = [
     {
-        category: 'School',
+        category: 'Study',
         icon: <BookOpenText className='icon' />,
         links: [
             'eeclass',
@@ -31,19 +31,12 @@ export const linkTree: CategoryData[] = [
     },
     {
         category: 'SNS',
-        icon: <MessageSquare className='icon' />,
-        links: [
-            'Messenger',
-            'Instagram',
-            'Twitter',
-            'Facebook',
-            'Discord',
-            'Gmail',
-        ],
+        icon: <MessagesSquare className='icon' />,
+        links: ['Messenger', 'Instagram', 'Twitter', 'Facebook', 'Discord'],
     },
     {
         category: 'Media',
-        icon: <Youtube className='icon' />,
+        icon: <MonitorPlay className='icon' />,
         links: ['YouTube', 'Anigamer', 'Spotify', 'Utaten', 'Dam'],
     },
     {
@@ -57,7 +50,6 @@ export const linkTree: CategoryData[] = [
         links: [
             'HackMD',
             'Gemini',
-            'NotebookLM',
             'Mathpix',
             'OJAD',
             'Famiport',
@@ -67,13 +59,13 @@ export const linkTree: CategoryData[] = [
         ],
     },
     {
-        category: 'Code',
+        category: 'Dev',
         icon: <CodeXml className='icon' />,
         links: [
             'GitHub',
-            'Vercel',
-            'React dev',
             'Colab',
+            'React dev',
+            'Vercel',
             'Lucide',
             'Font',
             'Squoosh',
@@ -96,16 +88,7 @@ export const linkTree: CategoryData[] = [
     },
     {
         category: 'GSuite',
-        icon: <LoaderCircle className='icon' />,
-        links: [
-            'Gemini',
-            'Maps',
-            'Drive',
-            'Calendar',
-            'Doc',
-            'Sheet',
-            'Slide',
-            'Gmail',
-        ],
+        icon: <LayoutGrid className='icon' />,
+        links: ['Maps', 'Drive', 'Calendar', 'Doc', 'Sheet', 'Slide', 'Gmail'],
     },
 ];
