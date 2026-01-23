@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { linkTree } from '@constants';
 import LinkCategory from 'components/LinkCategory';
 import { useLinkNavigation } from 'hooks';
@@ -30,13 +30,13 @@ export default function Links({
         endMouseNav,
     } = useLinkNavigation(keyboardNavEnabled);
 
-    useEffect(() => {
-        if (highlightedCategoryIdx) {
-            setSelectedCategory(highlightedCategoryIdx);
-        } else {
-            setSelectedCategory(0);
-        }
-    }, [highlightedCategoryIdx, setSelectedCategory]);
+    const [prevHighlightedCategoryIdx, setPrevHighlightedCategoryIdx] =
+        useState(highlightedCategoryIdx);
+
+    if (highlightedCategoryIdx !== prevHighlightedCategoryIdx) {
+        setPrevHighlightedCategoryIdx(highlightedCategoryIdx);
+        setSelectedCategory(highlightedCategoryIdx || 0);
+    }
 
     const panelPaddings = useMemo(() => {
         const windowHeight = window.innerHeight;

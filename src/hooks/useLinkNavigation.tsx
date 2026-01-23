@@ -5,6 +5,18 @@ export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
     const [selectedCategory, setSelectedCategory] = useState(0);
     const [isKeyboardNav, setIsKeyboardNav] = useState(false);
     const [isMouseNav, setIsMouseNav] = useState(true);
+    const [prevKeyboardNavEnabled, setPrevKeyboardNavEnabled] =
+        useState(keyboardNavEnabled);
+
+    // Adjust state during render when keyboardNavEnabled changes (prevents cascading render warning)
+    if (keyboardNavEnabled !== prevKeyboardNavEnabled) {
+        setPrevKeyboardNavEnabled(keyboardNavEnabled);
+        if (!keyboardNavEnabled) {
+            setIsKeyboardNav(false);
+            setIsMouseNav(false);
+            setSelectedCategory(0);
+        }
+    }
 
     useEffect(() => {
         const onClick = () => {
@@ -60,14 +72,6 @@ export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
             window.removeEventListener('click', onClick);
         };
     }, [isKeyboardNav, isMouseNav, selectedCategory, keyboardNavEnabled]);
-
-    useEffect(() => {
-        if (!keyboardNavEnabled) {
-            setIsKeyboardNav(false);
-            setIsMouseNav(false);
-            setSelectedCategory(0);
-        }
-    }, [keyboardNavEnabled]);
 
     const startMouseNav = () => {
         setSelectedCategory(0);
