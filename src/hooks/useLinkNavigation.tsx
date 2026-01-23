@@ -2,13 +2,19 @@ import { useEffect, useState } from 'react';
 import { links, linkTree } from '@constants';
 
 export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
+    // 1-based indexing
     const [selectedCategory, setSelectedCategory] = useState(0);
+
+    // Shows hotkey hint, expands the base panel
     const [isKeyboardNav, setIsKeyboardNav] = useState(false);
+
+    // Hide the hotkey hint, cancels keyboard navigation
     const [isMouseNav, setIsMouseNav] = useState(true);
+
     const [prevKeyboardNavEnabled, setPrevKeyboardNavEnabled] =
         useState(keyboardNavEnabled);
 
-    // Adjust state during render when keyboardNavEnabled changes (prevents cascading render warning)
+    // Clear nav states
     if (keyboardNavEnabled !== prevKeyboardNavEnabled) {
         setPrevKeyboardNavEnabled(keyboardNavEnabled);
         if (!keyboardNavEnabled) {
@@ -60,7 +66,7 @@ export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
                 return;
             }
 
-            // else go to link
+            // else navigate to the selected link
             window.location.href =
                 links[linkTree[selectedCategory - 1].links[idx - 1]];
         };
