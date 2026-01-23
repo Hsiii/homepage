@@ -5,7 +5,7 @@ export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
     // 1-based indexing
     const [selectedCategory, setSelectedCategory] = useState(0);
 
-    // Shows hotkey hint, expands the base panel
+    // Shows hotkey hint, expands the base panel, cancels mouse navigation
     const [isKeyboardNav, setIsKeyboardNav] = useState(false);
 
     // Hide the hotkey hint, cancels keyboard navigation
