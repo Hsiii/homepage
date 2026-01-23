@@ -27,6 +27,7 @@ export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
     useEffect(() => {
         const onClick = () => {
             setIsKeyboardNav(false);
+            setSelectedCategory(0);
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
