@@ -230,7 +230,7 @@
     position: absolute;
     right: 2rem;
     text-align: center;
-    font-size: var(--fs-sm);
+    font: var(--fontBoldSm);
     color: var(--clr-neutral);
     opacity: 0.75;
 
