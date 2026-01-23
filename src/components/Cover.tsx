@@ -17,8 +17,8 @@ import 'components/Cover.css';
 const Links = lazy(() => import('components/Links'));
 
 interface LinkItem {
+    category: number;
     link: string;
-    categoryIndex: number;
 }
 
 export default function Cover() {
@@ -33,8 +33,8 @@ export default function Cover() {
         return linkTree.flatMap((category, categoryIndex) =>
             category.links.map((link) => ({
                 link,
-                categoryIndex: categoryIndex + 1,
-            })),
+                category: categoryIndex + 1,
+            }))
         );
     }, []);
 
@@ -120,15 +120,13 @@ export default function Cover() {
             </div>
 
             <Suspense fallback={null}>
-                {
-                    <Links
-                        hidden={hideLinks}
-                        keyboardNavEnabled={!inputFocused}
-                        highlightedLink={match?.link}
-                        highlightedCategoryIdx={match?.categoryIndex}
-                        onClearSearch={handleClearSearch}
-                    />
-                }
+                <Links
+                    hidden={hideLinks}
+                    isSearchNav={inputFocused}
+                    highlightedLink={match?.link}
+                    highlightedCategory={match?.category}
+                    onClearSearch={handleClearSearch}
+                />
             </Suspense>
         </section>
     );
