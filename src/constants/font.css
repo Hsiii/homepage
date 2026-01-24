@@ -7,18 +7,21 @@
 
     /* Font Size */
     --fs-sm: 0.85rem;
-    --fs-base: 1rem;
+    --fs-md: 1rem;
     --fs-lg: 1.2rem;
-    --fs-huge: 7.5rem;
+    --fs-xl: 7.5rem;
 
     /* Font Weight */
     --fw-base: 500;
     --fw-bold: 700;
 
     /* Semantic Fonts */
-    --fontRegularBase: var(--fw-base) var(--fs-base) var(--ff-quicksand);
-    --fontRegularLg: var(--fw-base) var(--fs-lg) var(--ff-quicksand);
-    --fontBoldBase: var(--fw-bold) var(--fs-base) var(--ff-quicksand);
+    --fontBaseSm: var(--fw-base) var(--fs-sm) var(--ff-quicksand);
+    --fontBaseMd: var(--fw-base) var(--fs-md) var(--ff-quicksand);
+    --fontBaseLg: var(--fw-base) var(--fs-lg) var(--ff-quicksand);
+    --fontBaseXl: var(--fw-base) var(--fs-xl) var(--ff-quicksand);
+    --fontBoldSm: var(--fw-bold) var(--fs-sm) var(--ff-quicksand);
+    --fontBoldMd: var(--fw-bold) var(--fs-md) var(--ff-quicksand);
     --fontBoldLg: var(--fw-bold) var(--fs-lg) var(--ff-quicksand);
-    --fontBoldHuge: var(--fw-bold) var(--fs-huge) var(--ff-quicksand);
+    --fontBoldXl: var(--fw-bold) var(--fs-xl) var(--ff-quicksand);
 }

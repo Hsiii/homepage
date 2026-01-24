@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { linkTree } from '@constants';
 import LinkCategory from 'components/LinkCategory';
 import { useLinkNavigation } from 'hooks';
@@ -7,36 +7,27 @@ import { Bookmark } from 'lucide-react';
 import 'components/Links.css';
 
 interface LinksProps {
-    hidden?: boolean;
-    keyboardNavEnabled?: boolean;
+    hidden: boolean;
+    isSearchNav: boolean;
     highlightedLink?: string;
-    highlightedCategoryIdx?: number;
+    highlightedCategory?: number;
     onClearSearch: () => void;
 }
 
 export default function Links({
     hidden,
-    keyboardNavEnabled = true,
+    isSearchNav = false,
     highlightedLink,
-    highlightedCategoryIdx,
+    highlightedCategory,
     onClearSearch,
 }: LinksProps) {
     const {
         selectedCategory,
-        setSelectedCategory,
         isKeyboardNav,
         isMouseNav,
         startMouseNav,
         endMouseNav,
-    } = useLinkNavigation(keyboardNavEnabled);
-
-    useEffect(() => {
-        if (highlightedCategoryIdx) {
-            setSelectedCategory(highlightedCategoryIdx);
-        } else {
-            setSelectedCategory(0);
-        }
-    }, [highlightedCategoryIdx, setSelectedCategory]);
+    } = useLinkNavigation(isSearchNav, highlightedCategory);
 
     const panelPaddings = useMemo(() => {
         const windowHeight = window.innerHeight;
@@ -55,7 +46,7 @@ export default function Links({
             if (padding < remToPx) padding = remToPx;
             return padding + 'px';
         });
-    }, [window.innerHeight, linkTree]);
+    }, []);
 
     return (
         <section
@@ -91,7 +82,7 @@ export default function Links({
                     index={i}
                     selectedCategory={selectedCategory}
                     isMouseNav={isMouseNav}
-                    keyboardNavEnabled={keyboardNavEnabled}
+                    keyboardNavEnabled={!isSearchNav}
                     padding={panelPaddings[i]}
                     highlightedLink={highlightedLink}
                 />

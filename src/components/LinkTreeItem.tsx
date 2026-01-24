@@ -27,9 +27,9 @@ export default function LinkTreeItem({
     return (
         <Component className={finalClassName} {...props}>
             {icon && icon}
-            <p className={`hint ${isHotkeyHidden ? 'hidden' : ''}`}>
+            <code className={`hint ${isHotkeyHidden ? 'hidden' : ''}`}>
                 [{hotkey}]
-            </p>
+            </code>
             <span>{children}</span>
         </Component>
     );

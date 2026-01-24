@@ -17,7 +17,7 @@
 
 .mobile-warning-dialog p {
     color: var(--clr-text);
-    font: var(--fontRegularLg);
+    font: var(--fontBaseLg);
 
     margin-bottom: 1rem;
 }
@@ -29,7 +29,7 @@
     border-radius: 0.5rem;
     background-color: var(--clr-primary);
     color: var(--clr-neutral-light);
-    font: var(--fontBoldBase);
+    font: var(--fontBoldMd);
 
     cursor: pointer;
 }

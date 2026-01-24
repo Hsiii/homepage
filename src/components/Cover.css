@@ -35,7 +35,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 
-    font-size: var(--fs-huge);
+    font-size: var(--fs-xl);
 
     letter-spacing: 0.25rem;
 
@@ -81,7 +81,7 @@
 }
 
 .search-input {
-    font: var(--fontRegularLg);
+    font: var(--fontBaseLg);
     width: 0;
     height: var(--height);
 

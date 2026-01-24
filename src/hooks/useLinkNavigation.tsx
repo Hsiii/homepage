@@ -1,14 +1,43 @@
 import { useEffect, useState } from 'react';
 import { links, linkTree } from '@constants';
 
-export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
+export const useLinkNavigation = (
+    isSearchNav: boolean,
+    highlightedCategory?: number
+) => {
+    // 1-based indexing
     const [selectedCategory, setSelectedCategory] = useState(0);
+
+    const [prevHighlightedCategory, setPrevHighlightedCategory] =
+        useState(highlightedCategory);
+
+    if (highlightedCategory !== prevHighlightedCategory) {
+        setPrevHighlightedCategory(highlightedCategory);
+        setSelectedCategory(highlightedCategory || 0);
+    }
+
+    // Shows hotkey hint, expands the base panel, cancels mouse navigation
     const [isKeyboardNav, setIsKeyboardNav] = useState(false);
-    const [isMouseNav, setIsMouseNav] = useState(true);
+
+    // Hide the hotkey hint, cancels keyboard navigation
+    const [isMouseNav, setIsMouseNav] = useState(false);
+
+    const [prevIsSearchNav, setPrevIsSearchNav] = useState(isSearchNav);
+
+    // Clear nav states
+    if (isSearchNav !== prevIsSearchNav) {
+        setPrevIsSearchNav(isSearchNav);
+        if (isSearchNav) {
+            setIsKeyboardNav(false);
+            setIsMouseNav(false);
+            setSelectedCategory(0);
+        }
+    }
 
     useEffect(() => {
         const onClick = () => {
             setIsKeyboardNav(false);
+            setSelectedCategory(0);
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
@@ -17,15 +46,12 @@ export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
 
             // activate navigation
             if (!isKeyboardNav) {
-                if (key === '1' && keyboardNavEnabled) {
+                if (key === '1' && !isSearchNav) {
                     setIsKeyboardNav(true);
                     setIsMouseNav(false);
                 }
                 return;
             }
-
-            // disable when mouse navigation is active
-            if (isMouseNav) return;
 
             // go to previous layer on escape
             if (e.key === 'Escape') {
@@ -48,7 +74,7 @@ export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
                 return;
             }
 
-            // else go to link
+            // else navigate to the selected link
             window.location.href =
                 links[linkTree[selectedCategory - 1].links[idx - 1]];
         };
@@ -59,25 +85,15 @@ export const useLinkNavigation = (keyboardNavEnabled: boolean) => {
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('click', onClick);
         };
-    }, [isKeyboardNav, isMouseNav, selectedCategory, keyboardNavEnabled]);
-
-    useEffect(() => {
-        if (!keyboardNavEnabled) {
-            setIsKeyboardNav(false);
-            setIsMouseNav(false);
-            setSelectedCategory(0);
-        }
-    }, [keyboardNavEnabled]);
+    }, [isKeyboardNav, isMouseNav, selectedCategory, isSearchNav]);
 
     const startMouseNav = () => {
-        setSelectedCategory(0);
         setIsMouseNav(true);
+        setIsKeyboardNav(false);
+        setSelectedCategory(0);
     };
 
     const endMouseNav = () => {
-        if (isMouseNav) {
-            setIsKeyboardNav(false);
-        }
         setIsMouseNav(false);
     };
 
