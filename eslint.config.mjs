@@ -64,5 +64,5 @@ export default tseslint.config(
         rules: {
             'sort-keys/sort-keys-fix': 'error',
         },
-    },
+    }
 );
