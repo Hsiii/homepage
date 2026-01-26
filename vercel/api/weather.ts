@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(
     request: VercelRequest,
-    response: VercelResponse,
+    response: VercelResponse
 ) {
     const allowedOrigins = [
         'https://hsiii.github.io',
@@ -23,18 +23,18 @@ export default async function handler(
         // Fallback to primary production domain
         response.setHeader(
             'Access-Control-Allow-Origin',
-            'https://hsiii.github.io',
+            'https://hsiii.github.io'
         );
     }
 
     response.setHeader('Access-Control-Allow-Credentials', 'true');
     response.setHeader(
         'Access-Control-Allow-Methods',
-        'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+        'GET,OPTIONS,PATCH,DELETE,POST,PUT'
     );
     response.setHeader(
         'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Origin',
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Origin'
     );
 
     // Handle OPTIONS request for preflight

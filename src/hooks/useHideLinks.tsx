@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const useHideLinks = () => {
     const ticking = useRef(false);
-    const [hideLinks, setHideLinks] = useState(false);
+    const [hideLinks, setHideLinks] = useState(
+        () => typeof window !== 'undefined' && window.scrollY !== 0
+    );
 
     const handleScroll = useCallback(() => {
         setHideLinks(window.scrollY !== 0);
@@ -19,10 +21,9 @@ export const useHideLinks = () => {
     }, [handleScroll]);
 
     useEffect(() => {
-        handleScroll();
-        window.addEventListener('scroll', onScroll);
+        window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
-    }, [handleScroll, onScroll]);
+    }, [onScroll]);
 
     return { hideLinks };
 };

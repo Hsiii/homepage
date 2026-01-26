@@ -30,5 +30,5 @@
             "types": ["types"]
         }
     },
-    "include": ["src", "api", "vite.config.ts"]
+    "include": ["src", "vercel/api", "vite.config.ts"]
 }

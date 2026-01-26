@@ -1,14 +1,14 @@
+import { ReactElement } from 'react';
 import {
     BookOpenText,
-    CodeXml,
-    ToolCase,
-    MonitorPlay,
     Brush,
-    MessagesSquare,
+    CodeXml,
     Gamepad2,
     LayoutGrid,
+    MessagesSquare,
+    MonitorPlay,
+    ToolCase,
 } from 'lucide-react';
-import { ReactElement } from 'react';
 
 export type CategoryData = {
     category: string;

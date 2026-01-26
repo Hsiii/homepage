@@ -1,16 +1,16 @@
 footer {
     height: calc(10rem);
-    
+
     background-color: var(--clr-neutral-dark);
-    
+
     display: grid;
-    place-items: center;   
+    place-items: center;
 
     a {
         text-decoration: none;
         color: var(--clr-neutral-light);
-        filter: brightness(.8);
-        transition: .2s;
+        filter: brightness(0.8);
+        transition: 0.2s;
 
         &:hover {
             filter: brightness(1);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Cloud,
     CloudDrizzle,
@@ -71,7 +71,7 @@ export default function Weather() {
         return false;
     });
 
-    const fetchWeather = async (lat?: string, lon?: string) => {
+    const fetchWeather = useCallback(async (lat?: string, lon?: string) => {
         setLoading(true);
         try {
             let apiUrl = 'https://hsi-homepage.vercel.app/api/weather';
@@ -100,9 +100,9 @@ export default function Weather() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const getCoordinates = () => {
+    const getCoordinates = useCallback(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -114,12 +114,12 @@ export default function Weather() {
                     console.warn('Geolocation denied or failed:', error);
                     // Fallback to default (Taipei)
                     fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-                },
+                }
             );
         } else {
             fetchWeather(DEFAULT_LAT, DEFAULT_LON);
         }
-    };
+    }, [fetchWeather]);
 
     useEffect(() => {
         const initWeather = async () => {
