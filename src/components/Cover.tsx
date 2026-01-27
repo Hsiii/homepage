@@ -95,7 +95,7 @@ export default function Cover() {
         <section className='cover'>
             <Mountains />
             <Help />
-            <div className={`cover-content ${match ? 'focused' : ''}`}>
+            <div className={`cover-content ${inputFocused ? 'focused' : ''}`}>
                 <div className='title-container'>
                     <Weather />
                     <span className='title'>{time}</span>

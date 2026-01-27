@@ -146,10 +146,10 @@
     }
 }
 
-@media (width < 32rem) {
+@media (width < 600px) {
     .cover-content.focused {
         justify-content: flex-start;
-        padding-top: 1rem;
+        padding-top: 4rem;
         transition: 0.2s;
         z-index: 1000;
     }
