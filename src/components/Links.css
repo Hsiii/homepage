@@ -1,10 +1,48 @@
-.link-tree {
+nav {
     --width: 15rem;
     --indicator-gap: 0.5rem;
     --indicator-width: 2rem;
     --link-height: 3.5rem;
     --font-size: var(--fs-lg);
+}
 
+.trigger {
+    --clr-trigger: #52a5;
+    position: absolute;
+    left: 0;
+    padding-left: calc(var(--indicator-gap));
+
+    width: 2.5rem;
+    height: 100%;
+
+    opacity: 1;
+    transition:
+        translate 0.1s,
+        opacity 0.4s ease-in;
+
+    display: flex;
+    align-items: center;
+
+    z-index: 19;
+
+    .indicator {
+        width: 0.25rem;
+        height: 14rem;
+
+        background-color: var(--clr-trigger);
+        backdrop-filter: saturate(1.2) blur(0.5rem);
+        border-radius: 0.3rem;
+    }
+
+    .icon {
+        position: absolute;
+        left: 1rem;
+        color: transparent;
+        fill: var(--clr-trigger);
+    }
+}
+
+.link-tree {
     @media (width < 32rem) {
         --width: 10rem;
         --font-size: var(--fs-base);
@@ -30,43 +68,6 @@
 
     &.hidden {
         pointer-events: none;
-        & .trigger {
-            opacity: 0;
-        }
-    }
-
-    .trigger {
-        --clr-trigger: #52a5;
-        position: absolute;
-        left: 100%;
-        padding-left: calc(var(--indicator-gap));
-
-        width: 2.5rem;
-        height: 100%;
-
-        opacity: 1;
-        transition:
-            translate 0.1s,
-            opacity 0.4s ease-in;
-
-        display: flex;
-        align-items: center;
-
-        .indicator {
-            width: 0.25rem;
-            height: 14rem;
-
-            background-color: var(--clr-trigger);
-            backdrop-filter: saturate(1.2) blur(0.5rem);
-            border-radius: 0.3rem;
-        }
-
-        .icon {
-            position: absolute;
-            left: 1rem;
-            color: transparent;
-            fill: var(--clr-trigger);
-        }
     }
 
     .panel {
@@ -75,17 +76,9 @@
         background-color: var(--clr-neutral-light-alpha);
     }
 
-    &.hoverEffective:hover,
+    nav.hoverEffective:hover &,
     &.expanded {
         translate: 0;
-
-        .trigger {
-            transition: translate 0.1s;
-            translate: calc(
-                (var(--indicator-width) + var(--indicator-gap)) * -1
-            );
-            opacity: 0;
-        }
 
         .panel {
             border-right: 1px solid var(--clr-neutral-light-alpha);
@@ -123,8 +116,8 @@
         border-radius: 0 0.5rem 0.5rem 0;
     }
 
-    &.hoverEffective:hover,
-    &:has(+ .links.hoverEffective:hover),
+    .hoverEffective &:hover,
+    .hoverEffective &:has(+ .links:hover),
     &.selected {
         translate: 1rem;
 
@@ -171,9 +164,9 @@
 
     z-index: 8;
 
-    .category.hoverEffective:hover + &,
+    .hoverEffective .category:hover + &,
     .category.selected + &,
-    &.hoverEffective:hover {
+    .hoverEffective &:hover {
         translate: var(--width);
     }
 
@@ -208,7 +201,7 @@
         display: flex;
         align-items: center;
 
-        &.hoverEffective:hover,
+        .hoverEffective &:hover,
         &.highlighted {
             text-decoration: none;
             color: var(--clr-secondary);

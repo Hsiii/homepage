@@ -3,6 +3,7 @@ import { links, linkTree } from '@constants';
 
 export const useLinkNavigation = (
     isSearchNav: boolean,
+    onClearSearch: () => void,
     highlightedCategory?: number
 ) => {
     // 1-based indexing
@@ -91,6 +92,7 @@ export const useLinkNavigation = (
         setIsMouseNav(true);
         setIsKeyboardNav(false);
         setSelectedCategory(0);
+        onClearSearch();
     };
 
     const endMouseNav = () => {

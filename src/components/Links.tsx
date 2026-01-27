@@ -27,7 +27,7 @@ export default function Links({
         isMouseNav,
         startMouseNav,
         endMouseNav,
-    } = useLinkNavigation(isSearchNav, highlightedCategory);
+    } = useLinkNavigation(isSearchNav, onClearSearch, highlightedCategory);
 
     const panelPaddings = useMemo(() => {
         const windowHeight = window.innerHeight;
@@ -49,23 +49,10 @@ export default function Links({
     }, []);
 
     return (
-        <section
-            role='navigation'
-            className={`link-tree ${hidden && 'hidden'} ${
-                (isKeyboardNav || selectedCategory) && 'expanded'
-            } ${isMouseNav ? 'hoverEffective' : ''}`}
-            onMouseMove={() => {
-                startMouseNav();
-                onClearSearch();
-            }}
-            onClick={() => {
-                startMouseNav();
-                onClearSearch();
-            }}
-            onTouchStart={() => {
-                startMouseNav();
-                onClearSearch();
-            }}
+        <nav
+            className={`link-panel ${hidden && 'hidden'} ${isMouseNav ? 'hoverEffective' : ''}`}
+            onMouseMove={startMouseNav}
+            onTouchStart={startMouseNav}
             onMouseOut={endMouseNav}
             aria-hidden={hidden}
             aria-expanded={isKeyboardNav}
@@ -74,19 +61,25 @@ export default function Links({
                 <div className='indicator' />
                 <Bookmark className='icon' />
             </div>
-            <div className='panel' />
-            {linkTree.map((categoryData, i) => (
-                <LinkCategory
-                    key={categoryData.category}
-                    categoryData={categoryData}
-                    index={i}
-                    selectedCategory={selectedCategory}
-                    isMouseNav={isMouseNav}
-                    keyboardNavEnabled={!isSearchNav}
-                    padding={panelPaddings[i]}
-                    highlightedLink={highlightedLink}
-                />
-            ))}
-        </section>
+            <div
+                className={`link-tree ${
+                    (isKeyboardNav || selectedCategory) && 'expanded'
+                }`}
+            >
+                <div className='panel' />
+                {linkTree.map((categoryData, i) => (
+                    <LinkCategory
+                        key={categoryData.category}
+                        categoryData={categoryData}
+                        index={i}
+                        selectedCategory={selectedCategory}
+                        isMouseNav={isMouseNav}
+                        keyboardNavEnabled={!isSearchNav}
+                        padding={panelPaddings[i]}
+                        highlightedLink={highlightedLink}
+                    />
+                ))}
+            </div>
+        </nav>
     );
 }
