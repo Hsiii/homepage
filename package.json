@@ -2,17 +2,26 @@
     "name": "hsi-homepage",
     "version": "1.0.0",
     "description": "A personal homepage.",
+    "keywords": [],
+    "license": "MIT",
+    "author": "",
     "type": "module",
     "main": "src/index.tsx",
     "scripts": {
-        "dev": "vite",
         "build": "vite build",
+        "dev": "vite",
         "preview": "npm run build && vite preview"
     },
-    "keywords": [],
-    "author": "",
-    "license": "MIT",
+    "overrides": {
+        "@mapbox/node-pre-gyp": "^2.0.3",
+        "@vercel/nft": "^0.28.0",
+        "esbuild": "^0.25.0",
+        "path-to-regexp": "^6.3.0",
+        "tar": "^7.5.4",
+        "undici": "^6.23.0"
+    },
     "dependencies": {
+        "eslint-config-complete": "^4.1.4",
         "fuse.js": "^7.1.0",
         "lucide-react": "^0.563.0",
         "react": "^19.0.0",
@@ -25,10 +34,10 @@
         "@types/node": "^25.0.6",
         "@types/react": "^19.2.9",
         "@types/react-dom": "^19.2.3",
-        "@vercel/node": "^3.0.1",
+        "@vercel/node": "^5.5.28",
         "@vitejs/plugin-react": "^4.7.0",
         "complete-lint": "^5.1.5",
-        "complete-node": "^16.2.0",
+        "complete-node": "^1.1.0",
         "eslint": "^9.39.1",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-react": "^7.37.5",
@@ -40,10 +49,5 @@
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.53.1",
         "vite": "^6.4.1"
-    },
-    "overrides": {
-        "esbuild": "^0.25.0",
-        "path-to-regexp": "^6.3.0",
-        "undici": "^5.29.0"
     }
 }
