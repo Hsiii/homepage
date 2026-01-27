@@ -14,7 +14,7 @@ import { Search } from 'lucide-react';
 
 import 'components/Cover.css';
 
-const Links = lazy(() => import('components/Links'));
+const LinkPanel = lazy(() => import('components/LinkPanel'));
 
 interface LinkItem {
     category: number;
@@ -120,7 +120,7 @@ export default function Cover() {
             </div>
 
             <Suspense fallback={null}>
-                <Links
+                <LinkPanel
                     hidden={hideLinks}
                     isSearchNav={inputFocused}
                     highlightedLink={match?.link}
