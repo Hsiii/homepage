@@ -50,14 +50,14 @@ export default function LinkPanel({
 
     return (
         <nav
-            className={`link-panel ${hidden && 'hidden'} ${isMouseNav ? 'hoverEffective' : ''}`}
+            className={`link-panel ${isMouseNav ? 'hoverEffective' : ''}`}
             onMouseMove={startMouseNav}
             onTouchStart={startMouseNav}
             onMouseOut={endMouseNav}
             aria-hidden={hidden}
             aria-expanded={isKeyboardNav}
         >
-            <div className='trigger'>
+            <div className={`trigger ${hidden && 'hidden'}`}>
                 <div className='indicator' />
                 <Bookmark className='icon' />
             </div>
