@@ -4,9 +4,9 @@ import LinkCategory from 'components/LinkCategory';
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
 
-import 'components/Links.css';
+import 'components/LinkPanel.css';
 
-interface LinksProps {
+interface LinkPanelProps {
     hidden: boolean;
     isSearchNav: boolean;
     highlightedLink?: string;
@@ -14,13 +14,13 @@ interface LinksProps {
     onClearSearch: () => void;
 }
 
-export default function Links({
+export default function LinkPanel({
     hidden,
     isSearchNav = false,
     highlightedLink,
     highlightedCategory,
     onClearSearch,
-}: LinksProps) {
+}: LinkPanelProps) {
     const {
         selectedCategory,
         isKeyboardNav,

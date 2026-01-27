@@ -1,4 +1,4 @@
-nav {
+.link-panel {
     --width: 15rem;
     --indicator-gap: 0.5rem;
     --indicator-width: 2rem;
@@ -76,7 +76,7 @@ nav {
         background-color: var(--clr-neutral-light-alpha);
     }
 
-    nav.hoverEffective:hover &,
+    .link-panel.hoverEffective:hover &,
     &.expanded {
         translate: 0;
 
