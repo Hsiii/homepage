@@ -15,7 +15,8 @@ interface WeatherPayload {
     name: string;
 }
 
-export async function handler(
+// eslint-disable-next-line import-x/no-default-export
+export default async function handler(
     request: VercelRequest,
     response: VercelResponse
 ): Promise<VercelResponse> {
