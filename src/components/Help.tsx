@@ -1,29 +1,28 @@
+import React from 'react';
 import { HelpCircle } from 'lucide-react';
 
 import 'components/Help.css';
 
 import { keyboardNavInfo } from '@constants';
 
-export default function Help() {
-    return (
-        <div className='help'>
-            <button className='help-icon-btn' aria-label='Help'>
-                <HelpCircle className='icon' size={24} />
-            </button>
+export const Help: React.FC = () => (
+    <div className='help'>
+        <button className='help-icon-btn' aria-label='Help'>
+            <HelpCircle className='icon' size={24} />
+        </button>
 
-            <div className='help-dialog'>
-                <div className='help-content'>
-                    <h2 className='help-title'>
-                        If you like keyboard navigation...
-                    </h2>
-                    {keyboardNavInfo.map((info, index) => (
-                        <div className='help-row' key={index}>
-                            <span className='help-desc'>{info[0]}</span>
-                            <code className='key'>{info[1]}</code>
-                        </div>
-                    ))}
-                </div>
+        <div className='help-dialog'>
+            <div className='help-content'>
+                <h2 className='help-title'>
+                    If you like keyboard navigation...
+                </h2>
+                {keyboardNavInfo.map((info, index) => (
+                    <div className='help-row' key={index}>
+                        <span className='help-desc'>{info[0]}</span>
+                        <code className='key'>{info[1]}</code>
+                    </div>
+                ))}
             </div>
         </div>
-    );
-}
+    </div>
+);

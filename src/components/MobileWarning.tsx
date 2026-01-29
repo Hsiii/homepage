@@ -2,20 +2,24 @@ import { useState } from 'react';
 
 import 'components/MobileWarning.css';
 
-export default function MobileWarning() {
+export const MobileWarning: React.FC = () => {
     const [isVisible, setIsVisible] = useState(
-        () => typeof window !== 'undefined' && window.innerWidth < 600
+        () => globalThis.window.innerWidth < 600
     );
 
     return (
         isVisible && (
             <div
                 className='mobile-warning-overlay'
-                onClick={() => setIsVisible(false)}
+                onClick={() => {
+                    setIsVisible(false);
+                }}
             >
                 <div
                     className='mobile-warning-dialog'
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
                     role='dialog'
                     aria-modal='true'
                 >
@@ -25,7 +29,9 @@ export default function MobileWarning() {
                     </p>
                     <button
                         className='mobile-warning-action-btn'
-                        onClick={() => setIsVisible(false)}
+                        onClick={() => {
+                            setIsVisible(false);
+                        }}
                     >
                         Continue anyway
                     </button>
@@ -33,4 +39,4 @@ export default function MobileWarning() {
             </div>
         )
     );
-}
+};

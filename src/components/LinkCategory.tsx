@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
-import { CategoryData, links } from '@constants';
-import LinkTreeItem from 'components/LinkTreeItem';
+import type { CategoryData } from '@constants';
+import { links } from '@constants';
+
+import { LinkTreeItem } from './LinkTreeItem.js';
 
 interface LinkCategoryProps {
     categoryData: CategoryData;
@@ -12,7 +14,7 @@ interface LinkCategoryProps {
     highlightedLink?: string;
 }
 
-export default function LinkCategory({
+export const LinkCategory: React.FC<LinkCategoryProps> = ({
     categoryData,
     index,
     selectedCategory,
@@ -20,12 +22,14 @@ export default function LinkCategory({
     keyboardNavEnabled,
     padding,
     highlightedLink,
-}: LinkCategoryProps) {
+}) => {
     const isCategorySelected = selectedCategory === index + 1;
 
-    // Hint visibility logic for Category
     const isCategoryHotkeyHidden =
-        isMouseNav || selectedCategory || index + 1 > 9 || !keyboardNavEnabled;
+        isMouseNav ||
+        selectedCategory !== 0 ||
+        index + 1 > 9 ||
+        !keyboardNavEnabled;
 
     const categoryModifiers = [
         isCategorySelected && 'selected',
@@ -38,7 +42,7 @@ export default function LinkCategory({
                 className='category'
                 icon={categoryData.icon}
                 hotkey={index + 1}
-                isHotkeyHidden={!!isCategoryHotkeyHidden}
+                isHotkeyHidden={isCategoryHotkeyHidden}
                 modifiers={categoryModifiers}
             >
                 {categoryData.category}
@@ -49,13 +53,13 @@ export default function LinkCategory({
             >
                 <div className='panel' />
                 {categoryData.links.map((link, j) => {
-                    const isDisabled = !links[link];
+                    const isDisabled = !(link in links);
                     const isHighlighted = highlightedLink === link;
 
-                    // Hint visibility logic for Link
+                    // Hint visibility logic for Link.
                     const isLinkHotkeyHidden =
                         isMouseNav ||
-                        !selectedCategory ||
+                        selectedCategory === 0 ||
                         j + 1 > 9 ||
                         isDisabled ||
                         !keyboardNavEnabled;
@@ -74,7 +78,7 @@ export default function LinkCategory({
                             href={links[link]}
                             className='link'
                             hotkey={j + 1}
-                            isHotkeyHidden={!!isLinkHotkeyHidden}
+                            isHotkeyHidden={isLinkHotkeyHidden}
                             modifiers={linkModifiers}
                         >
                             {link}
@@ -84,4 +88,4 @@ export default function LinkCategory({
             </div>
         </Fragment>
     );
-}
+};

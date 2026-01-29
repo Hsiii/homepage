@@ -4,20 +4,18 @@ import midSrc from '../assets/images/mountain/mid.svg';
 
 import 'components/Mountains.css';
 
-export default function Mountains() {
-    return (
-        <div className='mountains'>
-            <img
-                className='parallax-back'
-                src={backSrc}
-                alt='a flat-color mountain in the background'
-            />
-            <img
-                className='parallax-mid'
-                src={midSrc}
-                alt='a flat-color mountain in the middle'
-            />
-            <img src={frontSrc} alt='a flat-color mountain in the foreground' />
-        </div>
-    );
-}
+export const Mountains: React.FC = () => (
+    <div className='mountains'>
+        <img
+            className='parallax-back'
+            src={backSrc}
+            alt='a flat-color mountain in the background'
+        />
+        <img
+            className='parallax-mid'
+            src={midSrc}
+            alt='a flat-color mountain in the middle'
+        />
+        <img src={frontSrc} alt='a flat-color mountain in the foreground' />
+    </div>
+);
