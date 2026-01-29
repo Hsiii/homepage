@@ -6,7 +6,13 @@ export default defineConfig(
 
     {
         rules: {
-            // Insert changed or disabled rules here, if necessary.
+            '@stylistic/quotes': 'off',
+            'import-x/no-unassigned-import': [
+                'error',
+                {
+                    allow: ['**/*.css'],
+                },
+            ],
         },
     }
 );
