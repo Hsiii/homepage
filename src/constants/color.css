@@ -9,8 +9,14 @@
     hsl(275, 72%, 68%);
     --clr-primary-alpha:
     hsla(275, 72%, 68%, .8);
+    --clr-primary-alpha-2:
+    hsla(275, 72%, 68%, .3);
     --clr-secondary:
     hsl(249, 50%, 60%);
+    --clr-secondary-alpha:
+    hsla(249, 50%, 60%, .8);
+    --clr-secondary-alpha-2:
+    hsla(249, 50%, 60%, .3);
     --clr-neutral:
     hsl(249, 25%, 37%);
     --clr-neutral-light:
@@ -18,7 +24,7 @@
     --clr-neutral-light-alpha:
     #fff6;
     --clr-neutral-dark:
-    #222;
+    hsl(0, 0%, 13%);
 
     --clr-sky-1:
     hsl(249, 25%, 37%);
@@ -38,4 +44,8 @@
     #757575;
     --clr-text: 
     #777;
+    --clr-text-alpha:
+    hsla(0, 0%, 13%, .5);
+    --clr-text-alpha-2:
+    hsla(0, 0%, 13%, .05);
 }
