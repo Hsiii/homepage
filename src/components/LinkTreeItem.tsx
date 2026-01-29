@@ -1,13 +1,14 @@
-import React, { ElementType, ReactElement, ReactNode } from 'react';
+import type { ElementType, ReactElement, ReactNode } from 'react';
+import React from 'react';
 
 interface LinkTreeItemProps extends React.HTMLAttributes<HTMLElement> {
     as?: ElementType;
     className?: string;
     children: ReactNode;
-    icon?: ReactElement | null;
+    icon?: ReactElement;
     hotkey: string | number;
     isHotkeyHidden?: boolean;
-    modifiers?: (string | boolean | undefined | null)[];
+    modifiers?: Array<string | boolean | undefined | null>;
     href?: string;
 }
 
@@ -15,7 +16,7 @@ export const LinkTreeItem: React.FC<LinkTreeItemProps> = ({
     as: Component = 'div',
     className = '',
     children,
-    icon = null,
+    icon,
     hotkey,
     isHotkeyHidden = false,
     modifiers = [],

@@ -1,9 +1,24 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { WeatherData } from 'components/Weather';
 
-export default async function handler(
+interface WeatherPayload {
+    main: {
+        temp: number;
+    };
+    weather: Array<{
+        description: string;
+        icon: string;
+        main: string;
+    }>;
+    dt: number;
+    timezone: number;
+    name: string;
+}
+
+export async function handler(
     request: VercelRequest,
     response: VercelResponse
-) {
+): Promise<VercelResponse> {
     const allowedOrigins = [
         'https://hsiii.github.io',
         'http://localhost:4173',
@@ -11,16 +26,16 @@ export default async function handler(
         'http://127.0.0.1:4173',
         'http://127.0.0.1:5173',
     ];
-    const origin = request.headers.origin;
+    const { origin } = request.headers;
 
-    // Critical for Vercel/CDN caching: tell the cache that the response
-    // depends on the Origin header.
+    // Critical for Vercel/CDN caching: tell the cache that the response depends on the Origin
+    // header.
     response.setHeader('Vary', 'Origin');
 
-    if (origin && allowedOrigins.includes(origin)) {
+    if (origin !== undefined && allowedOrigins.includes(origin)) {
         response.setHeader('Access-Control-Allow-Origin', origin);
     } else {
-        // Fallback to primary production domain
+        // Fallback to primary production domain.
         response.setHeader(
             'Access-Control-Allow-Origin',
             'https://hsiii.github.io'
@@ -37,7 +52,7 @@ export default async function handler(
         'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Origin'
     );
 
-    // Handle OPTIONS request for preflight
+    // Handle OPTIONS request for preflight.
     if (request.method === 'OPTIONS') {
         return response.status(200).end();
     }
@@ -45,7 +60,7 @@ export default async function handler(
     const { lat = '25.0330', lon = '121.5654' } = request.query;
     const apiKey = process.env.OPENWEATHERMAP_API_KEY;
 
-    if (!apiKey) {
+    if (apiKey === undefined) {
         return response.status(500).json({
             error: 'OpenWeatherMap API key not configured',
         });
@@ -59,17 +74,23 @@ export default async function handler(
             throw new Error(`Weather API responded with status ${res.status}`);
         }
 
-        const data = await res.json();
+        const {
+            main: { temp },
+            weather,
+            dt,
+            timezone,
+            name,
+        } = (await res.json()) as WeatherPayload;
 
-        // Simplify payload for client
-        const payload = {
-            temp: data.main.temp,
-            description: data.weather[0].description,
-            icon: data.weather[0].icon,
-            main: data.weather[0].main,
-            dt: data.dt,
-            timezone: data.timezone,
-            name: data.name,
+        // Simplify payload for client.
+        const payload: WeatherData = {
+            temp,
+            description: weather[0].description,
+            icon: weather[0].icon,
+            main: weather[0].main,
+            dt,
+            timezone,
+            name,
         };
 
         return response.status(200).json(payload);

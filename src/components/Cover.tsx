@@ -58,11 +58,11 @@ export const Cover: React.FC = () => {
     );
 
     const match = useMemo(() => {
-        if (!searchValue) {
-            return null;
+        if (searchValue === '') {
+            return undefined;
         }
         const results = fuse.search(searchValue);
-        return results.length > 0 ? results[0].item : null;
+        return results.length > 0 ? results[0].item : undefined;
     }, [searchValue, fuse]);
 
     useEffect(() => {
@@ -88,7 +88,7 @@ export const Cover: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (match?.link && links[match.link]) {
+        if (match?.link !== undefined && match.link in links) {
             globalThis.location.href = links[match.link];
         }
     };
@@ -139,7 +139,7 @@ export const Cover: React.FC = () => {
                 </div>
             </div>
 
-            <Suspense fallback={null}>
+            <Suspense fallback={undefined}>
                 <LinkPanel
                     hidden={hideLinks}
                     isSearchNav={inputFocused}

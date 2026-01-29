@@ -40,7 +40,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                 windowHeight / 2 +
                 (categoryIndex + 1 - linkTree.length / 2 - 0.5) * linkHeight;
             const linksHeight = categoryData.links.length * linkHeight;
-            let padding;
+            let padding: number;
             padding =
                 headerPosition + linksHeight / 2 <= windowHeight - remToPx
                     ? headerPosition - linksHeight / 2
@@ -67,7 +67,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
             </div>
             <div
                 className={`link-tree ${
-                    (isKeyboardNav || selectedCategory) && 'expanded'
+                    (isKeyboardNav || selectedCategory !== 0) && 'expanded'
                 }`}
             >
                 <div className='panel' />

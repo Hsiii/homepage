@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import {
     Cloud,
     CloudDrizzle,
-    CloudFog,
     CloudLightning,
     CloudRain,
     CloudSnow,
@@ -21,7 +20,7 @@ enum WeatherType {
     Clouds = 'Clouds',
 }
 
-interface WeatherData {
+export interface WeatherData {
     temp: number;
     description: string;
     icon: string;
@@ -45,25 +44,29 @@ interface CachedWeather {
 }
 
 export const Weather: React.FC = () => {
-    const [weather, setWeather] = useState<WeatherData | null>(() => {
+    const [weather, setWeather] = useState<WeatherData | undefined>(() => {
         const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
+        if (cached !== null) {
             try {
-                const { data }: CachedWeather = JSON.parse(cached);
+                const { data }: CachedWeather = JSON.parse(
+                    cached
+                ) as CachedWeather;
                 return data;
             } catch {
-                return null;
+                return undefined;
             }
         }
-        return null;
+        return undefined;
     });
     const [loading, setLoading] = useState(false);
     const [isLocal, setIsLocal] = useState(() => {
         const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
+        if (cached !== null) {
             try {
-                const { isLocal }: CachedWeather = JSON.parse(cached);
-                return isLocal;
+                const { isLocal: _isLocal }: CachedWeather = JSON.parse(
+                    cached
+                ) as CachedWeather;
+                return _isLocal;
             } catch {
                 return false;
             }
@@ -76,16 +79,18 @@ export const Weather: React.FC = () => {
         try {
             let apiUrl = 'https://hsi-homepage.vercel.app/api/weather';
 
-            if (lat && lon) {
+            if (lat !== undefined && lon !== undefined) {
                 const separator = apiUrl.includes('?') ? '&' : '?';
                 apiUrl += `${separator}lat=${lat}&lon=${lon}`;
             }
 
             const res = await fetch(apiUrl);
-            if (!res.ok) throw new Error('Failed to fetch');
-            const data = await res.json();
+            if (!res.ok) {
+                throw new Error('Failed to fetch');
+            }
+            const data = (await res.json()) as WeatherData;
             setWeather(data);
-            const isLocalUpdate = !!(lat && lon);
+            const isLocalUpdate = lat !== undefined && lon !== undefined;
             setIsLocal(isLocalUpdate);
 
             // Update Cache
@@ -95,39 +100,43 @@ export const Weather: React.FC = () => {
                 timestamp: Date.now(),
             };
             localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
         } finally {
             setLoading(false);
         }
     }, []);
 
     const getCoordinates = useCallback(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude.toString();
-                    const lon = position.coords.longitude.toString();
-                    fetchWeather(lat, lon);
-                },
-                (error) => {
-                    console.warn('Geolocation denied or failed:', error);
-                    // Fallback to default (Taipei)
-                    fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-                }
-            );
-        } else {
-            fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-        }
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude.toString();
+                const lon = position.coords.longitude.toString();
+                fetchWeather(lat, lon).catch((error: unknown) => {
+                    console.warn('Failed to fetch weather:', error);
+                });
+            },
+            (error) => {
+                console.warn('Geolocation denied or failed:', error);
+                // Fallback to default (Taipei).
+                fetchWeather(DEFAULT_LAT, DEFAULT_LON).catch(
+                    (error_: unknown) => {
+                        console.error('Failed to fetch weather:', error_);
+                    }
+                );
+            }
+        );
     }, [fetchWeather]);
 
     useEffect(() => {
         const initWeather = async () => {
-            // Check if cache is still valid
+            // Check if cache is still valid.
             const cached = localStorage.getItem(CACHE_KEY);
-            if (cached) {
+            if (cached !== null) {
                 try {
-                    const { timestamp }: CachedWeather = JSON.parse(cached);
+                    const { timestamp }: CachedWeather = JSON.parse(
+                        cached
+                    ) as CachedWeather;
                     if (Date.now() - timestamp < CACHE_TTL) {
                         return; // Cache is fresh, skip background update
                     }
@@ -136,28 +145,23 @@ export const Weather: React.FC = () => {
                 }
             }
 
-            if (navigator.permissions && navigator.permissions.query) {
-                try {
-                    const result = await navigator.permissions.query({
-                        name: 'geolocation',
-                    });
-                    if (result.state === 'granted') {
-                        getCoordinates();
-                    } else if (
-                        result.state === 'prompt' ||
-                        result.state === 'denied'
-                    ) {
-                        fetchWeather(DEFAULT_LAT, DEFAULT_LON);
-                    }
-                } catch {
-                    fetchWeather(DEFAULT_LAT, DEFAULT_LON);
+            try {
+                const result = await navigator.permissions.query({
+                    name: 'geolocation',
+                });
+                if (result.state === 'granted') {
+                    getCoordinates();
+                } else {
+                    await fetchWeather(DEFAULT_LAT, DEFAULT_LON);
                 }
-            } else {
-                fetchWeather(DEFAULT_LAT, DEFAULT_LON);
+            } catch {
+                await fetchWeather(DEFAULT_LAT, DEFAULT_LON);
             }
         };
 
-        initWeather();
+        initWeather().catch((error: unknown) => {
+            console.error('Failed to fetch weather:', error);
+        });
     }, [fetchWeather, getCoordinates]);
 
     const handleRefresh = () => {
@@ -171,22 +175,31 @@ export const Weather: React.FC = () => {
         weekday: 'short',
     });
 
-    const getIcon = (main: string) => {
+    const getIcon = (main: WeatherType) => {
         switch (main) {
-            case WeatherType.Thunderstorm:
+            case WeatherType.Thunderstorm: {
                 return <CloudLightning size={20} />;
-            case WeatherType.Drizzle:
+            }
+
+            case WeatherType.Drizzle: {
                 return <CloudDrizzle size={20} />;
-            case WeatherType.Rain:
+            }
+
+            case WeatherType.Rain: {
                 return <CloudRain size={20} />;
-            case WeatherType.Snow:
+            }
+
+            case WeatherType.Snow: {
                 return <CloudSnow size={20} />;
-            case WeatherType.Clear:
+            }
+
+            case WeatherType.Clear: {
                 return <Sun size={20} />;
-            case WeatherType.Clouds:
+            }
+
+            case WeatherType.Clouds: {
                 return <Cloud size={20} />;
-            default:
-                return <CloudFog size={20} />; // Atmosphere/Mist/Fog etc
+            }
         }
     };
 
@@ -195,7 +208,7 @@ export const Weather: React.FC = () => {
             <div className='weather-container'>
                 <span className='weather-date'>{dateStr}</span>
                 <span className='weather-info'>
-                    {getIcon(weather.main)}
+                    {getIcon(weather.main as WeatherType)}
                     {Math.round(weather.temp)}°C
                     {!isLocal && (
                         <button

@@ -25,9 +25,11 @@ export const LinkCategory: React.FC<LinkCategoryProps> = ({
 }) => {
     const isCategorySelected = selectedCategory === index + 1;
 
-    // Hint visibility logic for Category
     const isCategoryHotkeyHidden =
-        isMouseNav || selectedCategory || index + 1 > 9 || !keyboardNavEnabled;
+        isMouseNav ||
+        selectedCategory !== 0 ||
+        index + 1 > 9 ||
+        !keyboardNavEnabled;
 
     const categoryModifiers = [
         isCategorySelected && 'selected',
@@ -40,7 +42,7 @@ export const LinkCategory: React.FC<LinkCategoryProps> = ({
                 className='category'
                 icon={categoryData.icon}
                 hotkey={index + 1}
-                isHotkeyHidden={Boolean(isCategoryHotkeyHidden)}
+                isHotkeyHidden={isCategoryHotkeyHidden}
                 modifiers={categoryModifiers}
             >
                 {categoryData.category}
@@ -51,13 +53,13 @@ export const LinkCategory: React.FC<LinkCategoryProps> = ({
             >
                 <div className='panel' />
                 {categoryData.links.map((link, j) => {
-                    const isDisabled = !links[link];
+                    const isDisabled = !(link in links);
                     const isHighlighted = highlightedLink === link;
 
-                    // Hint visibility logic for Link
+                    // Hint visibility logic for Link.
                     const isLinkHotkeyHidden =
                         isMouseNav ||
-                        !selectedCategory ||
+                        selectedCategory === 0 ||
                         j + 1 > 9 ||
                         isDisabled ||
                         !keyboardNavEnabled;
@@ -76,7 +78,7 @@ export const LinkCategory: React.FC<LinkCategoryProps> = ({
                             href={links[link]}
                             className='link'
                             hotkey={j + 1}
-                            isHotkeyHidden={Boolean(isLinkHotkeyHidden)}
+                            isHotkeyHidden={isLinkHotkeyHidden}
                             modifiers={linkModifiers}
                         >
                             {link}
