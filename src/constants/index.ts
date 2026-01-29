@@ -1,4 +1,3 @@
-export * from './linkTree';
-export * from './links';
-export * from './footer';
-export * from './keyboardNavInfo';
+export * from './linkTree.js';
+export * from './links.js';
+export * from './footer.js';
