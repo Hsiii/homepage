@@ -7,21 +7,29 @@ import React, {
     useState,
 } from 'react';
 import { links, linkTree } from '@constants';
-import { Help, Mountains, Weather } from 'components';
 import Fuse from 'fuse.js';
 import { useHideLinks, useTime } from 'hooks';
 import { Search } from 'lucide-react';
 
+import { Help } from './Help.js';
+import { Mountains } from './Mountains.js';
+import { Weather } from './Weather.js';
+
 import 'components/Cover.css';
 
-const LinkPanel = lazy(() => import('components/LinkPanel'));
+const LinkPanel = lazy(
+    async () =>
+        await import('./LinkPanel.js').then((module) => ({
+            default: module.LinkPanel,
+        }))
+);
 
 interface LinkItem {
     category: number;
     link: string;
 }
 
-export default function Cover() {
+export const Cover: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
@@ -29,31 +37,37 @@ export default function Cover() {
 
     const [searchValue, setSearchValue] = useState('');
 
-    const flattenedLinks = useMemo<LinkItem[]>(() => {
-        return linkTree.flatMap((category, categoryIndex) =>
-            category.links.map((link) => ({
-                link,
-                category: categoryIndex + 1,
-            }))
-        );
-    }, []);
+    const flattenedLinks = useMemo<LinkItem[]>(
+        () =>
+            linkTree.flatMap((category, categoryIndex) =>
+                category.links.map((link) => ({
+                    link,
+                    category: categoryIndex + 1,
+                }))
+            ),
+        []
+    );
 
-    const fuse = useMemo(() => {
-        return new Fuse(flattenedLinks, {
-            keys: ['link'],
-            threshold: 0.4,
-        });
-    }, [flattenedLinks]);
+    const fuse = useMemo(
+        () =>
+            new Fuse(flattenedLinks, {
+                keys: ['link'],
+                threshold: 0.4,
+            }),
+        [flattenedLinks]
+    );
 
     const match = useMemo(() => {
-        if (!searchValue) return null;
+        if (!searchValue) {
+            return null;
+        }
         const results = fuse.search(searchValue);
         return results.length > 0 ? results[0].item : null;
     }, [searchValue, fuse]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key == ' ' && !inputFocused) {
+            if (e.key === ' ' && !inputFocused) {
                 e.preventDefault();
                 inputRef.current?.focus();
             }
@@ -66,14 +80,16 @@ export default function Cover() {
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        globalThis.addEventListener('keydown', handleKeyDown);
+        return () => {
+            globalThis.removeEventListener('keydown', handleKeyDown);
+        };
     }, [inputFocused]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (match?.link && links[match.link]) {
-            window.location.href = links[match.link];
+            globalThis.location.href = links[match.link];
         }
     };
 
@@ -111,8 +127,12 @@ export default function Cover() {
                             placeholder='Search bookmarks'
                             autoComplete='off'
                             ref={inputRef}
-                            onChange={(e) => setSearchValue(e.target.value)}
-                            onFocus={() => setInputFocused(true)}
+                            onChange={(e) => {
+                                setSearchValue(e.target.value);
+                            }}
+                            onFocus={() => {
+                                setInputFocused(true);
+                            }}
                             onBlur={handleSearchBlur}
                         />
                     </form>
@@ -130,4 +150,4 @@ export default function Cover() {
             </Suspense>
         </section>
     );
-}
+};

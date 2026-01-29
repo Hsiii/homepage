@@ -4,7 +4,7 @@ import midSrc from '../assets/images/mountain/mid.svg';
 
 import 'components/Mountains.css';
 
-export default function Mountains() {
+export const Mountains: React.FC = () => {
     return (
         <div className='mountains'>
             <img
@@ -20,4 +20,4 @@ export default function Mountains() {
             <img src={frontSrc} alt='a flat-color mountain in the foreground' />
         </div>
     );
-}
+};

@@ -11,7 +11,7 @@ interface LinkTreeItemProps extends React.HTMLAttributes<HTMLElement> {
     href?: string;
 }
 
-export default function LinkTreeItem({
+export const LinkTreeItem: React.FC<LinkTreeItemProps> = ({
     as: Component = 'div',
     className = '',
     children,
@@ -20,7 +20,7 @@ export default function LinkTreeItem({
     isHotkeyHidden = false,
     modifiers = [],
     ...props
-}: LinkTreeItemProps) {
+}) => {
     const modifierClasses = modifiers.filter(Boolean).join(' ');
     const finalClassName = `${className} ${modifierClasses}`.trim();
 
@@ -33,4 +33,4 @@ export default function LinkTreeItem({
             <span>{children}</span>
         </Component>
     );
-}
+};

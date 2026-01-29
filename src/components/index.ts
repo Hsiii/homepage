@@ -1,7 +1,9 @@
-export { default as Cover } from './Cover';
-export { default as LinkPanel } from './LinkPanel';
-export { default as Main } from './Main';
-export { default as Mountains } from './Mountains';
-export { default as Help } from './Help';
-export { default as MobileWarning } from './MobileWarning';
-export { default as Weather } from './Weather';
+export { Cover } from './Cover.js';
+export { LinkPanel } from './LinkPanel.js';
+export { Main } from './Main.js';
+export { Mountains } from './Mountains.js';
+export { Help } from './Help.js';
+export { MobileWarning } from './MobileWarning.js';
+export { Weather } from './Weather.js';
+export { LinkCategory } from './LinkCategory.js';
+export { LinkTreeItem } from './LinkTreeItem.js';

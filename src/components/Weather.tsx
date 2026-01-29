@@ -44,7 +44,7 @@ interface CachedWeather {
     timestamp: number;
 }
 
-export default function Weather() {
+export const Weather: React.FC = () => {
     const [weather, setWeather] = useState<WeatherData | null>(() => {
         const cached = localStorage.getItem(CACHE_KEY);
         if (cached) {
@@ -210,4 +210,4 @@ export default function Weather() {
             </div>
         )
     );
-}
+};

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import 'components/MobileWarning.css';
 
-export default function MobileWarning() {
+export const MobileWarning: React.FC = () => {
     const [isVisible, setIsVisible] = useState(
         () => typeof window !== 'undefined' && window.innerWidth < 600
     );
@@ -33,4 +33,4 @@ export default function MobileWarning() {
             </div>
         )
     );
-}
+};

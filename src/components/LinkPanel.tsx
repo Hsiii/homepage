@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { linkTree } from '@constants';
-import LinkCategory from 'components/LinkCategory';
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
+
+import { LinkCategory } from './LinkCategory.js';
 
 import 'components/LinkPanel.css';
 
@@ -14,13 +15,13 @@ interface LinkPanelProps {
     onClearSearch: () => void;
 }
 
-export default function LinkPanel({
+export const LinkPanel: React.FC<LinkPanelProps> = ({
     hidden,
-    isSearchNav = false,
+    isSearchNav,
     highlightedLink,
     highlightedCategory,
     onClearSearch,
-}: LinkPanelProps) {
+}) => {
     const {
         selectedCategory,
         isKeyboardNav,
@@ -40,11 +41,14 @@ export default function LinkPanel({
                 (categoryIndex + 1 - linkTree.length / 2 - 0.5) * linkHeight;
             const linksHeight = categoryData.links.length * linkHeight;
             let padding;
-            if (headerPosition + linksHeight / 2 <= windowHeight - remToPx)
-                padding = headerPosition - linksHeight / 2;
-            else padding = windowHeight - linksHeight - remToPx;
-            if (padding < remToPx) padding = remToPx;
-            return padding + 'px';
+            padding =
+                headerPosition + linksHeight / 2 <= windowHeight - remToPx
+                    ? headerPosition - linksHeight / 2
+                    : windowHeight - linksHeight - remToPx;
+            if (padding < remToPx) {
+                padding = remToPx;
+            }
+            return `${padding}px`;
         });
     }, []);
 
@@ -82,4 +86,4 @@ export default function LinkPanel({
             </div>
         </nav>
     );
-}
+};
