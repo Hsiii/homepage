@@ -4,9 +4,10 @@
     right: 1rem;
     z-index: 1000;
 
-    @media (width < 600px) {
-        display: none;
-    }
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
 }
 
 .help-icon-btn {
@@ -22,70 +23,126 @@
         color: var(--clr-primary);
     }
 
+    &:has(~ .open) {
+        background-color: var(--clr-neutral-light-alpha);
+    }
+
     animation: rise-show var(--rise-show-time) ease-out;
 }
 
 .help-dialog {
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    right: 0;
-    width: max-content;
-    max-width: 400px;
+    position: relative;
+    width: 400px;
     background-color: var(
         --clr-neutral-light
     ); /* Assuming this variable exists for panel bg */
-    padding: 1.5rem;
     border-radius: 1rem;
 
     visibility: hidden;
     opacity: 0;
     transform: translateY(-5px);
-    transition:
-        opacity 0.2s ease-out,
-        transform 0.2s ease-out,
-        visibility 0.2s ease-out;
-}
+    transition: all 0.1s ease-out;
 
-.help:hover .help-dialog {
-    visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.help-title {
-    font: var(--fontBoldLg);
-
-    color: var(--clr-secondary);
-    margin-bottom: 0.5rem;
+    &.open {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .help-content {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
     width: 100%;
-    min-width: 200px;
 }
 
-.help-row {
+.help-switch {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--clr-text-alpha-2);
+    padding: 0.5rem;
+}
+
+.help-switch-btn {
+    background: transparent;
+    color: var(--clr-text-alpha);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    flex: 1;
     display: grid;
-    grid-template-columns: 1fr 5ch;
-    gap: 1.5rem;
+    place-items: center;
+    transition: all 0.1s ease-out;
+
+    &:hover {
+        background-color: var(--clr-text-alpha-2);
+        color: var(--clr-text);
+    }
+
+    &.active {
+        color: var(--clr-primary);
+    }
 }
 
-.help-desc {
+.help-desc-list {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.help-desc-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 84px;
+}
+
+.icon-container {
+    color: var(--clr-secondary);
+    background-color: var(--clr-secondary-alpha-2);
+    padding: 1rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+}
+
+.help-desc-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font: var(--fontBaseMd);
     color: var(--clr-text);
-    white-space: nowrap;
+    width: 100%;
 }
 
 .key {
     display: inline-block;
     padding: 0.1em 0.4em;
     margin: 0;
-    font-size: var(--fs-sm);
+    font: var(--fontBoldSm);
+    width: fit-content;
 
-    background-color: var(--clr-neutral-light);
+    background-color: var(--clr-primary-alpha-2);
     border-radius: 4px;
     color: var(--clr-primary);
-    border: 1px solid var(--clr-neutral-light-alpha);
+    border: 1px solid var(--clr-primary-alpha);
+}
+
+.key-info {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+
+    animation: appear 0.2s ease-out;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
