@@ -2,7 +2,7 @@
     position: fixed;
     top: 1rem;
     right: 1rem;
-    z-index: 1000;
+    z-index: 18;
 
     display: flex;
     flex-direction: column;
@@ -47,6 +47,13 @@
         visibility: visible;
         opacity: 1;
         transform: translateY(0);
+    }
+
+    @media (width < 600px) {
+        position: fixed;
+        top: 4rem;
+        inset-inline: 1rem;
+        width: auto;
     }
 }
 
@@ -115,6 +122,10 @@
     font: var(--fontBaseMd);
     color: var(--clr-text);
     width: 100%;
+
+    @media (width < 600px) {
+        font: var(--fontBaseSm);
+    }
 }
 
 .key {
@@ -144,5 +155,11 @@
     }
     to {
         opacity: 1;
+    }
+}
+
+@media (width < 600px) {
+    .help-switch {
+        display: none;
     }
 }
