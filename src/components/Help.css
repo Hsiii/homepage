@@ -24,7 +24,7 @@
     }
 
     &:has(~ .open) {
-        background-color: var(--clr-neutral-light-alpha);
+        background-color: var(--clr-neutral-light-alpha-2);
     }
 
     animation: rise-show var(--rise-show-time) ease-out;

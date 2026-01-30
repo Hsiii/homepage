@@ -7,7 +7,7 @@
 }
 
 .trigger {
-    --clr-trigger: #52a5;
+    --clr-trigger: var(--clr-neutral-light-alpha);
     position: absolute;
     left: 0;
     padding-left: var(--indicator-gap);
@@ -28,9 +28,7 @@
     .indicator {
         width: 0.25rem;
         height: 14rem;
-
         background-color: var(--clr-trigger);
-        backdrop-filter: saturate(1.2) blur(0.5rem);
         border-radius: 0.3rem;
     }
 
@@ -77,8 +75,8 @@
     .panel {
         position: absolute;
         inset: 0;
-        background-color: var(--clr-neutral-light-alpha);
-        border-right: 1px solid var(--clr-neutral-light-alpha);
+        background-color: var(--clr-neutral-light-alpha-2);
+        border-right: 1px solid var(--clr-neutral-light-alpha-2);
         backdrop-filter: blur(0.75rem);
         z-index: 9;
     }
@@ -176,8 +174,8 @@
         height: inherit;
         position: absolute;
         left: -100%;
-        background-color: var(--clr-neutral-light-alpha);
-        border-right: 1px solid var(--clr-neutral-light-alpha);
+        background-color: var(--clr-neutral-light-alpha-2);
+        border-right: 1px solid var(--clr-neutral-light-alpha-2);
         backdrop-filter: blur(0.25rem);
         z-index: 9;
     }
@@ -209,7 +207,7 @@
             background: linear-gradient(
                 to right,
                 transparent,
-                var(--clr-neutral-light-alpha)
+                var(--clr-neutral-light-alpha-2)
             );
         }
 
