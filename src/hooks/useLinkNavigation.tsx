@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { links, linkTree } from '@constants';
 
 export const useLinkNavigation = (
@@ -6,6 +6,7 @@ export const useLinkNavigation = (
     onClearSearch: () => void,
     highlightedCategory?: number
 ) => {
+    const hoverExitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     // 1-based indexing
     const [selectedCategory, setSelectedCategory] = useState(0);
 
@@ -85,10 +86,19 @@ export const useLinkNavigation = (
         return () => {
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('click', onClick);
+            // Clean up any pending hover exit timeout
+            if (hoverExitTimeoutRef.current) {
+                clearTimeout(hoverExitTimeoutRef.current);
+            }
         };
     }, [isKeyboardNav, isMouseNav, selectedCategory, isSearchNav]);
 
     const startMouseNav = () => {
+        // Clear any pending exit timeout
+        if (hoverExitTimeoutRef.current) {
+            clearTimeout(hoverExitTimeoutRef.current);
+            hoverExitTimeoutRef.current = null;
+        }
         setIsMouseNav(true);
         setIsKeyboardNav(false);
         setSelectedCategory(0);
@@ -96,7 +106,12 @@ export const useLinkNavigation = (
     };
 
     const endMouseNav = () => {
-        setIsMouseNav(false);
+        // Add 150ms delay before removing hover state
+        // This prevents the panel from flashing when there are minor gaps during animation
+        hoverExitTimeoutRef.current = setTimeout(() => {
+            setIsMouseNav(false);
+            hoverExitTimeoutRef.current = null;
+        }, 150);
     };
 
     return {
