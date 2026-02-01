@@ -16,6 +16,10 @@ export const Mountains: React.FC = () => (
             src={midSrc}
             alt='a flat-color mountain in the middle'
         />
-        <img src={frontSrc} alt='a flat-color mountain in the foreground' />
+        <img
+            src={frontSrc}
+            fetchPriority='high'
+            alt='a flat-color mountain in the foreground'
+        />
     </div>
 );
