@@ -1,19 +1,75 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-import type { WeatherData } from './types';
+export type WeatherData = {
+    weatherType: string;
+    temp: number;
+};
 
 interface WeatherPayload {
     main: {
         temp: number;
     };
     weather: Array<{
-        description: string;
-        icon: string;
         main: string;
     }>;
-    dt: number;
-    timezone: number;
-    name: string;
+}
+
+const allowedOrigins = [
+    'https://hsiii.github.io',
+    'http://localhost:4173',
+    'http://localhost:5173',
+    'http://127.0.0.1:4173',
+    'http://127.0.0.1:5173',
+];
+
+const defaultCoords = {
+    lat: '25.03',
+    lon: '121.57',
+};
+
+/**
+ * Sets CORS headers on the response.
+ * Uses the request origin if it's in the allowed list, otherwise defaults to production.
+ */
+function setCorsHeaders(
+    request: VercelRequest,
+    response: VercelResponse
+): void {
+    const { origin } = request.headers;
+
+    // Critical for Vercel/CDN caching: tell the cache that the response depends on the Origin header.
+    response.setHeader('Vary', 'Origin');
+
+    response.setHeader(
+        'Access-Control-Allow-Origin',
+        origin !== undefined && allowedOrigins.includes(origin)
+            ? origin
+            : 'https://hsiii.github.io'
+    );
+    response.setHeader('Access-Control-Allow-Credentials', 'true');
+    response.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Origin');
+}
+
+/**
+ * Extracts and validates a coordinate query parameter.
+ * Handles array case (e.g., ?lat=25&lat=30) and validates numeric format.
+ * Returns the coordinate rounded to 2 decimal places for better cache hits.
+ */
+function parseCoordinate(
+    value: string | string[] | undefined,
+    defaultValue: string
+): string | null {
+    const raw = Array.isArray(value) ? value[0] : value;
+    const str = raw ?? defaultValue;
+    const num = parseFloat(str);
+
+    if (Number.isNaN(num)) {
+        return null;
+    }
+
+    // Round to 2 decimal places (~1km precision) for better cache hit rate.
+    return num.toFixed(2);
 }
 
 // eslint-disable-next-line import-x/no-default-export
@@ -21,45 +77,23 @@ export default async function handler(
     request: VercelRequest,
     response: VercelResponse
 ): Promise<VercelResponse> {
-    const allowedOrigins = [
-        'https://hsiii.github.io',
-        'http://localhost:4173',
-        'http://localhost:5173',
-        'http://127.0.0.1:4173',
-        'http://127.0.0.1:5173',
-    ];
-    const { origin } = request.headers;
-
-    // Critical for Vercel/CDN caching: tell the cache that the response depends on the Origin
-    // header.
-    response.setHeader('Vary', 'Origin');
-
-    if (origin !== undefined && allowedOrigins.includes(origin)) {
-        response.setHeader('Access-Control-Allow-Origin', origin);
-    } else {
-        // Fallback to primary production domain.
-        response.setHeader(
-            'Access-Control-Allow-Origin',
-            'https://hsiii.github.io'
-        );
-    }
-
-    response.setHeader('Access-Control-Allow-Credentials', 'true');
-    response.setHeader(
-        'Access-Control-Allow-Methods',
-        'GET,OPTIONS,PATCH,DELETE,POST,PUT'
-    );
-    response.setHeader(
-        'Access-Control-Allow-Headers',
-        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Origin'
-    );
+    setCorsHeaders(request, response);
 
     // Handle OPTIONS request for preflight.
     if (request.method === 'OPTIONS') {
         return response.status(200).end();
     }
 
-    const { lat = '25.0330', lon = '121.5654' } = request.query;
+    // Validate and parse coordinates.
+    const lat = parseCoordinate(request.query.lat, defaultCoords.lat);
+    const lon = parseCoordinate(request.query.lon, defaultCoords.lon);
+
+    if (lat === null || lon === null) {
+        return response.status(400).json({
+            error: 'Invalid lat/lon parameters. Must be numeric values.',
+        });
+    }
+
     const apiKey = process.env.OPENWEATHERMAP_API_KEY;
 
     if (apiKey === undefined) {
@@ -78,22 +112,20 @@ export default async function handler(
 
         const {
             main: { temp },
-            weather,
-            dt,
-            timezone,
-            name,
+            weather: [{ main: weatherType }],
         } = (await res.json()) as WeatherPayload;
 
-        // Simplify payload for client.
         const payload: WeatherData = {
+            weatherType,
             temp,
-            description: weather[0].description,
-            icon: weather[0].icon,
-            main: weather[0].main,
-            dt,
-            timezone,
-            name,
         };
+
+        // Cache for 5 minutes, serve stale while revalidating for up to 10 minutes.
+        // This reduces API calls and speeds up responses for nearby users.
+        response.setHeader(
+            'Cache-Control',
+            's-maxage=300, stale-while-revalidate=600'
+        );
 
         return response.status(200).json(payload);
     } catch (error) {

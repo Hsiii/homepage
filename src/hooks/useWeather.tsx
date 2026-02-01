@@ -1,5 +1,5 @@
 import { JSX, useCallback, useEffect, useState } from 'react';
-import type { WeatherData } from 'api/types';
+import type { WeatherData } from 'api/weather';
 import {
     Cloud,
     CloudDrizzle,
@@ -63,7 +63,9 @@ export const useWeather = () => {
         cachedWeather !== undefined && cachedWeather.isDefault !== true;
     const weather = cachedWeather?.data;
     const weatherIcon = weather
-        ? (weatherIcons[weather.main as WeatherType] ?? <Cloud size={20} />)
+        ? (weatherIcons[weather.weatherType as WeatherType] ?? (
+              <Cloud size={20} />
+          ))
         : undefined;
     const [isLoading, setIsLoading] = useState(false);
 
