@@ -9,6 +9,14 @@
         <!-- Corrected path if valid, otherwise might be broken but script is priority -->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
+        <!-- Preload critical mountain asset to prevent flash on load -->
+        <link
+            rel="preload"
+            href="/homepage/assets/front.svg"
+            as="image"
+            type="image/svg+xml"
+        />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
