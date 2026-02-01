@@ -1,9 +1,9 @@
 <div align="center">
    <img alt="Logo" src="https://raw.githubusercontent.com/Hsiii/homepage/gh-pages/assets/favicon.png" width="100"/>
 </div>
-<h1 align="center">Homepage</h1>
+<h1 align="center"><a href="https://hsiii.github.io/homepage">Homepage</a></h1>
 <p align="center">
-   My personal browser homepage <a href="https://hsiii.github.io/homepage">hsiii.github.io/homepage</a> built with <a href="https://vite.dev/">Vite</a> and <a href="https://react.dev/">React</a>.
+   My personal browser homepage built with <a href="https://vite.dev/">Vite</a>, <a href="https://react.dev/">React</a> and <a href="https://vercel.com/">Vercel</a>.
 </p>
 
 ![Homepage](https://raw.githubusercontent.com/Hsiii/homepage/gh-pages/assets/demo.webp)
@@ -36,8 +36,4 @@
 2. Preview the site:
     ```bash
     npm run preview
-    ```
-3. Deploy to GitHub Pages (deploy to `release` branch):
-    ```bash
-    npm run deploy
     ```
