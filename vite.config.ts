@@ -10,6 +10,7 @@ export default defineConfig({
             '@constants': '/src/constants',
             'hooks': '/src/hooks',
             'types': '/src/types',
+            'api': '/vercel/api',
         },
     },
     build: {
