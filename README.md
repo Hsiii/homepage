@@ -1,10 +1,6 @@
-<div align="center">
-   <img alt="Logo" src="https://raw.githubusercontent.com/Hsiii/homepage/gh-pages/assets/favicon.png" width="100"/>
-</div>
-<h1 align="center"><a href="https://hsiii.github.io/homepage">Homepage</a></h1>
-<p align="center">
-   My personal browser homepage built with <a href="https://vite.dev/">Vite</a>, <a href="https://react.dev/">React</a> and <a href="https://vercel.com/">Vercel</a>.
-</p>
+# [Homepage](https://hsiii.github.io/homepage)
+My universal default tab built with <a href="https://vite.dev/">Vite</a>, <a href="https://react.dev/">React</a> and <a href="https://vercel.com/">Vercel</a>.
+Beyond allowing for endless customization, it serves as a portable, browser-agnostic dashboard — providing instant access to my bookmarks on any machine or browser. No more migration pain!
 
 ![Homepage](https://raw.githubusercontent.com/Hsiii/homepage/gh-pages/assets/demo.webp)
 
