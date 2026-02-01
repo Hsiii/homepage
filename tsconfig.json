@@ -27,7 +27,8 @@
             "@constants": ["constants"],
             "hooks/*": ["hooks/*"],
             "hooks": ["hooks"],
-            "types": ["types"]
+            "api/*": ["../vercel/api/*"],
+            "api": ["../vercel/api"]
         }
     },
     "include": ["src", "vercel/api", "vite.config.ts"]

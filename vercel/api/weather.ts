@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { WeatherData } from 'components/Weather';
+
+import type { WeatherData } from './types';
 
 interface WeatherPayload {
     main: {

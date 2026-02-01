@@ -1,3 +1,4 @@
-export { useTime } from './useTime';
-export { useHideLinks } from './useHideLinks';
-export { useLinkNavigation } from './useLinkNavigation';
+export * from './useTime';
+export * from './useHideLinks';
+export * from './useLinkNavigation';
+export * from './useWeather';
