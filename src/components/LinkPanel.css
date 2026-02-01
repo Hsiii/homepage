@@ -43,7 +43,7 @@
         fill: var(--clr-trigger);
     }
 
-    &:has(+ .link-tree.expanded) {
+    &:has(+ :is(.link-tree.expanded, .link-tree:focus-within)) {
         opacity: 0;
     }
 
@@ -83,7 +83,8 @@
     }
 
     .link-panel.hoverEffective:hover &,
-    &.expanded {
+    &.expanded,
+    &.focus-within {
         translate: 0;
     }
 
@@ -174,7 +175,8 @@
 
     .hoverEffective .category:hover + &,
     .category.selected + &,
-    .hoverEffective &:hover {
+    .hoverEffective &:hover,
+    &:focus-within {
         translate: var(--width);
     }
 
