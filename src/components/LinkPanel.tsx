@@ -55,6 +55,9 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
     return (
         <nav
             className={`link-panel ${isMouseNav ? 'hoverEffective' : ''}`}
+            onMouseDown={(e) => {
+                e.preventDefault();
+            }}
             onMouseMove={startMouseNav}
             onTouchStart={startMouseNav}
             onMouseOut={endMouseNav}

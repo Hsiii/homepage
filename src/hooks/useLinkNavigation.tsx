@@ -5,8 +5,15 @@ export const useLinkNavigation = (
     isSearchNav: boolean,
     onClearSearch: () => void,
     highlightedCategory?: number
-) => {
-    const hoverExitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+): {
+    selectedCategory: number;
+    setSelectedCategory: React.Dispatch<React.SetStateAction<number>>;
+    isKeyboardNav: boolean;
+    isMouseNav: boolean;
+    startMouseNav: () => void;
+    endMouseNav: () => void;
+} => {
+    const hoverExitTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     // 1-based indexing
     const [selectedCategory, setSelectedCategory] = useState(0);
 
@@ -15,13 +22,13 @@ export const useLinkNavigation = (
 
     if (highlightedCategory !== prevHighlightedCategory) {
         setPrevHighlightedCategory(highlightedCategory);
-        setSelectedCategory(highlightedCategory || 0);
+        setSelectedCategory(highlightedCategory ?? 0);
     }
 
-    // Shows hotkey hint, expands the base panel, cancels mouse navigation
+    // Shows hotkey hint, expands the base panel, cancels mouse navigation.
     const [isKeyboardNav, setIsKeyboardNav] = useState(false);
 
-    // Hide the hotkey hint, cancels keyboard navigation
+    // Hide the hotkey hint, cancels keyboard navigation.
     const [isMouseNav, setIsMouseNav] = useState(false);
 
     const [prevIsSearchNav, setPrevIsSearchNav] = useState(isSearchNav);
@@ -55,9 +62,9 @@ export const useLinkNavigation = (
                 return;
             }
 
-            // go to previous layer on escape
+            // Go to previous layer on escape.
             if (e.key === 'Escape') {
-                if (selectedCategory) {
+                if (selectedCategory > 0) {
                     setSelectedCategory(0);
                     return;
                 }
@@ -65,28 +72,32 @@ export const useLinkNavigation = (
                 return;
             }
 
-            // keep valid navigation keys
-            if (!/^[1-9]$/.test(key)) return;
-            const idx = parseInt(key);
-            if (idx > linkTree.length) return;
+            // Keep valid navigation keys.
+            if (!/^[1-9]$/.test(key)) {
+                return;
+            }
+            const idx = Number.parseInt(key, 10);
+            if (idx > linkTree.length) {
+                return;
+            }
 
             // if nothing selected yet, select category
-            if (!selectedCategory) {
+            if (selectedCategory === 0) {
                 setSelectedCategory(idx);
                 return;
             }
 
             // else navigate to the selected link
-            window.location.href =
+            globalThis.location.href =
                 links[linkTree[selectedCategory - 1].links[idx - 1]];
         };
 
-        window.addEventListener('keydown', onKeyDown);
-        window.addEventListener('click', onClick);
+        globalThis.addEventListener('keydown', onKeyDown);
+        globalThis.addEventListener('click', onClick);
         return () => {
-            window.removeEventListener('keydown', onKeyDown);
-            window.removeEventListener('click', onClick);
-            // Clean up any pending hover exit timeout
+            globalThis.removeEventListener('keydown', onKeyDown);
+            globalThis.removeEventListener('click', onClick);
+            // Clean up any pending hover exit timeout.
             if (hoverExitTimeoutRef.current) {
                 clearTimeout(hoverExitTimeoutRef.current);
             }
@@ -94,10 +105,10 @@ export const useLinkNavigation = (
     }, [isKeyboardNav, isMouseNav, selectedCategory, isSearchNav]);
 
     const startMouseNav = () => {
-        // Clear any pending exit timeout
+        // Clear any pending exit timeout.
         if (hoverExitTimeoutRef.current) {
             clearTimeout(hoverExitTimeoutRef.current);
-            hoverExitTimeoutRef.current = null;
+            hoverExitTimeoutRef.current = undefined;
         }
         setIsMouseNav(true);
         setIsKeyboardNav(false);
@@ -106,11 +117,11 @@ export const useLinkNavigation = (
     };
 
     const endMouseNav = () => {
-        // Add 150ms delay before removing hover state
-        // This prevents the panel from flashing when there are minor gaps during animation
+        // Add 150ms delay before removing hover state This prevents the panel from flashing when
+        // there are minor gaps during animation.
         hoverExitTimeoutRef.current = setTimeout(() => {
             setIsMouseNav(false);
-            hoverExitTimeoutRef.current = null;
+            hoverExitTimeoutRef.current = undefined;
         }, 150);
     };
 
