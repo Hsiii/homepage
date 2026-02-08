@@ -1,4 +1,5 @@
-import { JSX, useCallback, useEffect, useState } from 'react';
+import type { JSX } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WeatherData } from 'api/weather';
 import {
     Cloud,
@@ -9,14 +10,12 @@ import {
     Sun,
 } from 'lucide-react';
 
-/**
- * The weather type returned by the OpenWeatherMap API.
- */
-type CachedWeather = {
+// The weather type returned by the OpenWeatherMap API.
+interface CachedWeather {
     data: WeatherData;
     timestamp: number;
     isDefault?: boolean;
-};
+}
 
 enum WeatherType {
     Thunderstorm = 'Thunderstorm',
@@ -36,20 +35,25 @@ const weatherIcons: Record<WeatherType, JSX.Element> = {
     [WeatherType.Clouds]: <Cloud size={20} />,
 };
 
-export const useWeather = () => {
-    // Taipei Coordinates
-    const [defaultLat, defaultLon] = [25.033, 121.5654];
+// Taipei Coordinates
+const DEFAULT_LAT = 25.033;
+const DEFAULT_LON = 121.5654;
+const BASE_API_URL = 'https://hsi-homepage.vercel.app/api/weather';
+const CACHE_KEY = 'weather_cache';
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
-    const baseApiUrl = 'https://hsi-homepage.vercel.app/api/weather';
-
-    const cacheKey = 'weather_cache';
-    const cacheTTL = 30 * 60 * 1000; // 30 minutes
-
+export const useWeather = (): {
+    weather: WeatherData | undefined;
+    weatherIcon: JSX.Element | undefined;
+    isLoading: boolean;
+    isCached: boolean;
+    fetchWeatherByCurrentLocation: () => void;
+} => {
     // sync with localStorage
     const [cachedWeather, setCachedWeather] = useState<
         CachedWeather | undefined
     >(() => {
-        const cached = localStorage.getItem(cacheKey);
+        const cached = localStorage.getItem(CACHE_KEY);
         if (cached !== null) {
             try {
                 return JSON.parse(cached) as CachedWeather;
@@ -63,9 +67,7 @@ export const useWeather = () => {
         cachedWeather !== undefined && cachedWeather.isDefault !== true;
     const weather = cachedWeather?.data;
     const weatherIcon = weather
-        ? (weatherIcons[weather.weatherType as WeatherType] ?? (
-              <Cloud size={20} />
-          ))
+        ? weatherIcons[weather.weatherType as WeatherType]
         : undefined;
     const [isLoading, setIsLoading] = useState(false);
 
@@ -75,7 +77,7 @@ export const useWeather = () => {
             timestamp: Date.now(),
             isDefault,
         };
-        localStorage.setItem(cacheKey, JSON.stringify(cache));
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
         setCachedWeather(cache);
     }, []);
 
@@ -83,7 +85,9 @@ export const useWeather = () => {
         async (lat: number, lon: number, isDefault: boolean) => {
             setIsLoading(true);
             try {
-                const res = await fetch(`${baseApiUrl}?lat=${lat}&lon=${lon}`);
+                const res = await fetch(
+                    `${BASE_API_URL}?lat=${lat}&lon=${lon}`
+                );
                 if (!res.ok) {
                     throw new Error('Failed to fetch weather data');
                 }
@@ -99,21 +103,25 @@ export const useWeather = () => {
     );
 
     const fetchWeatherByDefaultLocation = useCallback(() => {
-        fetchWeather(defaultLat, defaultLon, true);
-    }, [fetchWeather, defaultLat, defaultLon]);
+        fetchWeather(DEFAULT_LAT, DEFAULT_LON, true).catch(console.error);
+    }, [fetchWeather]);
 
     const fetchWeatherByCurrentLocation = useCallback(() => {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
-            fetchWeather(latitude, longitude, false);
+            fetchWeather(latitude, longitude, false).catch(console.error);
         }, fetchWeatherByDefaultLocation);
     }, [fetchWeather, fetchWeatherByDefaultLocation]);
 
+    const cachedWeatherRef = useRef(cachedWeather);
+    cachedWeatherRef.current = cachedWeather;
+
     useEffect(() => {
         const initWeather = async () => {
+            const cached = cachedWeatherRef.current;
             const isCacheValid =
-                cachedWeather !== undefined &&
-                Date.now() - cachedWeather.timestamp < cacheTTL;
+                cached !== undefined &&
+                Date.now() - cached.timestamp < CACHE_TTL;
             if (isCacheValid) {
                 return;
             }
@@ -135,7 +143,7 @@ export const useWeather = () => {
         initWeather().catch((error: unknown) => {
             console.error('Failed to fetch weather:', error);
         });
-    }, [fetchWeather, fetchWeatherByCurrentLocation]);
+    }, [fetchWeatherByCurrentLocation, fetchWeatherByDefaultLocation]);
 
     return {
         weather,
