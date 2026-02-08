@@ -10,7 +10,11 @@ export default defineConfig({
             '@constants': '/src/constants',
             'hooks': '/src/hooks',
             'types': '/src/types',
-            'api': '/api',
+        },
+    },
+    server: {
+        watch: {
+            ignored: ['**/api/**'],
         },
     },
     build: {
