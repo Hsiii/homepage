@@ -1,9 +1,0 @@
-{
-    "name": "hsi-homepage-api",
-    "version": "1.0.0",
-    "private": true,
-    "dependencies": {},
-    "devDependencies": {
-        "@vercel/node": "^5.5.16"
-    }
-}

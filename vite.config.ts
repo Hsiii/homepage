@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-    base: '/homepage/',
+    base: '/',
     plugins: [react()],
     resolve: {
         alias: {
@@ -10,7 +10,7 @@ export default defineConfig({
             '@constants': '/src/constants',
             'hooks': '/src/hooks',
             'types': '/src/types',
-            'api': '/vercel/api',
+            'api': '/api',
         },
     },
     build: {
