@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export const useHideLinks = () => {
+export const useHideLinks = (): { hideLinks: boolean } => {
     const ticking = useRef(false);
     const [hideLinks, setHideLinks] = useState(
         () => typeof globalThis !== 'undefined' && globalThis.scrollY !== 0
@@ -22,7 +22,9 @@ export const useHideLinks = () => {
 
     useEffect(() => {
         globalThis.addEventListener('scroll', onScroll, { passive: true });
-        return () => globalThis.removeEventListener('scroll', onScroll);
+        return () => {
+            globalThis.removeEventListener('scroll', onScroll);
+        };
     }, [onScroll]);
 
     return { hideLinks };
