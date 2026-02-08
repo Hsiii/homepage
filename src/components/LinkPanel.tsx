@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { linkTree } from '@constants';
 import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
@@ -30,8 +30,15 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
         endMouseNav,
     } = useLinkNavigation(isSearchNav, onClearSearch, highlightedCategory);
 
+    const [windowHeight, setWindowHeight] = useState(globalThis.innerHeight);
+
+    useEffect(() => {
+        const onResize = () => setWindowHeight(globalThis.innerHeight);
+        globalThis.addEventListener('resize', onResize);
+        return () => globalThis.removeEventListener('resize', onResize);
+    }, []);
+
     const panelPaddings = useMemo(() => {
-        const windowHeight = window.innerHeight;
         const remToPx = 16;
         const linkHeight = 3.5 * remToPx;
 
@@ -50,7 +57,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
             }
             return `${padding}px`;
         });
-    }, []);
+    }, [windowHeight]);
 
     return (
         <nav
