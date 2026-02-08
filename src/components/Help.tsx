@@ -18,7 +18,7 @@ export const Help: React.FC = () => {
         const onClickOutside = (e: MouseEvent) => {
             if (
                 isOpen &&
-                !(e.target as HTMLElement).contains(helpRef.current)
+                helpRef.current?.contains(e.target as Node) === false
             ) {
                 setIsOpen(false);
             }
@@ -27,7 +27,7 @@ export const Help: React.FC = () => {
         return () => {
             document.removeEventListener('click', onClickOutside);
         };
-    }, [isOpen, helpRef]);
+    }, [isOpen]);
 
     return (
         <div className='help' ref={helpRef}>
