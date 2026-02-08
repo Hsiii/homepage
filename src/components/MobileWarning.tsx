@@ -4,7 +4,7 @@ import 'components/MobileWarning.css';
 
 export const MobileWarning: React.FC = () => {
     const [isVisible, setIsVisible] = useState(
-        () => globalThis.window.innerWidth < 600
+        () => globalThis.innerWidth < 600
     );
 
     return (

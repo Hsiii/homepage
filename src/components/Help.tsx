@@ -23,9 +23,9 @@ export const Help: React.FC = () => {
                 setIsOpen(false);
             }
         };
-        document.addEventListener('click', onClickOutside);
+        globalThis.document.addEventListener('click', onClickOutside);
         return () => {
-            document.removeEventListener('click', onClickOutside);
+            globalThis.document.removeEventListener('click', onClickOutside);
         };
     }, [isOpen]);
 
