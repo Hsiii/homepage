@@ -7,6 +7,7 @@ export default defineConfig(
     {
         rules: {
             '@stylistic/quotes': 'off',
+            '@typescript-eslint/consistent-type-definitions': 'off',
             'import-x/no-unassigned-import': [
                 'error',
                 {
