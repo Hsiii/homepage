@@ -10,7 +10,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "preview": "npm run build && vite preview"
+        "preview": "bun run build && vite preview"
     },
     "dependencies": {
         "fuse.js": "^7.1.0",
