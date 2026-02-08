@@ -1,4 +1,5 @@
 # [Homepage](https://hsiii.github.io/homepage)
+
 My universal default tab built with <a href="https://vite.dev/">Vite</a>, <a href="https://react.dev/">React</a> and <a href="https://vercel.com/">Vercel</a>.
 Beyond allowing for endless customization, it serves as a portable, browser-agnostic dashboard — providing instant access to my bookmarks on any machine or browser. No more migration pain!
 
@@ -16,20 +17,20 @@ Beyond allowing for endless customization, it serves as a portable, browser-agno
     ```
 3. Install dependencies:
     ```bash
-    npm install
+    bun i
     ```
 4. Run the development server:
     ```bash
-    npm run dev
+    bun dev
     ```
 
 ## Building for production
 
 1. Generate a production build:
     ```bash
-    npm run build
+    bun run build
     ```
 2. Preview the site:
     ```bash
-    npm run preview
+    bun run preview
     ```
