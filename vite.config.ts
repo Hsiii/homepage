@@ -16,6 +16,12 @@ export default defineConfig({
         watch: {
             ignored: ['**/api/**'],
         },
+        fs: {
+            deny: ['api/**'],
+        },
+    },
+    optimizeDeps: {
+        exclude: ['api'],
     },
     build: {
         rollupOptions: {

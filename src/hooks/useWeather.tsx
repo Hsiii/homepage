@@ -1,6 +1,5 @@
 import type { JSX } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { WeatherData } from 'api/weather';
 import {
     Cloud,
     CloudDrizzle,
@@ -11,6 +10,11 @@ import {
 } from 'lucide-react';
 
 // The weather type returned by the OpenWeatherMap API.
+export type WeatherData = {
+    weatherType: string;
+    temp: number;
+};
+
 interface CachedWeather {
     data: WeatherData;
     timestamp: number;
@@ -38,7 +42,10 @@ const weatherIcons: Record<WeatherType, JSX.Element> = {
 // Taipei Coordinates
 const DEFAULT_LAT = 25.033;
 const DEFAULT_LON = 121.5654;
-const BASE_API_URL = '/api/weather';
+// Use production API for local dev (bun dev), relative path for Vercel
+const BASE_API_URL = import.meta.env.DEV
+    ? 'https://hsi-homepage.vercel.app/api/weather'
+    : '/api/weather';
 const CACHE_KEY = 'weather_cache';
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
