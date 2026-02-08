@@ -7,6 +7,10 @@ dist/
 # IDE files
 .vscode/
 
+# Lock files
+bun.lock
+package-lock.json
+
 # Others
 bookmarkLink.jsx
 color.css
