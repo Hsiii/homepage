@@ -1,4 +1,4 @@
-# [Homepage](https://hsiii.github.io/homepage)
+# [Homepage](hsi-homepage.vercel.app)
 
 My browser homepage built with <a href="https://react.dev/">React</a> and <a href="https://vercel.com/">Vercel</a>.
 Beyond allowing for endless customization, it serves as a universal default tab — providing access to my bookmarks on any machine or browser, no more migration pain for me.
