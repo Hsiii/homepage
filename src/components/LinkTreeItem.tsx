@@ -27,7 +27,7 @@ export const LinkTreeItem: React.FC<LinkTreeItemProps> = ({
 
     return (
         <Component className={finalClassName} {...props}>
-            {icon && icon}
+            {icon}
             <code className={`hint ${isHotkeyHidden ? 'hidden' : ''}`}>
                 [{hotkey}]
             </code>
