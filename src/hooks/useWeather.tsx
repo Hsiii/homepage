@@ -66,9 +66,10 @@ export const useWeather = (): {
     const isCached =
         cachedWeather !== undefined && cachedWeather.isDefault !== true;
     const weather = cachedWeather?.data;
-    const weatherIcon = weather
+    const correspondingWeatherIcon = weather
         ? weatherIcons[weather.weatherType as WeatherType]
         : undefined;
+    const weatherIcon = correspondingWeatherIcon ?? <Cloud size={20} />;
     const [isLoading, setIsLoading] = useState(false);
 
     const updateCache = useCallback((data: WeatherData, isDefault: boolean) => {
