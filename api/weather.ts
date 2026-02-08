@@ -15,7 +15,7 @@ interface WeatherPayload {
 }
 
 const allowedOrigins = [
-    'https://hsiii.github.io',
+    'https://hsi-homepage.vercel.app',
     'http://localhost:4173',
     'http://localhost:5173',
     'http://127.0.0.1:4173',
@@ -44,7 +44,7 @@ function setCorsHeaders(
         'Access-Control-Allow-Origin',
         origin !== undefined && allowedOrigins.includes(origin)
             ? origin
-            : 'https://hsiii.github.io'
+            : 'https://hsi-homepage.vercel.app'
     );
     response.setHeader('Access-Control-Allow-Credentials', 'true');
     response.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

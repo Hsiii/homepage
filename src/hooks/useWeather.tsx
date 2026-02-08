@@ -38,7 +38,7 @@ const weatherIcons: Record<WeatherType, JSX.Element> = {
 // Taipei Coordinates
 const DEFAULT_LAT = 25.033;
 const DEFAULT_LON = 121.5654;
-const BASE_API_URL = 'https://hsi-homepage.vercel.app/api/weather';
+const BASE_API_URL = '/api/weather';
 const CACHE_KEY = 'weather_cache';
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
