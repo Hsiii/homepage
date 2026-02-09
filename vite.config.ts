@@ -19,6 +19,11 @@ export default defineConfig({
         fs: {
             deny: ['api/**'],
         },
+        port: 3000,
+        open: true,
+    },
+    preview: {
+        port: 3000,
     },
     optimizeDeps: {
         exclude: ['api'],
