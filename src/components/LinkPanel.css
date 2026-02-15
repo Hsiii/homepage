@@ -188,7 +188,7 @@
         background-color: var(--clr-neutral-light-alpha);
         border: 1px solid var(--clr-neutral-light-alpha);
         border-left: none;
-        backdrop-filter: blur(0.25rem);
+        backdrop-filter: blur(0.75rem);
         z-index: 9;
         border-radius: 0 1rem 1rem 0;
     }
