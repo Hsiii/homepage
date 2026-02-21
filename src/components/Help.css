@@ -30,16 +30,16 @@
         color: var(--clr-primary);
     }
 
-    :has(~ .open) & {
-        background-color: var(--clr-neutral-light-alpha);
-    }
-
     &:focus-visible {
         outline: 2px solid var(--clr-primary-alpha);
         outline-offset: 2px;
     }
 
     animation: rise-show var(--rise-show-time) ease-out;
+}
+
+.help:has(.help-dialog.open) .help-icon-btn {
+    background-color: var(--clr-neutral-light-alpha);
 }
 
 .help-dialog {
