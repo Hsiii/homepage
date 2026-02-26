@@ -1,4 +1,4 @@
-export const links: Record<string, string> = {
+export const links = {
     'AQI TW': 'https://airtw.moenv.gov.tw/',
     'Algo Ans': 'https://walkccc.me/CLRS/',
     'Anigamer': 'https://ani.gamer.com.tw/',
@@ -73,4 +73,6 @@ export const links: Record<string, string> = {
     'elearn': 'https://elearn.nthu.edu.tw/',
     'maimai': 'https://maimaidx-eng.com/maimai-mobile/home/',
     'refern': 'https://my.refern.app/',
-};
+} as const satisfies Record<string, string>;
+
+export type LinkName = keyof typeof links;
