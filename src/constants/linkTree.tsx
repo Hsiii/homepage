@@ -10,10 +10,12 @@ import {
     ToolCase,
 } from 'lucide-react';
 
+import type { LinkName } from './links.js';
+
 export type CategoryData = {
     category: string;
     icon?: ReactElement;
-    links: string[];
+    links: LinkName[];
 };
 
 export const linkTree: CategoryData[] = [
@@ -24,6 +26,7 @@ export const linkTree: CategoryData[] = [
             'eeclass',
             'elearn',
             'ccxp',
+            'DB',
             'Past Exam',
             'Presentation',
             'NotebookLM',
