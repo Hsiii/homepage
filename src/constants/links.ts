@@ -8,6 +8,7 @@ export const links: Record<string, string> = {
         'https://colab.research.google.com/drive/1c56LHV9HmUk_IMPTMROKPGCe-vUsvOGQ',
     'Coolor': 'https://coolors.co/',
     'Dam': 'https://www.clubdam.com/',
+    'DB': 'https://nthu-datalab.github.io/db/',
     'Discord': 'https://discord.com/channels/@me',
     'Doc': 'https://docs.google.com/document/u/0/',
     'Drive': 'https://drive.google.com/drive/u/0/home',
@@ -24,7 +25,7 @@ export const links: Record<string, string> = {
     'Group': 'https://groups.google.com/u/0/g/nmsl-all/c/AsGZhi2lT5s',
     'HackMD': 'https://hackmd.io/?nav=overview',
     'Haikei': 'https://app.haikei.app/',
-    'Hololive': 'https://hololive.hololivepro.com/en/talents',
+    'Hololive Ref': 'https://hololive.hololivepro.com/en/talents',
     'Instagram': 'https://www.instagram.com/',
     'JP Space':
         'https://hackmd.io/@tropical08842/B1_YN_-kp/https%3A%2F%2Fhackmd.io%2F%40tropical08842%2FHJEHlK-kT%2F%252Fp7Ti7wARSoq9GKGdiLh0xg',

@@ -24,6 +24,7 @@ export const linkTree: CategoryData[] = [
             'eeclass',
             'elearn',
             'ccxp',
+            'DB',
             'Past Exam',
             'Presentation',
             'NotebookLM',
