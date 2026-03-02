@@ -19,16 +19,10 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "baseUrl": "./src",
+        "baseUrl": ".",
         "paths": {
-            "components/*": ["components/*"],
-            "components": ["components"],
-            "@constants/*": ["constants/*"],
-            "@constants": ["constants"],
-            "hooks/*": ["hooks/*"],
-            "hooks": ["hooks"]
+            "@/*": ["./src/*"]
         }
     },
-    "include": ["src", "vite.config.ts"],
-    "exclude": ["api"]
+    "include": ["src", "api"]
 }

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useThemeTransition } from 'hooks';
 import {
     Bookmark,
     HelpCircle,
@@ -10,7 +9,9 @@ import {
     Sun,
 } from 'lucide-react';
 
-import 'components/Help.css';
+import { useThemeTransition } from '@/hooks/useThemeTransition';
+
+import './Help.css';
 
 export const Help: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);

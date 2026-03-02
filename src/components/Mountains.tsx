@@ -2,7 +2,7 @@ import backSrc from '../assets/images/mountain/back.svg';
 import frontSrc from '../assets/images/mountain/front.svg';
 import midSrc from '../assets/images/mountain/mid.svg';
 
-import 'components/Mountains.css';
+import './Mountains.css';
 
 export const Mountains: React.FC = () => (
     <div className='mountains'>

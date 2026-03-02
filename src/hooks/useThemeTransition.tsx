@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
-import { createBlobPath } from './themeTransitionUtils.js';
+import { createBlobPath } from './themeTransitionUtils';
 
 export const useThemeTransition = (): {
     isDarkMode: boolean;

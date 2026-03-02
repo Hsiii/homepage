@@ -1,9 +1,8 @@
-import { footerCredit, footerLink } from '@constants';
+import { footerCredit, footerLink } from '@/constants/footer';
+import { Cover } from './Cover';
+import { MobileWarning } from './MobileWarning';
 
-import { Cover } from './Cover.js';
-import { MobileWarning } from './MobileWarning.js';
-
-import 'components/Main.css';
+import './Main.css';
 
 export const Main: React.FC = () => (
     <>

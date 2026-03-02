@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { links, linkTree } from '@constants';
+
+import { links } from '@/constants/links.ts';
+import { linkTree } from '@/constants/linkTree.tsx';
 
 export const useLinkNavigation = (
     isSearchNav: boolean,

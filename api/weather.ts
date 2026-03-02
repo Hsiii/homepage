@@ -14,33 +14,24 @@ interface WeatherPayload {
     }>;
 }
 
-const allowedOrigins = [
+const allowedOrigins = new Set([
     'https://hsi-homepage.vercel.app',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-];
+]);
 
 const defaultCoords = {
     lat: '25.03',
     lon: '121.57',
 };
 
-/**
- * Sets CORS headers on the response.
- * Uses the request origin if it's in the allowed list, otherwise defaults to production.
- */
-function setCorsHeaders(
-    request: VercelRequest,
-    response: VercelResponse
-): void {
+function setCorsHeaders(request: VercelRequest, response: VercelResponse) {
     const { origin } = request.headers;
-
-    // Critical for Vercel/CDN caching: tell the cache that the response depends on the Origin header.
     response.setHeader('Vary', 'Origin');
 
     response.setHeader(
         'Access-Control-Allow-Origin',
-        origin !== undefined && allowedOrigins.includes(origin)
+        origin !== undefined && allowedOrigins.has(origin)
             ? origin
             : 'https://hsi-homepage.vercel.app'
     );
@@ -49,24 +40,18 @@ function setCorsHeaders(
     response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Origin');
 }
 
-/**
- * Extracts and validates a coordinate query parameter.
- * Handles array case (e.g., ?lat=25&lat=30) and validates numeric format.
- * Returns the coordinate rounded to 2 decimal places for better cache hits.
- */
 function parseCoordinate(
     value: string | string[] | undefined,
     defaultValue: string
-): string | null {
+): string | undefined {
     const raw = Array.isArray(value) ? value[0] : value;
     const str = raw ?? defaultValue;
-    const num = parseFloat(str);
+    const num = Number.parseFloat(str);
 
     if (Number.isNaN(num)) {
-        return null;
+        return undefined;
     }
 
-    // Round to 2 decimal places (~1km precision) for better cache hit rate.
     return num.toFixed(2);
 }
 
@@ -77,16 +62,14 @@ export default async function handler(
 ): Promise<VercelResponse> {
     setCorsHeaders(request, response);
 
-    // Handle OPTIONS request for preflight.
     if (request.method === 'OPTIONS') {
         return response.status(200).end();
     }
 
-    // Validate and parse coordinates.
     const lat = parseCoordinate(request.query.lat, defaultCoords.lat);
     const lon = parseCoordinate(request.query.lon, defaultCoords.lon);
 
-    if (lat === null || lon === null) {
+    if (lat === undefined || lon === undefined) {
         return response.status(400).json({
             error: 'Invalid lat/lon parameters. Must be numeric values.',
         });
@@ -118,8 +101,6 @@ export default async function handler(
             temp,
         };
 
-        // Cache for 5 minutes, serve stale while revalidating for up to 10 minutes.
-        // This reduces API calls and speeds up responses for nearby users.
         response.setHeader(
             'Cache-Control',
             's-maxage=300, stale-while-revalidate=600'

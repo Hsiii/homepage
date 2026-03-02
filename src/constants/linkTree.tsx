@@ -10,7 +10,7 @@ import {
     ToolCase,
 } from 'lucide-react';
 
-import type { LinkName } from './links.js';
+import type { LinkName } from '@/constants/links';
 
 export type CategoryData = {
     category: string;

@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
-import type { CategoryData } from '@constants';
-import { links } from '@constants';
 
-import { LinkTreeItem } from './LinkTreeItem.js';
+import { links } from '@/constants/links';
+import type { CategoryData } from '@/constants/linkTree';
+import { LinkTreeItem } from './LinkTreeItem';
 
 interface LinkCategoryProps {
     categoryData: CategoryData;

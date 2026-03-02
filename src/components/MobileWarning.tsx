@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import 'components/MobileWarning.css';
+import './MobileWarning.css';
 
 export const MobileWarning: React.FC = () => {
     const [isVisible, setIsVisible] = useState(

@@ -1,8 +1,8 @@
 import { RefreshCw } from 'lucide-react';
 
-import 'components/Weather.css';
+import './Weather.css';
 
-import { useWeather } from 'hooks';
+import { useWeather } from '@/hooks/useWeather';
 
 export const Weather: React.FC = () => {
     const {

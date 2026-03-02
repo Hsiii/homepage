@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { linkTree } from '@constants';
-import { useLinkNavigation } from 'hooks';
 import { Bookmark } from 'lucide-react';
 
-import { LinkCategory } from './LinkCategory.js';
+import { linkTree } from '@/constants/linkTree';
+import { useLinkNavigation } from '@/hooks/useLinkNavigation';
+import { LinkCategory } from './LinkCategory';
 
-import 'components/LinkPanel.css';
+import './LinkPanel.css';
 
 interface LinkPanelProps {
     hidden: boolean;
@@ -31,6 +31,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
     } = useLinkNavigation(isSearchNav, onClearSearch, highlightedCategory);
 
     const [windowHeight, setWindowHeight] = useState(globalThis.innerHeight);
+    const isExpanded = isKeyboardNav ? true : selectedCategory !== 0;
 
     useEffect(() => {
         const onResize = () => {
@@ -79,11 +80,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                 <div className='indicator' />
                 <Bookmark className='icon' />
             </div>
-            <div
-                className={`link-tree ${
-                    (isKeyboardNav || selectedCategory !== 0) && 'expanded'
-                }`}
-            >
+            <div className={`link-tree ${isExpanded && 'expanded'}`}>
                 <div className='panel' />
                 {linkTree.map((categoryData, i) => (
                     <LinkCategory
