@@ -13,7 +13,7 @@ export default defineConfig(
         languageOptions: {
             parserOptions: {
                 projectService: true,
-                allowDefaultProject: [],
+                allowDefaultProject: ['vite.config.ts'],
             },
         },
     },
