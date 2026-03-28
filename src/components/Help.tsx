@@ -70,11 +70,12 @@ export const Help: React.FC = () => {
     const handleThemeToggle = useCallback(
         async (event: React.MouseEvent<HTMLButtonElement>) => {
             event.stopPropagation();
+            const button = event.currentTarget;
 
             try {
                 const { runThemeTransition } = await loadThemeTransition();
                 const nextDarkMode = runThemeTransition({
-                    button: event.currentTarget,
+                    button,
                     isDarkMode,
                 });
 
