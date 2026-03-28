@@ -1,12 +1,12 @@
 import React, {
     lazy,
     Suspense,
+    useCallback,
     useEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
-import Fuse from 'fuse.js';
 import { Search } from 'lucide-react';
 
 import { links } from '@/constants/links';
@@ -31,13 +31,25 @@ interface LinkItem {
     link: string;
 }
 
+interface SearchResult {
+    item: LinkItem;
+}
+
+interface SearchIndex {
+    search: (query: string) => SearchResult[];
+}
+
 export const Cover: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const searchIndexRef = useRef<SearchIndex | undefined>(undefined);
+    const searchIndexLoaderRef = useRef<Promise<SearchIndex> | undefined>(
+        undefined
+    );
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
     const [inputFocused, setInputFocused] = useState(false);
-
     const [searchValue, setSearchValue] = useState('');
+    const [match, setMatch] = useState<LinkItem | undefined>(undefined);
 
     const flattenedLinks = useMemo<LinkItem[]>(
         () =>
@@ -50,22 +62,54 @@ export const Cover: React.FC = () => {
         []
     );
 
-    const fuse = useMemo(
-        () =>
-            new Fuse(flattenedLinks, {
-                keys: ['link'],
-                threshold: 0.4,
-            }),
-        [flattenedLinks]
-    );
+    const loadSearchIndex = useCallback(async (): Promise<SearchIndex> => {
+        if (searchIndexRef.current) {
+            return searchIndexRef.current;
+        }
 
-    const match = useMemo(() => {
+        searchIndexLoaderRef.current ??= import('fuse.js').then(
+            ({ default: Fuse }) => {
+                const searchIndex = new Fuse(flattenedLinks, {
+                    keys: ['link'],
+                    threshold: 0.4,
+                });
+
+                searchIndexRef.current = searchIndex;
+                return searchIndex;
+            }
+        );
+
+        return await searchIndexLoaderRef.current;
+    }, [flattenedLinks]);
+
+    useEffect(() => {
         if (searchValue === '') {
+            setMatch(undefined);
             return undefined;
         }
-        const results = fuse.search(searchValue);
-        return results.length > 0 ? results[0].item : undefined;
-    }, [searchValue, fuse]);
+
+        let isCancelled = false;
+
+        loadSearchIndex()
+            .then((searchIndex) => {
+                if (isCancelled) {
+                    return undefined;
+                }
+
+                const results = searchIndex.search(searchValue);
+                setMatch(results[0]?.item);
+            })
+            .catch((error: unknown) => {
+                console.error('Failed to load search index:', error);
+                if (!isCancelled) {
+                    setMatch(undefined);
+                }
+            });
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [loadSearchIndex, searchValue]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -104,6 +148,7 @@ export const Cover: React.FC = () => {
     const handleSearchBlur = () => {
         setInputFocused(false);
         setSearchValue('');
+        setMatch(undefined);
         if (inputRef.current) {
             inputRef.current.value = '';
         }
@@ -134,6 +179,12 @@ export const Cover: React.FC = () => {
                             }}
                             onFocus={() => {
                                 setInputFocused(true);
+                                loadSearchIndex().catch((error: unknown) => {
+                                    console.error(
+                                        'Failed to preload search index:',
+                                        error
+                                    );
+                                });
                             }}
                             onBlur={handleSearchBlur}
                         />
