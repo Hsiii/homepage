@@ -1,23 +1,90 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-    Bookmark,
-    HelpCircle,
-    Keyboard,
-    Moon,
-    MousePointerClick,
-    Search,
-    Sun,
-} from 'lucide-react';
-
-import { useThemeTransition } from '@/hooks/useThemeTransition';
+import React, {
+    lazy,
+    Suspense,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
+import { HelpCircle, Moon, Sun } from 'lucide-react';
 
 import './Help.css';
+
+const loadHelpDialog = async () => await import('./HelpDialog');
+
+const HelpDialog = lazy(
+    async () =>
+        await loadHelpDialog().then((module) => ({
+            default: module.HelpDialog,
+        }))
+);
+
+interface ThemeTransitionModule {
+    runThemeTransition: (options: {
+        button: HTMLButtonElement;
+        isDarkMode: boolean;
+    }) => boolean;
+}
+
+const applyThemeImmediately = (isDarkMode: boolean): boolean => {
+    const nextDarkMode = !isDarkMode;
+    const nextTheme = nextDarkMode ? 'dark' : 'light';
+    const root = globalThis.document.documentElement;
+
+    root.dataset.theme = nextTheme;
+    root.style.colorScheme = nextTheme;
+    globalThis.localStorage.setItem('theme', nextTheme);
+
+    return nextDarkMode;
+};
 
 export const Help: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isMouseMode, setIsMouseMode] = useState(true);
-    const { isDarkMode, toggleTheme } = useThemeTransition();
+    const [isDarkMode, setIsDarkMode] = useState(
+        () => globalThis.document.documentElement.dataset.theme === 'dark'
+    );
     const helpRef = useRef<HTMLDivElement>(null);
+    const themeTransitionLoaderRef = useRef<
+        Promise<ThemeTransitionModule> | undefined
+    >(undefined);
+
+    const preloadHelpDialog = useCallback(() => {
+        loadHelpDialog().catch(() => undefined);
+        return undefined;
+    }, []);
+
+    const loadThemeTransition =
+        useCallback(async (): Promise<ThemeTransitionModule> => {
+            themeTransitionLoaderRef.current ??=
+                import('@/utils/themeTransition');
+
+            return await themeTransitionLoaderRef.current;
+        }, []);
+
+    const preloadThemeTransition = useCallback(() => {
+        loadThemeTransition().catch(() => undefined);
+        return undefined;
+    }, [loadThemeTransition]);
+
+    const handleThemeToggle = useCallback(
+        async (event: React.MouseEvent<HTMLButtonElement>) => {
+            event.stopPropagation();
+
+            try {
+                const { runThemeTransition } = await loadThemeTransition();
+                const nextDarkMode = runThemeTransition({
+                    button: event.currentTarget,
+                    isDarkMode,
+                });
+
+                setIsDarkMode(nextDarkMode);
+            } catch {
+                setIsDarkMode(applyThemeImmediately(isDarkMode));
+            }
+        },
+        [isDarkMode, loadThemeTransition]
+    );
 
     useEffect(() => {
         const onClickOutside = (e: MouseEvent) => {
@@ -44,7 +111,11 @@ export const Help: React.FC = () => {
                             ? 'Switch to light mode'
                             : 'Switch to dark mode'
                     }
-                    onClick={toggleTheme}
+                    onClick={(event) => {
+                        handleThemeToggle(event).catch(() => undefined);
+                    }}
+                    onFocus={preloadThemeTransition}
+                    onMouseEnter={preloadThemeTransition}
                 >
                     {isDarkMode ? (
                         <Moon className='icon' />
@@ -55,8 +126,13 @@ export const Help: React.FC = () => {
                 <button
                     className='help-icon-btn'
                     aria-label='Help'
+                    onFocus={preloadHelpDialog}
+                    onMouseEnter={preloadHelpDialog}
                     onClick={(e) => {
                         e.stopPropagation();
+                        if (!isOpen) {
+                            preloadHelpDialog();
+                        }
                         setIsOpen(!isOpen);
                     }}
                 >
@@ -65,80 +141,19 @@ export const Help: React.FC = () => {
             </div>
 
             <div className={`help-dialog ${isOpen ? 'open' : ''}`}>
-                <div className='help-content'>
-                    <div className='help-switch'>
-                        <button
-                            className={`help-switch-btn ${isMouseMode ? 'active' : ''}`}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsMouseMode(true);
-                            }}
-                        >
-                            <MousePointerClick className='icon' size={24} />
-                        </button>
-                        <button
-                            className={`help-switch-btn ${isMouseMode ? '' : 'active'}`}
-                            onClick={(e) => {
-                                e.stopPropagation();
+                {isOpen ? (
+                    <Suspense fallback={undefined}>
+                        <HelpDialog
+                            isMouseMode={isMouseMode}
+                            onSelectKeyboardMode={() => {
                                 setIsMouseMode(false);
                             }}
-                        >
-                            <Keyboard className='icon' size={24} />
-                        </button>
-                    </div>
-                    <div className='help-desc-list'>
-                        <div className='help-desc-item bookmark-desc'>
-                            <div className='icon-container'>
-                                <Bookmark className='icon' size={20} />
-                            </div>
-                            <div className='help-desc-text'>
-                                {isMouseMode ? (
-                                    <p className='key-info'>
-                                        Access bookmark panel on the left.
-                                    </p>
-                                ) : (
-                                    <>
-                                        <div className='key-info'>
-                                            expand panel
-                                            <span className='key'>1</span>
-                                        </div>
-                                        <div className='key-info'>
-                                            select / jump to
-                                            <span className='key'>1 - 9</span>
-                                        </div>
-                                        <div className='key-info'>
-                                            unselect / close
-                                            <span className='key'>ESC</span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                        <div className='help-desc-item searchbar-desc'>
-                            <div className='icon-container'>
-                                <Search className='icon' size={20} />
-                            </div>
-                            <div className='help-desc-text'>
-                                {isMouseMode ? (
-                                    <p className='key-info'>
-                                        Search bookmarks directly.
-                                    </p>
-                                ) : (
-                                    <>
-                                        <div className='key-info'>
-                                            start searching
-                                            <span className='key'>SPACE</span>
-                                        </div>
-                                        <div className='key-info'>
-                                            cancel search
-                                            <span className='key'>ESC</span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                            onSelectMouseMode={() => {
+                                setIsMouseMode(true);
+                            }}
+                        />
+                    </Suspense>
+                ) : undefined}
             </div>
         </div>
     );
