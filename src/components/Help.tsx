@@ -6,7 +6,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { HelpCircle, Moon, Sun } from 'lucide-react';
+import { FastForward, HelpCircle, Moon, Play, Sun } from 'lucide-react';
 
 import './Help.css';
 
@@ -18,6 +18,10 @@ const HelpDialog = lazy(
             default: module.HelpDialog,
         }))
 );
+
+const animationStorageKey = 'animation-mode';
+const skipAnimationMode = 'skip';
+const normalAnimationMode = 'normal';
 
 interface ThemeTransitionModule {
     runThemeTransition: (options: {
@@ -43,6 +47,11 @@ export const Help: React.FC = () => {
     const [isMouseMode, setIsMouseMode] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(
         () => globalThis.document.documentElement.dataset.theme === 'dark'
+    );
+    const [isSkipAnimation, setIsSkipAnimation] = useState(
+        () =>
+            globalThis.document.documentElement.dataset.animationMode ===
+            skipAnimationMode
     );
     const helpRef = useRef<HTMLDivElement>(null);
     const themeTransitionLoaderRef = useRef<
@@ -87,6 +96,17 @@ export const Help: React.FC = () => {
         [isDarkMode, loadThemeTransition]
     );
 
+    const updateAnimationMode = useCallback((nextSkipAnimation: boolean) => {
+        const nextAnimationMode = nextSkipAnimation
+            ? skipAnimationMode
+            : normalAnimationMode;
+
+        globalThis.document.documentElement.dataset.animationMode =
+            nextAnimationMode;
+        globalThis.localStorage.setItem(animationStorageKey, nextAnimationMode);
+        setIsSkipAnimation(nextSkipAnimation);
+    }, []);
+
     useEffect(() => {
         const onClickOutside = (e: MouseEvent) => {
             if (
@@ -122,6 +142,29 @@ export const Help: React.FC = () => {
                         <Moon className='icon' />
                     ) : (
                         <Sun className='icon' />
+                    )}
+                </button>
+                <button
+                    className='theme-icon-btn'
+                    aria-label={
+                        isSkipAnimation
+                            ? 'Use normal animations'
+                            : 'Skip rise animations'
+                    }
+                    title={
+                        isSkipAnimation
+                            ? 'Use normal animations'
+                            : 'Skip rise animations'
+                    }
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        updateAnimationMode(!isSkipAnimation);
+                    }}
+                >
+                    {isSkipAnimation ? (
+                        <FastForward className='icon' />
+                    ) : (
+                        <Play className='icon' />
                     )}
                 </button>
                 <button
