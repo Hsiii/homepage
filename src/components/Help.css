@@ -1,20 +1,3 @@
-.help {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 18;
-
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-}
-.help-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
 .theme-icon-btn,
 .help-icon-btn {
     background: transparent;
@@ -38,12 +21,21 @@
     animation: rise-show var(--rise-show-duration) ease-out;
 }
 
-.help:has(.help-dialog.open) .help-icon-btn {
+.help-control {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.help-control.open .help-icon-btn {
     background-color: var(--clr-neutral-light-alpha);
 }
 
 .help-dialog {
-    position: relative;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
     width: 400px;
     background-color: var(
         --clr-neutral-light

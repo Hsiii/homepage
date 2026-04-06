@@ -13,7 +13,7 @@ import { links } from '@/constants/links';
 import { linkTree } from '@/constants/linkTree';
 import { useHideLinks } from '@/hooks/useHideLinks';
 import { useTime } from '@/hooks/useTime';
-import { Help } from './Help';
+import { Controls } from './Controls';
 import { Mountains } from './Mountains';
 import { Weather } from './Weather';
 
@@ -157,7 +157,7 @@ export const Cover: React.FC = () => {
     return (
         <section className='cover'>
             <Mountains />
-            <Help />
+            <Controls />
             <div className={`cover-content ${inputFocused ? 'focused' : ''}`}>
                 <div className='title-container'>
                     <Weather />

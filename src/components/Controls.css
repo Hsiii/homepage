@@ -1,0 +1,16 @@
+.controls {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 18;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.controls-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}

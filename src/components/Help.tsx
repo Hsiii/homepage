@@ -6,7 +6,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { FastForward, HelpCircle, Moon, Play, Sun } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 
 import './Help.css';
 
@@ -19,92 +19,14 @@ const HelpDialog = lazy(
         }))
 );
 
-const animationStorageKey = 'animation-mode';
-const skipAnimationMode = 'skip';
-const normalAnimationMode = 'normal';
-
-interface ThemeTransitionModule {
-    runThemeTransition: (options: {
-        button: HTMLButtonElement;
-        isDarkMode: boolean;
-    }) => boolean;
-}
-
-const applyThemeImmediately = (isDarkMode: boolean): boolean => {
-    const nextDarkMode = !isDarkMode;
-    const nextTheme = nextDarkMode ? 'dark' : 'light';
-    const root = globalThis.document.documentElement;
-
-    root.dataset.theme = nextTheme;
-    root.style.colorScheme = nextTheme;
-    globalThis.localStorage.setItem('theme', nextTheme);
-
-    return nextDarkMode;
-};
-
 export const Help: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isMouseMode, setIsMouseMode] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(
-        () => globalThis.document.documentElement.dataset.theme === 'dark'
-    );
-    const [isSkipAnimation, setIsSkipAnimation] = useState(
-        () =>
-            globalThis.document.documentElement.dataset.animationMode ===
-            skipAnimationMode
-    );
     const helpRef = useRef<HTMLDivElement>(null);
-    const themeTransitionLoaderRef = useRef<
-        Promise<ThemeTransitionModule> | undefined
-    >(undefined);
 
     const preloadHelpDialog = useCallback(() => {
         loadHelpDialog().catch(() => undefined);
         return undefined;
-    }, []);
-
-    const loadThemeTransition =
-        useCallback(async (): Promise<ThemeTransitionModule> => {
-            themeTransitionLoaderRef.current ??=
-                import('@/utils/themeTransition');
-
-            return await themeTransitionLoaderRef.current;
-        }, []);
-
-    const preloadThemeTransition = useCallback(() => {
-        loadThemeTransition().catch(() => undefined);
-        return undefined;
-    }, [loadThemeTransition]);
-
-    const handleThemeToggle = useCallback(
-        async (event: React.MouseEvent<HTMLButtonElement>) => {
-            event.stopPropagation();
-            const button = event.currentTarget;
-
-            try {
-                const { runThemeTransition } = await loadThemeTransition();
-                const nextDarkMode = runThemeTransition({
-                    button,
-                    isDarkMode,
-                });
-
-                setIsDarkMode(nextDarkMode);
-            } catch {
-                setIsDarkMode(applyThemeImmediately(isDarkMode));
-            }
-        },
-        [isDarkMode, loadThemeTransition]
-    );
-
-    const updateAnimationMode = useCallback((nextSkipAnimation: boolean) => {
-        const nextAnimationMode = nextSkipAnimation
-            ? skipAnimationMode
-            : normalAnimationMode;
-
-        globalThis.document.documentElement.dataset.animationMode =
-            nextAnimationMode;
-        globalThis.localStorage.setItem(animationStorageKey, nextAnimationMode);
-        setIsSkipAnimation(nextSkipAnimation);
     }, []);
 
     useEffect(() => {
@@ -123,66 +45,22 @@ export const Help: React.FC = () => {
     }, [isOpen]);
 
     return (
-        <div className='help' ref={helpRef}>
-            <div className='help-actions'>
-                <button
-                    className='theme-icon-btn'
-                    aria-label={
-                        isDarkMode
-                            ? 'Switch to light mode'
-                            : 'Switch to dark mode'
+        <div className={`help-control ${isOpen ? 'open' : ''}`} ref={helpRef}>
+            <button
+                className='help-icon-btn'
+                aria-label='Help'
+                onFocus={preloadHelpDialog}
+                onMouseEnter={preloadHelpDialog}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isOpen) {
+                        preloadHelpDialog();
                     }
-                    onClick={(event) => {
-                        handleThemeToggle(event).catch(() => undefined);
-                    }}
-                    onFocus={preloadThemeTransition}
-                    onMouseEnter={preloadThemeTransition}
-                >
-                    {isDarkMode ? (
-                        <Moon className='icon' />
-                    ) : (
-                        <Sun className='icon' />
-                    )}
-                </button>
-                <button
-                    className='theme-icon-btn'
-                    aria-label={
-                        isSkipAnimation
-                            ? 'Use normal animations'
-                            : 'Skip rise animations'
-                    }
-                    title={
-                        isSkipAnimation
-                            ? 'Use normal animations'
-                            : 'Skip rise animations'
-                    }
-                    onClick={(event) => {
-                        event.stopPropagation();
-                        updateAnimationMode(!isSkipAnimation);
-                    }}
-                >
-                    {isSkipAnimation ? (
-                        <FastForward className='icon' />
-                    ) : (
-                        <Play className='icon' />
-                    )}
-                </button>
-                <button
-                    className='help-icon-btn'
-                    aria-label='Help'
-                    onFocus={preloadHelpDialog}
-                    onMouseEnter={preloadHelpDialog}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        if (!isOpen) {
-                            preloadHelpDialog();
-                        }
-                        setIsOpen(!isOpen);
-                    }}
-                >
-                    <HelpCircle className='icon' />
-                </button>
-            </div>
+                    setIsOpen(!isOpen);
+                }}
+            >
+                <HelpCircle className='icon' />
+            </button>
 
             <div className={`help-dialog ${isOpen ? 'open' : ''}`}>
                 {isOpen ? (
