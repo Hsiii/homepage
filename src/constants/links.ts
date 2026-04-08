@@ -21,6 +21,7 @@ export const links = {
     'Font Awesome': 'https://fontawesome.com/icons',
     'Gemini': 'https://gemini.google.com/app',
     'GitHub': 'https://github.com/',
+    'GitLab': 'https://shwu10.cs.nthu.edu.tw/users/sign_in',
     'Gmail': 'https://mail.google.com/mail/u/0/#inbox',
     'Group': 'https://groups.google.com/u/0/g/nmsl-all/c/AsGZhi2lT5s',
     'HackMD': 'https://hackmd.io/?nav=overview',

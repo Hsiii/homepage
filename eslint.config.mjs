@@ -5,17 +5,7 @@ export default defineConfig(
     ...completeConfigBase,
 
     {
-        ignores: ['public/theme-init.js'],
-    },
-
-    {
-        files: ['vite.config.ts'],
-        languageOptions: {
-            parserOptions: {
-                projectService: true,
-                allowDefaultProject: ['vite.config.ts'],
-            },
-        },
+        ignores: ['public/theme-init.js', 'vite.config.ts'],
     },
 
     {
