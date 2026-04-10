@@ -50,6 +50,7 @@ export const linkTree: CategoryData[] = [
         icon: <CodeXml className='icon' />,
         links: [
             'GitHub',
+            'Crx',
             'Colab',
             'React dev',
             'Vercel',
@@ -58,7 +59,7 @@ export const linkTree: CategoryData[] = [
             'Squoosh',
             'Coolor',
             'Haikei',
-            'Stylish',
+            'Motion',
             'LeetCode',
         ],
     },
@@ -67,6 +68,7 @@ export const linkTree: CategoryData[] = [
         icon: <Brush className='icon' />,
         links: [
             'Pinterest',
+            'Head Ref',
             'Pose Ref',
             'Pixiv',
             'Line of Action',
