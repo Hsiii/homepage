@@ -22,7 +22,7 @@ export const linkTree: CategoryData[] = [
     {
         category: 'Study',
         icon: <BookOpenText className='icon' />,
-        links: ['eeclass', 'ccxp', 'DB', 'GitLab', 'Past Exam', 'NotebookLM'],
+        links: ['eeclass', 'ccxp', 'DB', 'DBHW', 'Past Exam', 'NotebookLM'],
     },
     {
         category: 'SNS',
