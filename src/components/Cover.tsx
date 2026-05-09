@@ -39,6 +39,26 @@ interface SearchIndex {
     search: (query: string) => SearchResult[];
 }
 
+const chillLinks = [
+    'Instagram',
+    'Messenger',
+    'Twitter',
+    'Facebook',
+    'GitHub',
+    'Crx',
+    'YouTube',
+    'Anigamer',
+] as const;
+
+const isChillSearch = (value: string): boolean =>
+    value.trim().toLowerCase() === 'chill';
+
+const openChillLinks = () => {
+    for (const linkName of chillLinks) {
+        globalThis.open(links[linkName], '_blank');
+    }
+};
+
 export const Cover: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const inputFocusedRef = useRef(false);
@@ -149,6 +169,14 @@ export const Cover: React.FC = () => {
             }
 
             if (inputFocusedRef.current) {
+                if (e.key === 'Enter') {
+                    if (isChillSearch(searchValue)) {
+                        e.preventDefault();
+                        openChillLinks();
+                    }
+                    return;
+                }
+
                 return;
             }
 
@@ -172,10 +200,15 @@ export const Cover: React.FC = () => {
         return () => {
             globalThis.removeEventListener('keydown', handleKeyDown);
         };
-    }, [flushPendingInput, syncSearchValue]);
+    }, [flushPendingInput, searchValue, syncSearchValue]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (isChillSearch(searchValue)) {
+            openChillLinks();
+            return;
+        }
+
         if (match?.link !== undefined && match.link in links) {
             globalThis.location.href = links[match.link as keyof typeof links];
         }
