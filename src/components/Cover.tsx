@@ -46,6 +46,9 @@ interface SearchIndex {
     search: (query: string) => SearchResult[];
 }
 
+const isLinkItem = (item: SearchItem | undefined): item is LinkItem =>
+    item !== undefined && 'link' in item;
+
 const chillLinks = [
     'Instagram',
     'Messenger',
@@ -115,7 +118,7 @@ export const Cover: React.FC = () => {
         );
 
         return await searchIndexLoaderRef.current;
-    }, [flattenedLinks]);
+    }, [flattenedSearchItems]);
 
     useEffect(() => {
         if (searchValue === '') {
@@ -184,7 +187,7 @@ export const Cover: React.FC = () => {
             return;
         }
 
-        if ('link' in (match ?? {}) && match.link in links) {
+        if (isLinkItem(match) && match.link in links) {
             globalThis.location.href = links[match.link as keyof typeof links];
         }
     };
@@ -246,9 +249,7 @@ export const Cover: React.FC = () => {
                 <LinkPanel
                     hidden={hideLinks}
                     isSearchNav={inputFocused}
-                    highlightedLink={
-                        'link' in (match ?? {}) ? match.link : undefined
-                    }
+                    highlightedLink={isLinkItem(match) ? match.link : undefined}
                     highlightedCategory={match?.category}
                     onClearSearch={handleClearSearch}
                 />
