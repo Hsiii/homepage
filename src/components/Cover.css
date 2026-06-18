@@ -245,6 +245,13 @@
     }
 
     .search {
+        width: var(--height);
+        transition: width var(--expand-duration);
+    }
+
+    .search.focused,
+    .search:hover,
+    .search:focus-within {
         width: min(100%, 22rem);
     }
 
@@ -258,7 +265,7 @@
     .search-input:focus,
     .search.focused .search-input,
     .search:hover .search-input {
-        width: 100%;
+        width: calc(100% - var(--height));
         max-width: none;
     }
 
