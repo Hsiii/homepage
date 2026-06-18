@@ -162,7 +162,7 @@ export const Cover: React.FC = () => {
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
     const googleSearchHotkeyLabel = useMemo(
-        () => (isAppleKeyboardPlatform() ? '⌘ Enter' : 'Ctrl Enter'),
+        () => (isAppleKeyboardPlatform() ? '⌘ ↵' : 'Ctrl ↵'),
         []
     );
     const [inputFocused, setInputFocused] = useState(false);

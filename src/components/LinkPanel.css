@@ -58,12 +58,12 @@
     animation: rise-show var(--rise-show-duration) ease-out;
 }
 
-.link-panel.search-nav .trigger,
-.link-panel.search-nav .link-tree {
-    display: none;
-}
-
 @media (width < 600px) {
+    .link-panel.search-nav .trigger,
+    .link-panel.search-nav .link-tree {
+        display: none;
+    }
+
     .mobile-bookmark-button {
         position: fixed;
         top: 1rem;

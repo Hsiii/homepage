@@ -180,10 +180,6 @@
     }
 }
 
-.google-search-suggestion {
-    gap: 0.5rem;
-}
-
 .search-suggestion-hotkey {
     margin-left: auto;
     padding: 0.25rem 0.5rem;
