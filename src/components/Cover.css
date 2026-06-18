@@ -48,12 +48,6 @@
 .search {
     --height: 3rem;
     --expand-duration: 0.25s;
-    --suggestion-gap: 0.5rem;
-    --suggestion-item-gap: 0.25rem;
-    --suggestion-min-height: 2rem;
-    --suggestion-padding-block: 0.25rem;
-    --suggestion-padding-inline: 0.75rem;
-    --suggestion-radius: 0.5rem;
 
     position: relative;
     border-radius: calc(var(--height) / 2);
@@ -120,9 +114,17 @@
 }
 
 .search-suggestions {
-    position: absolute;
-    top: calc(100% + var(--suggestion-gap));
-    inset-inline: 0;
+    --suggestion-gap: 0.5rem;
+    --suggestion-item-gap: 0.25rem;
+    --suggestion-min-height: 2rem;
+    --suggestion-padding-block: 0.25rem;
+    --suggestion-padding-inline: 0.75rem;
+    --suggestion-radius: 0.5rem;
+
+    position: fixed;
+    top: calc(var(--suggestion-top) + var(--suggestion-gap));
+    left: var(--suggestion-left);
+    width: var(--suggestion-width);
 
     display: flex;
     flex-direction: column;
@@ -144,12 +146,14 @@
     text-align: center;
     transition:
         background-color 0.1s ease-out,
+        border-color 0.1s ease-out,
         color 0.1s ease-out;
 
     &.selected,
     &:hover,
     &:focus-visible {
         background-color: var(--clr-search-suggestion-bg-active);
+        border-color: var(--clr-search-suggestion-text-active);
         color: var(--clr-search-suggestion-text-active);
         outline: none;
     }

@@ -4,11 +4,13 @@ import React, {
     useCallback,
     useEffect,
     useId,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
 import { Search } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 import type { LinkName } from '@/constants/links';
 import { links } from '@/constants/links';
@@ -40,6 +42,12 @@ interface SearchResult {
 
 interface SearchIndex {
     search: (query: string) => SearchResult[];
+}
+
+interface SearchSuggestionsPosition {
+    left: number;
+    top: number;
+    width: number;
 }
 
 const maxSearchResults = 4;
@@ -86,6 +94,7 @@ const getGoogleSearchUrl = (value: string): string =>
 
 export const Cover: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const searchRef = useRef<HTMLDivElement>(null);
     const searchSuggestionsId = useId();
     const searchIndexRef = useRef<SearchIndex | undefined>(undefined);
     const searchIndexLoaderRef = useRef<Promise<SearchIndex> | undefined>(
@@ -98,9 +107,13 @@ export const Cover: React.FC = () => {
     const [searchResults, setSearchResults] = useState<LinkItem[]>([]);
     const [selectedSearchResultIndex, setSelectedSearchResultIndex] =
         useState(0);
+    const [searchSuggestionsPosition, setSearchSuggestionsPosition] = useState<
+        SearchSuggestionsPosition | undefined
+    >(undefined);
 
     const selectedSearchResult = searchResults.at(selectedSearchResultIndex);
     const alternativeSearchResults = searchResults.slice(1);
+    const hasAlternativeSearchResults = alternativeSearchResults.length > 0;
 
     const flattenedSearchItems = useMemo<LinkItem[]>(
         () =>
@@ -168,6 +181,66 @@ export const Cover: React.FC = () => {
             isCancelled = true;
         };
     }, [loadSearchIndex, searchValue]);
+
+    const updateSearchSuggestionsPosition = useCallback(() => {
+        const rect = searchRef.current?.getBoundingClientRect();
+        if (!rect) {
+            setSearchSuggestionsPosition(undefined);
+            return;
+        }
+
+        setSearchSuggestionsPosition({
+            left: rect.left,
+            top: rect.bottom,
+            width: rect.width,
+        });
+    }, []);
+
+    useLayoutEffect(() => {
+        if (!hasAlternativeSearchResults) {
+            setSearchSuggestionsPosition(undefined);
+            return undefined;
+        }
+
+        updateSearchSuggestionsPosition();
+
+        const animationFrame = globalThis.requestAnimationFrame(
+            updateSearchSuggestionsPosition
+        );
+        const transitionTimeout = globalThis.setTimeout(
+            updateSearchSuggestionsPosition,
+            300,
+            undefined
+        );
+        const searchElement = searchRef.current;
+
+        searchElement?.addEventListener(
+            'transitionend',
+            updateSearchSuggestionsPosition
+        );
+        globalThis.addEventListener('resize', updateSearchSuggestionsPosition);
+        globalThis.visualViewport?.addEventListener(
+            'resize',
+            updateSearchSuggestionsPosition
+        );
+
+        return () => {
+            globalThis.cancelAnimationFrame(animationFrame);
+            globalThis.clearTimeout(transitionTimeout);
+            searchElement?.removeEventListener(
+                'transitionend',
+                updateSearchSuggestionsPosition
+            );
+            globalThis.removeEventListener(
+                'resize',
+                updateSearchSuggestionsPosition
+            );
+            globalThis.visualViewport?.removeEventListener(
+                'resize',
+                updateSearchSuggestionsPosition
+            );
+        };
+    }, [hasAlternativeSearchResults, updateSearchSuggestionsPosition]);
 
     const navigateToSearchResult = useCallback((result?: LinkItem) => {
         if (result) {
@@ -275,6 +348,54 @@ export const Cover: React.FC = () => {
         setSelectedSearchResultIndex(0);
     };
 
+    const searchSuggestions =
+        hasAlternativeSearchResults && searchSuggestionsPosition
+            ? createPortal(
+                  <div
+                      className='search-suggestions'
+                      id={searchSuggestionsId}
+                      role='listbox'
+                      aria-label='Other bookmark matches'
+                      style={
+                          {
+                              '--suggestion-left': `${searchSuggestionsPosition.left}px`,
+                              '--suggestion-top': `${searchSuggestionsPosition.top}px`,
+                              '--suggestion-width': `${searchSuggestionsPosition.width}px`,
+                          } as React.CSSProperties
+                      }
+                  >
+                      {alternativeSearchResults.map((result, index) => {
+                          const resultIndex = index + 1;
+                          const isSelected =
+                              selectedSearchResultIndex === resultIndex;
+
+                          return (
+                              <button
+                                  key={result.link}
+                                  className={`search-suggestion ${isSelected ? 'selected' : ''}`}
+                                  id={`${searchSuggestionsId}-${resultIndex}`}
+                                  type='button'
+                                  role='option'
+                                  aria-selected={isSelected}
+                                  onMouseDown={(event) => {
+                                      event.preventDefault();
+                                  }}
+                                  onMouseEnter={() => {
+                                      setSelectedSearchResultIndex(resultIndex);
+                                  }}
+                                  onClick={() => {
+                                      navigateToSearchResult(result);
+                                  }}
+                              >
+                                  or <span>{result.link}</span>?
+                              </button>
+                          );
+                      })}
+                  </div>,
+                  globalThis.document.body
+              )
+            : undefined;
+
     return (
         <section className='cover'>
             <Mountains />
@@ -284,7 +405,7 @@ export const Cover: React.FC = () => {
                     <Weather />
                     <span className='title'>{time}</span>
                 </div>
-                <div className='search'>
+                <div className='search' ref={searchRef}>
                     <form className='search-form' onSubmit={handleSubmit}>
                         <div className='search-icon'>
                             <Search className='icon' size={24} />
@@ -297,11 +418,11 @@ export const Cover: React.FC = () => {
                             value={searchValue}
                             ref={inputRef}
                             aria-controls={
-                                alternativeSearchResults.length > 0
+                                hasAlternativeSearchResults
                                     ? searchSuggestionsId
                                     : undefined
                             }
-                            aria-expanded={alternativeSearchResults.length > 0}
+                            aria-expanded={hasAlternativeSearchResults}
                             aria-autocomplete='list'
                             onChange={(e) => {
                                 setSearchValue(e.target.value);
@@ -318,46 +439,9 @@ export const Cover: React.FC = () => {
                             onBlur={handleSearchBlur}
                         />
                     </form>
-                    {alternativeSearchResults.length > 0 ? (
-                        <div
-                            className='search-suggestions'
-                            id={searchSuggestionsId}
-                            role='listbox'
-                            aria-label='Other bookmark matches'
-                        >
-                            {alternativeSearchResults.map((result, index) => {
-                                const resultIndex = index + 1;
-                                const isSelected =
-                                    selectedSearchResultIndex === resultIndex;
-
-                                return (
-                                    <button
-                                        key={result.link}
-                                        className={`search-suggestion ${isSelected ? 'selected' : ''}`}
-                                        id={`${searchSuggestionsId}-${resultIndex}`}
-                                        type='button'
-                                        role='option'
-                                        aria-selected={isSelected}
-                                        onMouseDown={(event) => {
-                                            event.preventDefault();
-                                        }}
-                                        onMouseEnter={() => {
-                                            setSelectedSearchResultIndex(
-                                                resultIndex
-                                            );
-                                        }}
-                                        onClick={() => {
-                                            navigateToSearchResult(result);
-                                        }}
-                                    >
-                                        or <span>{result.link}</span>?
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    ) : undefined}
                 </div>
             </div>
+            {searchSuggestions}
 
             <Suspense fallback={undefined}>
                 <LinkPanel
