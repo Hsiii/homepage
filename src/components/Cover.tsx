@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 import { useBookmarkSearch } from '@/hooks/useBookmarkSearch';
 import { useHideLinks } from '@/hooks/useHideLinks';
@@ -28,7 +28,10 @@ export const Cover: React.FC = () => {
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
     const {
+        blockedChillLinks,
         clearSearch,
+        clearBlockedChillLinks,
+        executeChillCommand,
         focusSearchInput,
         googleSearchResultIndex,
         hasChillCommand,
@@ -119,12 +122,41 @@ export const Cover: React.FC = () => {
                     onHighlightGoogleSearch={highlightGoogleSearch}
                     onHighlightSearchResult={highlightSearchResult}
                     onSearchGoogle={searchGoogleCurrentValue}
+                    onSelectChillCommand={executeChillCommand}
                     onSelectSearchResult={navigateToSearchResult}
                     position={searchSuggestionsPosition}
                     searchResults={searchResults}
                     searchResultIndexOffset={searchResultIndexOffset}
                     trimmedSearchValue={trimmedSearchValue}
                 />
+            )}
+
+            {blockedChillLinks.length > 0 && (
+                <div className='chill-fallback' role='status'>
+                    <div className='chill-fallback-header'>
+                        <span>Open remaining chill tabs</span>
+                        <button
+                            className='chill-fallback-close'
+                            type='button'
+                            aria-label='Dismiss'
+                            onClick={clearBlockedChillLinks}
+                        >
+                            <X className='icon' size={20} />
+                        </button>
+                    </div>
+                    <div className='chill-fallback-links'>
+                        {blockedChillLinks.map(({ link, url }) => (
+                            <a
+                                key={link}
+                                href={url}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                            >
+                                {link}
+                            </a>
+                        ))}
+                    </div>
+                </div>
             )}
 
             <Suspense fallback={undefined}>

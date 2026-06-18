@@ -27,6 +27,15 @@ export interface SearchCommand {
     searchValue: string;
 }
 
+export interface ChillLink {
+    link: LinkName;
+    url: string;
+}
+
+export interface OpenChillLinksResult {
+    blockedLinks: ChillLink[];
+}
+
 const maxSearchResults = 4;
 const secondaryResultScoreLimit = 0.25;
 
@@ -47,6 +56,12 @@ const chillLinks = [
     'Supercell Store',
 ] as const satisfies readonly LinkName[];
 
+export const getChillLinks = (): ChillLink[] =>
+    chillLinks.map((link) => ({
+        link,
+        url: links[link],
+    }));
+
 export const getSearchItems = (): LinkItem[] =>
     linkTree.flatMap((category, categoryIndex) => {
         const categoryId = categoryIndex + 1;
@@ -63,17 +78,26 @@ export const isChillSearch = (value: string): boolean =>
 export const isSlashCommandSearch = (value: string): boolean =>
     value.trim().startsWith('/');
 
-export const openChillLinks = (): void => {
-    for (const linkName of chillLinks) {
-        const openedTab = globalThis.open(links[linkName], '_blank');
+export const openChillLinks = (): OpenChillLinksResult => {
+    const blockedLinks: ChillLink[] = [];
+
+    for (const chillLink of getChillLinks()) {
+        const openedTab = globalThis.open(chillLink.url, '_blank');
         if (openedTab) {
             openedTab.opener = undefined;
+            continue;
         }
+
+        blockedLinks.push(chillLink);
     }
 
-    globalThis.requestAnimationFrame(() => {
-        Reflect.apply(globalThis.close, globalThis, []);
-    });
+    if (blockedLinks.length === 0) {
+        globalThis.requestAnimationFrame(() => {
+            Reflect.apply(globalThis.close, globalThis, []);
+        });
+    }
+
+    return { blockedLinks };
 };
 
 export const getSearchResults = (

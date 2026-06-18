@@ -11,6 +11,7 @@ import type React from 'react';
 
 import { links } from '@/constants/links';
 import type {
+    ChillLink,
     LinkItem,
     SearchIndex,
     SearchSuggestionsPosition,
@@ -56,7 +57,10 @@ const getElementMotionDuration = (element: HTMLElement): number => {
 };
 
 export const useBookmarkSearch = (): {
+    blockedChillLinks: ChillLink[];
     clearSearch: () => void;
+    clearBlockedChillLinks: () => void;
+    executeChillCommand: () => void;
     focusSearchInput: () => void;
     hasChillCommand: boolean;
     googleSearchResultIndex: number;
@@ -95,6 +99,7 @@ export const useBookmarkSearch = (): {
     const [inputFocused, setInputFocused] = useState(false);
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState<LinkItem[]>([]);
+    const [blockedChillLinks, setBlockedChillLinks] = useState<ChillLink[]>([]);
     const [highlightedSearchResultIndex, setHighlightedSearchResultIndex] =
         useState<number | undefined>(undefined);
     const [autocompleteEnabled, setAutocompleteEnabled] = useState(true);
@@ -129,6 +134,12 @@ export const useBookmarkSearch = (): {
         selectedSearchResult,
         autocompleteEnabled
     );
+
+    const executeChillCommand = useCallback(() => {
+        const { blockedLinks } = openChillLinks();
+
+        setBlockedChillLinks(blockedLinks);
+    }, []);
 
     const flattenedSearchItems = useMemo<LinkItem[]>(
         () => getSearchItems(),
@@ -404,7 +415,7 @@ export const useBookmarkSearch = (): {
                 highlightedSearchResultIndex === chillCommandResultIndex
             ) {
                 e.preventDefault();
-                openChillLinks();
+                executeChillCommand();
                 return;
             }
 
@@ -430,6 +441,7 @@ export const useBookmarkSearch = (): {
             hasChillCommand,
             hasSearchQuery,
             highlightedSearchResultIndex,
+            executeChillCommand,
             navigateToSearchResult,
             searchGoogle,
             searchNavigationItemCount,
@@ -464,7 +476,7 @@ export const useBookmarkSearch = (): {
                 hasChillCommand &&
                 highlightedSearchResultIndex === chillCommandResultIndex
             ) {
-                openChillLinks();
+                executeChillCommand();
                 return;
             }
 
@@ -477,6 +489,7 @@ export const useBookmarkSearch = (): {
             navigateToSearchResult,
             hasChillCommand,
             highlightedSearchResultIndex,
+            executeChillCommand,
             searchGoogle,
             searchValue,
             selectedSearchResult,
@@ -502,9 +515,14 @@ export const useBookmarkSearch = (): {
 
             setAutocompleteEnabled(!inputType.startsWith('delete'));
             setSearchValue(e.target.value);
+            setBlockedChillLinks([]);
         },
         []
     );
+
+    const clearBlockedChillLinks = useCallback(() => {
+        setBlockedChillLinks([]);
+    }, []);
 
     const handleSearchFocus = useCallback(() => {
         setInputFocused(true);
@@ -523,7 +541,10 @@ export const useBookmarkSearch = (): {
     }, [googleSearchResultIndex]);
 
     return {
+        blockedChillLinks,
         clearSearch,
+        clearBlockedChillLinks,
+        executeChillCommand,
         focusSearchInput,
         hasChillCommand,
         googleSearchResultIndex,

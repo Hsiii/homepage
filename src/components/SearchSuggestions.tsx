@@ -1,7 +1,7 @@
 import { Bookmark, Coffee, Search } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
-import { chillCommand, openChillLinks } from '@/utils/search';
+import { chillCommand } from '@/utils/search';
 import type { LinkItem, SearchSuggestionsPosition } from '@/utils/search';
 
 interface SearchSuggestionsProps {
@@ -12,6 +12,7 @@ interface SearchSuggestionsProps {
     onHighlightGoogleSearch: () => void;
     onHighlightSearchResult: (resultIndex: number) => void;
     onSearchGoogle: () => void;
+    onSelectChillCommand: () => void;
     onSelectSearchResult: (result: LinkItem) => void;
     position: SearchSuggestionsPosition;
     searchResults: LinkItem[];
@@ -27,6 +28,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
     onHighlightGoogleSearch,
     onHighlightSearchResult,
     onSearchGoogle,
+    onSelectChillCommand,
     onSelectSearchResult,
     position,
     searchResults,
@@ -65,9 +67,7 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
                     onPointerMove={() => {
                         onHighlightSearchResult(0);
                     }}
-                    onClick={() => {
-                        openChillLinks();
-                    }}
+                    onClick={onSelectChillCommand}
                 >
                     <span className='search-suggestion-icon'>
                         <Coffee className='icon' size={24} />
