@@ -65,7 +65,10 @@ export const isSlashCommandSearch = (value: string): boolean =>
 
 export const openChillLinks = (): void => {
     for (const linkName of chillLinks) {
-        globalThis.open(links[linkName], '_blank', 'noopener,noreferrer');
+        const openedTab = globalThis.open(links[linkName], '_blank');
+        if (openedTab) {
+            openedTab.opener = undefined;
+        }
     }
 
     globalThis.requestAnimationFrame(() => {
