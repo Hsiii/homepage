@@ -238,7 +238,7 @@
     }
 }
 
-@media (width < 600px) {
+@media (width < 37.5rem) {
     .cover-content {
         height: 58svh;
         gap: 1.5rem;

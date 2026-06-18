@@ -1,8 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Bookmark } from 'lucide-react';
 
+import { mobileViewportQuery } from '@/constants/breakpoints';
 import { linkTree } from '@/constants/linkTree';
 import { useLinkNavigation } from '@/hooks/useLinkNavigation';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { LinkCategory } from './LinkCategory';
 import { MobileBookmarks } from './MobileBookmarks';
 
@@ -23,7 +25,6 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
     highlightedCategory,
     onClearSearch,
 }) => {
-    const mobileBreakpointRef = useRef<HTMLSpanElement>(null);
     const {
         selectedCategory,
         isKeyboardNav,
@@ -33,8 +34,8 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
     } = useLinkNavigation(isSearchNav, onClearSearch, highlightedCategory);
 
     const [windowHeight, setWindowHeight] = useState(globalThis.innerHeight);
-    const [isMobileViewport, setIsMobileViewport] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const isMobileViewport = useMediaQuery(mobileViewportQuery);
     const isExpanded = isKeyboardNav ? true : selectedCategory !== 0;
 
     useEffect(() => {
@@ -44,24 +45,6 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
         globalThis.addEventListener('resize', onResize);
         return () => {
             globalThis.removeEventListener('resize', onResize);
-        };
-    }, []);
-
-    useLayoutEffect(() => {
-        const updateMobileViewport = () => {
-            const breakpointElement = mobileBreakpointRef.current;
-            setIsMobileViewport(
-                breakpointElement
-                    ? globalThis.getComputedStyle(breakpointElement).display !==
-                          'none'
-                    : false
-            );
-        };
-
-        updateMobileViewport();
-        globalThis.addEventListener('resize', updateMobileViewport);
-        return () => {
-            globalThis.removeEventListener('resize', updateMobileViewport);
         };
     }, []);
 
@@ -103,11 +86,6 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
             aria-hidden={hidden}
             aria-expanded={isExpanded || (isMobileViewport && isMobileOpen)}
         >
-            <span
-                className='mobile-bookmark-breakpoint'
-                ref={mobileBreakpointRef}
-                aria-hidden='true'
-            />
             {isMobileViewport && (
                 <MobileBookmarks
                     disabled={isSearchNav}
