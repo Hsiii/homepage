@@ -60,8 +60,6 @@
     overflow: visible;
 
     animation: rise var(--rise-time) ease-out 1 forwards;
-
-    z-index: 2;
 }
 
 @keyframes rise {
@@ -72,6 +70,7 @@
 }
 
 .search-form {
+    position: relative;
     display: flex;
     align-items: center;
     background-color: var(--clr-search-field-bg);
@@ -79,6 +78,7 @@
     overflow: hidden;
     transition: calc(var(--expand-duration) * 2);
     cursor: text;
+    z-index: 2;
 
     &:focus-within,
     .search:hover & {
@@ -128,7 +128,7 @@
     flex-direction: column;
     gap: var(--suggestion-item-gap);
 
-    z-index: 3;
+    z-index: 4;
 }
 
 .search-suggestion {
