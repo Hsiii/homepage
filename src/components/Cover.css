@@ -173,7 +173,7 @@
     aspect-ratio: 1 / 1;
     display: grid;
     place-items: center;
-    opacity: 0.28;
+    opacity: 0.48;
 
     .icon {
         color: var(--clr-search-suggestion-icon);
