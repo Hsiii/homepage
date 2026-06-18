@@ -119,12 +119,13 @@ const getSearchInputValue = (
 
     const query = searchValue.trim();
     const selectedLink = selectedSearchResult.link;
+    const normalizedSelectedLink = selectedLink.toLowerCase();
 
-    if (selectedLink.toLowerCase().startsWith(query.toLowerCase())) {
-        return `${query}${selectedLink.slice(query.length)}`;
+    if (normalizedSelectedLink.startsWith(query.toLowerCase())) {
+        return `${query}${normalizedSelectedLink.slice(query.length)}`;
     }
 
-    return selectedLink;
+    return normalizedSelectedLink;
 };
 
 const getAutocompleteSelectionStart = (
