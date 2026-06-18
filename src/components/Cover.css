@@ -173,10 +173,10 @@
     aspect-ratio: 1 / 1;
     display: grid;
     place-items: center;
-    opacity: 0.35;
+    opacity: 0.28;
 
     .icon {
-        color: var(--clr-search-icon-active);
+        color: var(--clr-search-suggestion-icon);
     }
 }
 

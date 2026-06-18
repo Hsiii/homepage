@@ -77,6 +77,7 @@
     --clr-search-suggestion-bg: var(--clr-search-field-bg-active);
     --clr-search-suggestion-bg-active: var(--clr-search-field-bg-active);
     --clr-search-suggestion-border: var(--clr-text-alpha-2);
+    --clr-search-suggestion-icon: var(--clr-text-alpha);
     --clr-search-suggestion-text: var(--clr-search-field-placeholder);
     --clr-search-suggestion-text-active: var(--clr-search-field-text);
     --clr-search-hotkey-bg: var(--clr-primary-alpha-2);
@@ -128,6 +129,7 @@
     --clr-search-suggestion-bg: var(--clr-search-field-bg-active);
     --clr-search-suggestion-bg-active: var(--clr-search-field-bg-active);
     --clr-search-suggestion-border: var(--clr-text-alpha-2);
+    --clr-search-suggestion-icon: var(--clr-text-alpha);
     --clr-search-suggestion-text: var(--clr-search-field-placeholder);
     --clr-search-suggestion-text-active: var(--clr-search-field-text);
     --clr-search-hotkey-bg: var(--clr-secondary-alpha-2);
