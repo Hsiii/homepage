@@ -63,13 +63,13 @@ export const isSlashCommandSearch = (value: string): boolean =>
     value.trim().startsWith('/');
 
 export const openChillLinks = (): void => {
-    const [primaryLinkName, ...backgroundLinkNames] = chillLinks;
-
-    for (const linkName of backgroundLinkNames) {
+    for (const linkName of chillLinks) {
         globalThis.open(links[linkName], '_blank', 'noopener,noreferrer');
     }
 
-    globalThis.location.replace(links[primaryLinkName]);
+    globalThis.requestAnimationFrame(() => {
+        Reflect.apply(globalThis.close, globalThis, []);
+    });
 };
 
 export const getSearchResults = (
