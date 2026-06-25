@@ -95,7 +95,7 @@ export const Cover: React.FC = () => {
                         <input
                             className='search-input'
                             type='text'
-                            placeholder='Search bookmarks'
+                            placeholder='Search...'
                             autoComplete='off'
                             value={searchInputValue}
                             ref={inputRef}
