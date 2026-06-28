@@ -51,6 +51,7 @@ export const links = {
     'Moz Add-on': 'https://addons.mozilla.org/en-US/developers/addons',
     'NMSL': 'https://nmsl.cs.nthu.edu.tw/cs5262-schedule-2024/',
     'NotebookLM': 'https://notebooklm.google.com/',
+    'OnTrack': 'https://ontrack.hsichen.dev/',
     'Overleaf': 'https://www.overleaf.com/project',
     'Past Exam':
         'https://drive.google.com/drive/folders/1zoRayCwbnTJIZ_WJSXRyR0Z5-BThec8X',
@@ -78,8 +79,6 @@ export const links = {
     'Tetr.io': 'https://tetr.io',
     'Texturelabs': 'https://texturelabs.org/',
     'Threads': 'https://www.threads.com/',
-    'Train':
-        'https://tip.railway.gov.tw/tra-tip-web/tip/tip001/tip112/gobytime',
     'Translate': 'https://translate.google.com/',
     'TUCaN':
         'https://www.tucan.tu-darmstadt.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=ACTION&ARGUMENTS=-A6-VkjuH-iRdxtcbUbsSwYyOYZhdqMJDQOCdoK1J-iuohpKVkbk4j6SVfVmPt6fAJu43JVC19q10MMNNT8aOL6-3RWt~L4wVJFuXwGJWSs1kEU6ibMllhU1rWF2sWLrm8XoUsylSK1Mvzv5Z2IPE1U7W6mT90jfDTFoBroshCATeT562F-9B27YdtR27UBEhDGh-GOXqGeeU7PHU_',
