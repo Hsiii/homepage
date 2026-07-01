@@ -152,6 +152,26 @@
     justify-self: end;
 }
 
+.settings-theme-group {
+    position: relative;
+}
+
+.settings-theme-group::before {
+    content: '';
+    width: 2.5rem;
+    height: 2.5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    background-color: var(--clr-search-field-bg-active);
+    box-shadow: var(--shadow-panel);
+    translate: calc(var(--settings-theme-index, 0) * 3rem) 0;
+    transition:
+        translate var(--motion-duration-fast) var(--motion-ease-out),
+        box-shadow var(--motion-duration-fast) var(--motion-ease-out);
+}
+
 .settings-option-label {
     min-width: 0;
     overflow: hidden;
@@ -181,8 +201,8 @@
 
     &:hover,
     &:focus-visible {
-        color: var(--clr-primary);
-        outline-color: var(--clr-primary-alpha);
+        color: var(--clr-text);
+        outline-color: var(--clr-text-alpha);
     }
 
     &:active {
@@ -190,11 +210,14 @@
     }
 }
 
+.settings-icon-choice {
+    position: relative;
+    z-index: 1;
+}
+
 .settings-icon-choice.selected {
-    background-color: var(--clr-primary);
-    box-shadow: var(--shadow-panel-hover);
-    color: var(--clr-on-dark);
-    outline-color: var(--clr-primary);
+    color: var(--clr-text);
+    outline-color: transparent;
 }
 
 .settings-color-choice::before {
@@ -218,6 +241,77 @@
     width: 2.5rem;
     height: 2.5rem;
     box-shadow: none;
+}
+
+.settings-animation-switch {
+    min-height: 2.5rem;
+    padding: 0 0.25rem 0 0.5rem;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--clr-text-alpha);
+    cursor: pointer;
+    outline: 2px solid transparent;
+    outline-offset: 0;
+    transition:
+        background-color var(--motion-duration-fast) var(--motion-ease-out),
+        color var(--motion-duration-fast) var(--motion-ease-out),
+        outline-color var(--motion-duration-fast) var(--motion-ease-out),
+        scale var(--motion-duration-fast) var(--motion-ease-out);
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-self: end;
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--clr-text-alpha-2);
+        color: var(--clr-text);
+        outline-color: var(--clr-text-alpha);
+    }
+
+    &:active {
+        scale: var(--motion-press-scale);
+    }
+}
+
+.settings-switch-track {
+    width: 2.5rem;
+    height: 1.5rem;
+    padding: 0.25rem;
+    border-radius: 999px;
+    background-color: var(--clr-text-alpha-2);
+    box-shadow: var(--shadow-panel);
+    transition:
+        background-color var(--motion-duration-fast) var(--motion-ease-out),
+        box-shadow var(--motion-duration-fast) var(--motion-ease-out);
+
+    display: flex;
+    align-items: center;
+}
+
+.settings-switch-thumb {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: var(--clr-text-alpha);
+    transition:
+        background-color var(--motion-duration-fast) var(--motion-ease-out),
+        translate var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.settings-animation-switch[aria-checked='true'] {
+    color: var(--clr-text);
+}
+
+.settings-animation-switch[aria-checked='true'] .settings-switch-track {
+    background-color: var(--clr-search-field-bg-active);
+    box-shadow: var(--shadow-panel-hover);
+}
+
+.settings-animation-switch[aria-checked='true'] .settings-switch-thumb {
+    background-color: var(--clr-text);
+    translate: 1rem 0;
 }
 
 .settings-swatch-amethyst {
@@ -275,12 +369,12 @@
 
     &[aria-expanded='true'],
     &:focus-visible {
-        outline-color: var(--clr-primary-alpha);
+        outline-color: var(--clr-text-alpha);
         box-shadow: var(--shadow-panel-hover);
     }
 
     &[aria-expanded='true'] .settings-select-chevron {
-        color: var(--clr-primary);
+        color: var(--clr-text);
         rotate: 180deg;
     }
 }
@@ -299,7 +393,7 @@
     right: 0.75rem;
     z-index: 1;
     translate: 0 -50%;
-    color: var(--clr-primary);
+    color: var(--clr-text);
     pointer-events: none;
     transition:
         color var(--motion-duration-fast) var(--motion-ease-out),
@@ -351,7 +445,7 @@
     &:focus-visible,
     &[aria-selected='true'] {
         background-color: var(--clr-text-alpha-2);
-        color: var(--clr-primary);
+        color: var(--clr-text);
         outline: none;
     }
 
@@ -368,7 +462,7 @@
 }
 
 .settings-dropdown-check {
-    color: var(--clr-primary);
+    color: var(--clr-text);
 }
 
 @keyframes settings-menu-enter {

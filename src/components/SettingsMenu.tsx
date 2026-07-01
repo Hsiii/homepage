@@ -44,6 +44,7 @@ type ThemeMode = 'system' | 'light' | 'dark';
 interface SettingsDropdownOption {
     readonly disabled?: boolean;
     readonly label: string;
+    readonly searchText?: string;
     readonly value: string;
 }
 
@@ -149,6 +150,39 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
 }) => {
     const selectedOption =
         options.find((option) => option.value === value) ?? options[0];
+    const typeaheadRef = useRef('');
+    const typeaheadTimeRef = useRef(0);
+
+    const searchMatchingOption = useCallback(
+        (key: string) => {
+            const now = Date.now();
+            if (now - typeaheadTimeRef.current > 700) {
+                typeaheadRef.current = '';
+            }
+
+            typeaheadRef.current =
+                `${typeaheadRef.current}${key}`.toLowerCase();
+            typeaheadTimeRef.current = now;
+
+            const matchingOption = options.find((option) => {
+                if (option.disabled) {
+                    return false;
+                }
+
+                const searchText = option.searchText ?? option.label;
+
+                return searchText
+                    .toLowerCase()
+                    .startsWith(typeaheadRef.current);
+            });
+
+            if (matchingOption !== undefined) {
+                onChange(matchingOption.value);
+                onOpenChange(false);
+            }
+        },
+        [onChange, onOpenChange, options]
+    );
 
     return (
         <span
@@ -176,6 +210,16 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
                     if (event.key === 'ArrowDown' && !isOpen) {
                         event.preventDefault();
                         onOpenChange(true);
+                    }
+
+                    if (
+                        event.key.length === 1 &&
+                        !event.altKey &&
+                        !event.ctrlKey &&
+                        !event.metaKey
+                    ) {
+                        event.preventDefault();
+                        searchMatchingOption(event.key);
                     }
                 }}
             >
@@ -355,19 +399,16 @@ export const SettingsMenu: React.FC = () => {
         { label: t.dark, value: 'dark' },
     ];
 
-    const animationModeOptions: SettingsDropdownOption[] = [
-        { label: t.normal, value: normalAnimationMode },
-        { label: t.skip, value: skipAnimationMode },
-    ];
-
     const locationOptions: SettingsDropdownOption[] = [
         {
             disabled: isSyncingLocation,
             label: isSyncingLocation ? t.syncing : t.myLocation,
+            searchText: 'my location',
             value: myLocationOptionValue,
         },
         ...taiwanLocations.map((location) => ({
             label: getLocationLabel(location, locale),
+            searchText: getLocationLabel(location, 'en'),
             value: location.id,
         })),
     ];
@@ -440,9 +481,19 @@ export const SettingsMenu: React.FC = () => {
                                 {t.theme}
                             </span>
                             <div
-                                className='settings-choice-group'
+                                className='settings-choice-group settings-theme-group'
                                 role='radiogroup'
                                 aria-label={t.theme}
+                                style={
+                                    {
+                                        '--settings-theme-index':
+                                            themeModeOptions.findIndex(
+                                                (option) =>
+                                                    option.value === themeMode
+                                            ),
+                                    } as React.CSSProperties &
+                                        Record<'--settings-theme-index', number>
+                                }
                             >
                                 {themeModeOptions.map((option) => {
                                     const isSelected =
@@ -525,48 +576,35 @@ export const SettingsMenu: React.FC = () => {
                             <span className='settings-row-label'>
                                 {t.animations}
                             </span>
-                            <div
-                                className='settings-choice-group'
-                                role='radiogroup'
+                            <button
+                                className='settings-animation-switch'
+                                type='button'
+                                role='switch'
+                                aria-checked={
+                                    animationMode === skipAnimationMode
+                                }
                                 aria-label={t.animations}
-                            >
-                                {animationModeOptions.map((option) => {
-                                    const isSelected =
-                                        option.value === animationMode;
-
-                                    return (
-                                        <button
-                                            className={[
-                                                'settings-icon-choice',
-                                                isSelected && 'selected',
-                                            ]
-                                                .filter(Boolean)
-                                                .join(' ')}
-                                            key={option.value}
-                                            type='button'
-                                            role='radio'
-                                            aria-checked={isSelected}
-                                            aria-label={option.label}
-                                            title={option.label}
-                                            onClick={() => {
-                                                if (
-                                                    isAnimationMode(
-                                                        option.value
-                                                    )
-                                                ) {
-                                                    updateAnimationMode(
-                                                        option.value
-                                                    );
-                                                }
-                                            }}
-                                        >
-                                            {getAnimationModeIcon(
-                                                option.value as AnimationMode
-                                            )}
-                                        </button>
+                                title={
+                                    animationMode === skipAnimationMode
+                                        ? t.skip
+                                        : t.normal
+                                }
+                                onClick={() => {
+                                    updateAnimationMode(
+                                        animationMode === skipAnimationMode
+                                            ? normalAnimationMode
+                                            : skipAnimationMode
                                     );
-                                })}
-                            </div>
+                                }}
+                            >
+                                {getAnimationModeIcon(animationMode)}
+                                <span
+                                    className='settings-switch-track'
+                                    aria-hidden
+                                >
+                                    <span className='settings-switch-thumb' />
+                                </span>
+                            </button>
                         </div>
                     </div>
 
