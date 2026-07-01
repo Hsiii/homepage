@@ -99,7 +99,7 @@
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
-    width: 24rem;
+    width: 22rem;
     max-height: calc(100svh - 4rem);
     padding: 0.75rem;
     border-radius: 1rem;
@@ -133,7 +133,7 @@
     min-height: 2.5rem;
     padding: 0.25rem 0.5rem;
     display: grid;
-    grid-template-columns: 2.5rem 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.75rem;
     border-radius: 0.75rem;
@@ -141,22 +141,15 @@
     font: var(--fontBaseMd);
 }
 
-.settings-row-icon {
-    height: 2.5rem;
-    display: grid;
-    place-items: center;
-    color: var(--clr-secondary);
-}
-
 .settings-row-label {
     font: var(--fontBoldMd);
 }
 
-.settings-option-content {
+.settings-choice-group {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    min-width: 0;
+    justify-self: end;
 }
 
 .settings-option-label {
@@ -166,13 +159,50 @@
     white-space: nowrap;
 }
 
-.settings-option-swatch {
-    width: 1rem;
-    height: 1rem;
+.settings-icon-choice,
+.settings-color-choice {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--clr-text-alpha);
+    cursor: pointer;
+    outline: 2px solid transparent;
+    outline-offset: 0;
+    transition:
+        background-color var(--motion-duration-fast) var(--motion-ease-out),
+        color var(--motion-duration-fast) var(--motion-ease-out),
+        outline-color var(--motion-duration-fast) var(--motion-ease-out),
+        scale var(--motion-duration-fast) var(--motion-ease-out);
+
+    display: grid;
+    place-items: center;
+
+    &:hover,
+    &:focus-visible {
+        color: var(--clr-primary);
+        outline-color: var(--clr-primary-alpha);
+    }
+
+    &.selected {
+        background-color: var(--clr-search-field-bg-active);
+        box-shadow: var(--shadow-panel);
+        color: var(--clr-primary);
+        outline-color: var(--clr-text);
+    }
+
+    &:active {
+        scale: var(--motion-press-scale);
+    }
+}
+
+.settings-color-choice::before {
+    content: '';
+    width: 1.5rem;
+    height: 1.5rem;
     border-radius: 50%;
     background-color: var(--settings-swatch-color);
     box-shadow: var(--shadow-panel);
-    flex: 0 0 auto;
 }
 
 .settings-swatch-amethyst {
@@ -185,7 +215,7 @@
 
 .settings-select-row {
     grid-template-columns:
-        2.5rem minmax(0, 1fr)
+        minmax(0, 1fr)
         minmax(0, var(--settings-select-width, 10rem));
 }
 
@@ -353,7 +383,7 @@
         position: fixed;
         top: 4rem;
         right: 1rem;
-        width: min(24rem, calc(100vw - 2rem));
+        width: min(22rem, calc(100vw - 2rem));
         max-height: calc(100svh - 5rem);
     }
 }
