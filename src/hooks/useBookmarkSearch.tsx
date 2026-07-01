@@ -31,6 +31,25 @@ const feedWindowOffsetHours = 8;
 const feedWindowStartHour = 16;
 const supercellStoreOpenedWindowKey = 'homepage.supercellStoreOpenedWindow';
 
+const getSearchKeySequenceInput = (
+    e: React.KeyboardEvent<HTMLInputElement>
+): string | undefined => {
+    if (e.metaKey || e.ctrlKey || e.altKey) {
+        return undefined;
+    }
+
+    const keyCodeMatch = /^Key(?<key>[A-Z])$/.exec(e.code);
+    if (keyCodeMatch?.groups?.key) {
+        return keyCodeMatch.groups.key.toLowerCase();
+    }
+
+    if (e.key.length === 1) {
+        return e.key.toLowerCase();
+    }
+
+    return undefined;
+};
+
 const feedLinks = [
     'Instagram',
     'Messenger',
@@ -147,6 +166,7 @@ export const useBookmarkSearch = (): {
     const searchSuggestionsId = useId();
     const [inputFocused, setInputFocused] = useState(false);
     const [searchValue, setSearchValue] = useState('');
+    const [searchKeySequence, setSearchKeySequence] = useState('');
     const [searchResults, setSearchResults] = useState<LinkItem[]>([]);
     const [blockedFeedsLinks, setBlockedFeedsLinks] = useState<FeedsLink[]>([]);
     const [highlightedSearchResultIndex, setHighlightedSearchResultIndex] =
@@ -248,14 +268,18 @@ export const useBookmarkSearch = (): {
             return undefined;
         }
 
-        const nextSearchResults = getSearchResults(flattenedSearchItems, query);
+        const nextSearchResults = getSearchResults(
+            flattenedSearchItems,
+            query,
+            searchKeySequence
+        );
 
         setSearchResults(nextSearchResults);
         setHighlightedSearchResultIndex(
             nextSearchResults.length > 0 ? 0 : undefined
         );
         return undefined;
-    }, [flattenedSearchItems, searchValue]);
+    }, [flattenedSearchItems, searchKeySequence, searchValue]);
 
     const updateSearchSuggestionsPosition = useCallback(() => {
         const rect =
@@ -414,11 +438,26 @@ export const useBookmarkSearch = (): {
             if (e.key === 'Escape') {
                 e.preventDefault();
                 setSearchValue('');
+                setSearchKeySequence('');
                 inputRef.current?.blur();
                 return;
             }
 
+            if (e.key === 'Backspace') {
+                setSearchKeySequence((value) => value.slice(0, -1));
+                return;
+            }
+
+            if (e.key === 'Delete') {
+                setSearchKeySequence('');
+                return;
+            }
+
             if (e.key !== 'Enter') {
+                const sequenceInput = getSearchKeySequenceInput(e);
+                if (sequenceInput !== undefined) {
+                    setSearchKeySequence((value) => value + sequenceInput);
+                }
                 return;
             }
 
@@ -482,6 +521,7 @@ export const useBookmarkSearch = (): {
             if (e.key === '/') {
                 e.preventDefault();
                 setSearchValue('/');
+                setSearchKeySequence('/');
                 setBlockedFeedsLinks([]);
                 setInputFocused(true);
                 focusSearchInput();
@@ -525,6 +565,7 @@ export const useBookmarkSearch = (): {
     const handleSearchBlur = useCallback(() => {
         setInputFocused(false);
         setSearchValue('');
+        setSearchKeySequence('');
         setSearchResults([]);
         setHighlightedSearchResultIndex(undefined);
     }, []);
@@ -532,6 +573,9 @@ export const useBookmarkSearch = (): {
     const handleSearchChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             setSearchValue(e.target.value);
+            if (e.target.value === '') {
+                setSearchKeySequence('');
+            }
             setBlockedFeedsLinks([]);
         },
         []

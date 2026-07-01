@@ -144,29 +144,49 @@ const getTextSearchScore = (
     return undefined;
 };
 
-const getSearchScore = (link: LinkName, query: string): number | undefined => {
+const getBestTextSearchScore = (
+    source: string,
+    queries: readonly string[]
+): number | undefined => {
+    let bestScore: number | undefined;
+
+    for (const query of queries) {
+        if (query === '') {
+            continue;
+        }
+
+        const score = getTextSearchScore(source, query);
+        if (score === undefined) {
+            continue;
+        }
+
+        bestScore =
+            bestScore === undefined ? score : Math.min(bestScore, score);
+    }
+
+    return bestScore;
+};
+
+const getSearchScore = (
+    link: LinkName,
+    query: string,
+    keySequence: string
+): number | undefined => {
     const normalizedLink = link.toLowerCase();
     const normalizedQuery = query.toLowerCase();
-    const directScore = getTextSearchScore(normalizedLink, normalizedQuery);
-    const latinKeySequenceScore = getTextSearchScore(
-        normalizedLink,
-        getLatinKeySequenceAlias(normalizedQuery) ?? normalizedQuery
-    );
+    const normalizedKeySequence = keySequence.toLowerCase();
 
-    if (directScore === undefined) {
-        return latinKeySequenceScore;
-    }
-
-    if (latinKeySequenceScore === undefined) {
-        return directScore;
-    }
-
-    return Math.min(directScore, latinKeySequenceScore);
+    return getBestTextSearchScore(normalizedLink, [
+        normalizedQuery,
+        getLatinKeySequenceAlias(normalizedQuery) ?? '',
+        normalizedKeySequence,
+    ]);
 };
 
 export const getSearchResults = (
     items: readonly LinkItem[],
-    query: string
+    query: string,
+    keySequence = ''
 ): LinkItem[] => {
     const trimmedQuery = query.trim();
     if (trimmedQuery === '') {
@@ -176,7 +196,7 @@ export const getSearchResults = (
     return items
         .map((item) => ({
             item,
-            score: getSearchScore(item.link, trimmedQuery),
+            score: getSearchScore(item.link, trimmedQuery, keySequence.trim()),
         }))
         .filter(
             (result): result is { item: LinkItem; score: number } =>
