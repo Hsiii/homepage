@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { AnimationToggle } from './AnimationToggle';
+import { AqiDistrictPicker } from './AqiDistrictPicker';
 import { Help } from './Help';
 import { ThemeColorPicker } from './ThemeColorPicker';
 import { ThemeToggle } from './ThemeToggle';
@@ -14,6 +15,7 @@ export const Controls: React.FC = () => (
             <ThemeColorPicker />
             <AnimationToggle />
             <Help />
+            <AqiDistrictPicker />
         </div>
     </div>
 );

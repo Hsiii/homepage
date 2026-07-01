@@ -29,6 +29,7 @@ interface CachedAqiSites {
 }
 
 const DEFAULT_AQI_SITE_NAME = '新竹';
+const AQI_SITE_CHANGE_EVENT = 'aqi-site-change';
 const AQI_SITE_STORAGE_KEY = 'aqi_site';
 const AQI_SITES_CACHE_KEY = 'aqi_sites_cache';
 const AQI_CACHE_KEY_PREFIX = 'aqi_cache';
@@ -70,6 +71,14 @@ function getInitialSiteName(): string {
         globalThis.localStorage.getItem(AQI_SITE_STORAGE_KEY) ??
         DEFAULT_AQI_SITE_NAME
     );
+}
+
+function getSiteNameFromEvent(event: Event): string | undefined {
+    if (!(event instanceof CustomEvent) || typeof event.detail !== 'string') {
+        return undefined;
+    }
+
+    return event.detail;
 }
 
 function getCachedAqi(siteName: string): AqiData | undefined {
@@ -181,11 +190,29 @@ export const useAqi = (): {
     const selectSiteName = useCallback((siteName: string) => {
         globalThis.localStorage.setItem(AQI_SITE_STORAGE_KEY, siteName);
         setSelectedSiteName(siteName);
+        globalThis.dispatchEvent(
+            new CustomEvent(AQI_SITE_CHANGE_EVENT, { detail: siteName })
+        );
     }, []);
 
     const refreshAqi = useCallback(() => {
         fetchAqi(selectedSiteName).catch(console.error);
     }, [fetchAqi, selectedSiteName]);
+
+    useEffect(() => {
+        const onSiteChange = (event: Event) => {
+            const siteName = getSiteNameFromEvent(event);
+
+            if (siteName !== undefined) {
+                setSelectedSiteName(siteName);
+            }
+        };
+
+        globalThis.addEventListener(AQI_SITE_CHANGE_EVENT, onSiteChange);
+        return () => {
+            globalThis.removeEventListener(AQI_SITE_CHANGE_EVENT, onSiteChange);
+        };
+    }, []);
 
     useEffect(() => {
         const cached = getCachedSites();

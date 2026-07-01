@@ -4,12 +4,14 @@ import {
     CloudLightning,
     CloudRain,
     CloudSnow,
+    Gauge,
     RefreshCw,
     Sun,
 } from 'lucide-react';
 
 import './Weather.css';
 
+import { useAqi } from '@/hooks/useAqi';
 import { useWeather } from '@/hooks/useWeather';
 
 const weatherIcons = {
@@ -24,6 +26,9 @@ const weatherIcons = {
 export const Weather: React.FC = () => {
     const { weather, isLoading, isCached, fetchWeatherByCurrentLocation } =
         useWeather();
+    const { aqi } = useAqi();
+    const hasWeather = weather !== undefined;
+    const hasAqi = aqi !== undefined;
 
     const date = new Date();
     const dateStr = date.toLocaleDateString('en-US', {
@@ -40,25 +45,36 @@ export const Weather: React.FC = () => {
 
     return (
         <div
-            className={`weather-container ${weather === undefined ? 'placeholder' : ''}`}
-            aria-hidden={weather === undefined}
+            className={`weather-container ${!hasWeather && !hasAqi ? 'placeholder' : ''}`}
+            aria-hidden={!hasWeather && !hasAqi}
         >
             <span className='weather-date'>{dateStr}</span>
-            <span className='weather-info'>
-                {weatherIcon}
-                {weather === undefined
-                    ? '--°C'
-                    : `${Math.round(weather.temp)}°C`}
-                {!isCached && weather !== undefined && (
-                    <button
-                        className={`weather-refresh ${isLoading ? 'loading' : ''}`}
-                        onClick={fetchWeatherByCurrentLocation}
-                        title='Update with my location'
-                    >
-                        <RefreshCw size={14} />
-                    </button>
-                )}
-            </span>
+            {hasWeather && (
+                <span className='weather-info'>
+                    {weatherIcon}
+                    {`${Math.round(weather.temp)}°C`}
+                    {!isCached && (
+                        <button
+                            className={`weather-refresh ${isLoading ? 'loading' : ''}`}
+                            onClick={fetchWeatherByCurrentLocation}
+                            title='Update with my location'
+                        >
+                            <RefreshCw size={14} />
+                        </button>
+                    )}
+                </span>
+            )}
+            {hasAqi && (
+                <span
+                    className='aqi-info'
+                    title={`${aqi.county} ${aqi.siteName} · ${aqi.publishTime}`}
+                >
+                    <Gauge size={20} />
+                    <span className='aqi-site'>{aqi.siteName}</span>
+                    <span>AQI {aqi.aqi ?? '--'}</span>
+                    <span className='aqi-status'>{aqi.status}</span>
+                </span>
+            )}
         </div>
     );
 };

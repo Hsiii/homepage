@@ -22,7 +22,18 @@
     align-items: flex-end;
 }
 
+.aqi-control {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
 .theme-color-control.open .theme-icon-btn {
+    background-color: var(--clr-neutral-light-alpha);
+}
+
+.aqi-control.open .theme-icon-btn {
     background-color: var(--clr-neutral-light-alpha);
 }
 
@@ -47,10 +58,71 @@
         visibility var(--motion-duration-fast) var(--motion-ease-out);
 }
 
+.aqi-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 16rem;
+    padding: 0.75rem;
+    border-radius: 1rem;
+    background-color: var(--clr-panel-bg);
+    box-shadow: var(--shadow-panel);
+    backdrop-filter: blur(0.75rem);
+
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-0.25rem);
+    transition:
+        opacity var(--motion-duration-fast) var(--motion-ease-out),
+        transform var(--motion-duration-fast) var(--motion-ease-out),
+        visibility var(--motion-duration-fast) var(--motion-ease-out);
+
+    display: grid;
+    gap: 0.5rem;
+}
+
 .theme-color-control.open .theme-color-menu {
     visibility: visible;
     opacity: 1;
     transform: translateY(0);
+}
+
+.aqi-control.open .aqi-menu {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.aqi-label {
+    color: var(--clr-text);
+    font: var(--fontBoldSm);
+}
+
+.aqi-select {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    background-color: var(--clr-search-field-bg-active);
+    box-shadow: var(--shadow-panel);
+    color: var(--clr-search-field-text);
+    cursor: pointer;
+    font: var(--fontBaseMd);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition:
+        box-shadow var(--motion-duration-fast) var(--motion-ease-out),
+        outline-color var(--motion-duration-fast) var(--motion-ease-out);
+
+    &:focus-visible {
+        outline-color: var(--clr-primary-alpha);
+        box-shadow: var(--shadow-panel-hover);
+    }
+}
+
+.aqi-current {
+    color: var(--clr-text-alpha);
+    font: var(--fontBaseSm);
 }
 
 .theme-color-option {
@@ -95,4 +167,13 @@
 
 .theme-color-option-azure {
     --theme-color-option: var(--clr-swatch-azure);
+}
+
+@media (width < 37.5rem) {
+    .aqi-menu {
+        position: fixed;
+        top: 4rem;
+        right: 1rem;
+        width: min(16rem, calc(100vw - 2rem));
+    }
 }

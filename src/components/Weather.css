@@ -35,6 +35,23 @@
     gap: 0.25rem;
 }
 
+.aqi-info {
+    color: var(--clr-secondary);
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.aqi-site,
+.aqi-status {
+    color: var(--clr-text);
+}
+
+.aqi-status {
+    opacity: 0.72;
+}
+
 .weather-refresh {
     background: transparent;
     border: none;
@@ -72,5 +89,11 @@
 @keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+@media (width < 37.5rem) {
+    .aqi-status {
+        display: none;
     }
 }
