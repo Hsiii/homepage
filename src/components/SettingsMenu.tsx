@@ -597,7 +597,12 @@ export const SettingsMenu: React.FC = () => {
                                     );
                                 }}
                             >
-                                {getAnimationModeIcon(animationMode)}
+                                <span
+                                    className='settings-animation-icon'
+                                    aria-hidden
+                                >
+                                    {getAnimationModeIcon(animationMode)}
+                                </span>
                                 <span
                                     className='settings-switch-track'
                                     aria-hidden
