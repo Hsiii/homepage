@@ -7,21 +7,22 @@ import React, {
     useState,
 } from 'react';
 import {
-    CloudSun,
-    Gauge,
     HelpCircle,
-    LocateFixed,
+    Languages,
+    MapPin,
     Moon,
     Palette,
     Play,
     PlayOff,
+    RefreshCw,
     Settings,
     Sun,
 } from 'lucide-react';
 
-import { useAqi } from '@/hooks/useAqi';
-import type { WeatherLocation } from '@/hooks/useWeather';
-import { useWeather } from '@/hooks/useWeather';
+import { isAppLocale, localeOptions } from '@/constants/i18n';
+import { getLocationLabel, taiwanLocations } from '@/constants/taiwanLocations';
+import { useLocale } from '@/hooks/useLocale';
+import { useTaiwanLocation } from '@/hooks/useTaiwanLocation';
 
 import './Help.css';
 
@@ -46,8 +47,6 @@ const defaultThemeColor = 'amethyst';
 const normalAnimationMode = 'normal';
 const skipAnimationMode = 'skip';
 const themeColorStorageKey = 'theme-color';
-const weatherLocationSearchDelay = 300;
-const weatherLocationSearchMinLength = 2;
 
 const themeColorOptions = [
     {
@@ -91,24 +90,16 @@ const applyThemeColor = (themeColor: ThemeColor) => {
 };
 
 export const SettingsMenu: React.FC = () => {
-    const { isSitesLoading, selectedSiteName, selectSiteName, siteOptions } =
-        useAqi();
     const {
-        fetchWeatherByCurrentLocation,
-        isLoading: isWeatherLoading,
-        searchWeatherLocations,
-        selectedLocation: selectedWeatherLocation,
-        selectWeatherLocation,
-    } = useWeather();
+        isSyncingLocation,
+        selectLocationId,
+        selectedLocation,
+        syncCurrentLocation,
+    } = useTaiwanLocation();
+    const { locale, setLocale, t } = useLocale();
     const [isOpen, setIsOpen] = useState(false);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
     const [isMouseMode, setIsMouseMode] = useState(true);
-    const [weatherLocationQuery, setWeatherLocationQuery] = useState('');
-    const [weatherLocationOptions, setWeatherLocationOptions] = useState<
-        readonly WeatherLocation[]
-    >([]);
-    const [isWeatherLocationLoading, setIsWeatherLocationLoading] =
-        useState(false);
     const [isDarkMode, setIsDarkMode] = useState(
         () => globalThis.document.documentElement.dataset.theme === 'dark'
     );
@@ -131,9 +122,6 @@ export const SettingsMenu: React.FC = () => {
     const themeTransitionLoaderRef = useRef<
         Promise<ThemeTransitionModule> | undefined
     >(undefined);
-    const selectedSite = siteOptions.find(
-        (site) => site.siteName === selectedSiteName
-    );
 
     const loadThemeTransition =
         useCallback(async (): Promise<ThemeTransitionModule> => {
@@ -170,47 +158,6 @@ export const SettingsMenu: React.FC = () => {
         };
     }, [isOpen]);
 
-    useEffect(() => {
-        const query = weatherLocationQuery.trim();
-
-        if (!isOpen || query.length < weatherLocationSearchMinLength) {
-            setWeatherLocationOptions([]);
-            setIsWeatherLocationLoading(false);
-            return undefined;
-        }
-
-        let isCancelled = false;
-        const timeoutHandle = globalThis.setTimeout(
-            () => {
-                setIsWeatherLocationLoading(true);
-                searchWeatherLocations(query)
-                    .then((locations) => {
-                        if (!isCancelled) {
-                            setWeatherLocationOptions(locations);
-                        }
-                    })
-                    .catch((error: unknown) => {
-                        console.error(error);
-                        if (!isCancelled) {
-                            setWeatherLocationOptions([]);
-                        }
-                    })
-                    .finally(() => {
-                        if (!isCancelled) {
-                            setIsWeatherLocationLoading(false);
-                        }
-                    });
-            },
-            weatherLocationSearchDelay,
-            undefined
-        );
-
-        return () => {
-            isCancelled = true;
-            globalThis.clearTimeout(timeoutHandle);
-        };
-    }, [isOpen, searchWeatherLocations, weatherLocationQuery]);
-
     const toggleTheme = useCallback(
         async (event: React.MouseEvent<HTMLButtonElement>) => {
             const button = event.currentTarget;
@@ -246,26 +193,12 @@ export const SettingsMenu: React.FC = () => {
         setIsSkipAnimation(nextSkipAnimation);
     }, []);
 
-    const clearWeatherLocationSearch = useCallback(() => {
-        setWeatherLocationQuery('');
-        setWeatherLocationOptions([]);
-        setIsWeatherLocationLoading(false);
-    }, []);
-
-    const chooseWeatherLocation = useCallback(
-        (location: WeatherLocation) => {
-            selectWeatherLocation(location);
-            clearWeatherLocationSearch();
-        },
-        [clearWeatherLocationSearch, selectWeatherLocation]
-    );
-
     return (
         <div className='settings-control' ref={menuRef}>
             <button
                 className='settings-trigger'
                 type='button'
-                aria-label='Settings'
+                aria-label={t.settings}
                 aria-expanded={isOpen}
                 onClick={(event) => {
                     event.stopPropagation();
@@ -278,7 +211,7 @@ export const SettingsMenu: React.FC = () => {
                 <div
                     className='settings-menu'
                     role='dialog'
-                    aria-label='Settings'
+                    aria-label={t.settings}
                 >
                     <div className='settings-section'>
                         <button
@@ -286,8 +219,8 @@ export const SettingsMenu: React.FC = () => {
                             type='button'
                             aria-label={
                                 isDarkMode
-                                    ? 'Switch to light mode'
-                                    : 'Switch to dark mode'
+                                    ? t.switchToLightMode
+                                    : t.switchToDarkMode
                             }
                             onFocus={preloadThemeTransition}
                             onMouseEnter={preloadThemeTransition}
@@ -302,9 +235,11 @@ export const SettingsMenu: React.FC = () => {
                                     <Sun className='icon' size={20} />
                                 )}
                             </span>
-                            <span className='settings-row-label'>Theme</span>
+                            <span className='settings-row-label'>
+                                {t.theme}
+                            </span>
                             <span className='settings-value'>
-                                {isDarkMode ? 'Dark' : 'Light'}
+                                {isDarkMode ? t.dark : t.light}
                             </span>
                         </button>
 
@@ -312,11 +247,13 @@ export const SettingsMenu: React.FC = () => {
                             <span className='settings-row-icon'>
                                 <Palette className='icon' size={20} />
                             </span>
-                            <span className='settings-row-label'>Accent</span>
+                            <span className='settings-row-label'>
+                                {t.accent}
+                            </span>
                             <div
                                 className='settings-swatch-group'
                                 role='radiogroup'
-                                aria-label='Accent'
+                                aria-label={t.accent}
                             >
                                 {themeColorOptions.map((option) => (
                                     <button
@@ -351,8 +288,8 @@ export const SettingsMenu: React.FC = () => {
                             type='button'
                             aria-label={
                                 isSkipAnimation
-                                    ? 'Use normal animations'
-                                    : 'Skip rise animations'
+                                    ? t.useNormalAnimations
+                                    : t.skipRiseAnimations
                             }
                             onClick={() => {
                                 updateAnimationMode(!isSkipAnimation);
@@ -366,126 +303,96 @@ export const SettingsMenu: React.FC = () => {
                                 )}
                             </span>
                             <span className='settings-row-label'>
-                                Animations
+                                {t.animations}
                             </span>
                             <span className='settings-value'>
-                                {isSkipAnimation ? 'Skip' : 'Normal'}
+                                {isSkipAnimation ? t.skip : t.normal}
                             </span>
                         </button>
 
-                        <div className='settings-row settings-location-row'>
+                        <div className='settings-row settings-location-select-row'>
                             <span className='settings-row-icon'>
-                                <CloudSun className='icon' size={20} />
+                                <MapPin className='icon' size={20} />
                             </span>
                             <label
                                 className='settings-row-label'
-                                htmlFor='weather-location-picker'
+                                htmlFor='location-picker'
                             >
-                                Weather
+                                {t.location}
                             </label>
-                            <input
-                                className='settings-input'
-                                id='weather-location-picker'
-                                type='search'
-                                value={weatherLocationQuery}
-                                placeholder={selectedWeatherLocation.label}
-                                autoComplete='off'
-                                spellCheck={false}
+                            <select
+                                className='settings-select'
+                                id='location-picker'
+                                value={selectedLocation.id}
                                 onChange={(event) => {
-                                    setWeatherLocationQuery(event.target.value);
-                                }}
-                            />
-                            <button
-                                className='settings-icon-action'
-                                type='button'
-                                aria-label='Use current location'
-                                title='Use current location'
-                                disabled={isWeatherLoading}
-                                onClick={() => {
-                                    fetchWeatherByCurrentLocation();
-                                    clearWeatherLocationSearch();
+                                    selectLocationId(event.target.value);
                                 }}
                             >
-                                <LocateFixed className='icon' size={18} />
+                                {taiwanLocations.map((location) => (
+                                    <option
+                                        key={location.id}
+                                        value={location.id}
+                                    >
+                                        {getLocationLabel(location, locale)}
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                className={[
+                                    'settings-icon-action',
+                                    isSyncingLocation && 'loading',
+                                ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                type='button'
+                                aria-label={t.useCurrentLocation}
+                                title={t.useCurrentLocation}
+                                disabled={isSyncingLocation}
+                                onClick={() => {
+                                    syncCurrentLocation();
+                                }}
+                            >
+                                <RefreshCw className='icon' size={18} />
                             </button>
                         </div>
-                        <span className='settings-hint'>
-                            {selectedWeatherLocation.label}
-                        </span>
-                        {weatherLocationOptions.length > 0 ? (
-                            <div
-                                className='settings-location-results'
-                                role='listbox'
-                                aria-label='Weather locations'
-                            >
-                                {weatherLocationOptions.map((location) => (
-                                    <button
-                                        className='settings-location-option'
-                                        key={`${location.lat}-${location.lon}-${location.label}`}
-                                        type='button'
-                                        role='option'
-                                        aria-selected={
-                                            location.lat ===
-                                                selectedWeatherLocation.lat &&
-                                            location.lon ===
-                                                selectedWeatherLocation.lon
-                                        }
-                                        onClick={() => {
-                                            chooseWeatherLocation(location);
-                                        }}
-                                    >
-                                        <span>{location.label}</span>
-                                        {location.localName !== undefined &&
-                                        location.localName !== location.name ? (
-                                            <span className='settings-location-local'>
-                                                {location.localName}
-                                            </span>
-                                        ) : undefined}
-                                    </button>
-                                ))}
-                            </div>
-                        ) : undefined}
-                        {isWeatherLocationLoading ? (
-                            <span className='settings-hint'>Searching</span>
-                        ) : undefined}
 
                         <label
                             className='settings-row settings-select-row'
-                            htmlFor='aqi-district-picker'
+                            htmlFor='language-picker'
                         >
                             <span className='settings-row-icon'>
-                                <Gauge className='icon' size={20} />
+                                <Languages className='icon' size={20} />
                             </span>
-                            <span className='settings-row-label'>AQI</span>
+                            <span className='settings-row-label'>
+                                {t.language}
+                            </span>
                             <select
                                 className='settings-select'
-                                id='aqi-district-picker'
-                                value={selectedSiteName}
-                                disabled={isSitesLoading}
+                                id='language-picker'
+                                value={locale}
                                 onChange={(event) => {
-                                    selectSiteName(event.target.value);
+                                    if (isAppLocale(event.target.value)) {
+                                        setLocale(event.target.value);
+                                    }
                                 }}
                             >
-                                {siteOptions.map((site) => (
+                                {localeOptions.map((option) => (
                                     <option
-                                        key={site.siteId || site.siteName}
-                                        value={site.siteName}
+                                        key={option.value}
+                                        value={option.value}
                                     >
-                                        {site.county} {site.siteName}
+                                        {option.label}
                                     </option>
                                 ))}
                             </select>
                         </label>
-                        <span className='settings-hint'>
-                            {selectedSite?.county ?? ''} {selectedSiteName}
-                        </span>
                     </div>
 
                     <div className='settings-section settings-help-section'>
                         <button
                             className='settings-row settings-action-row'
                             type='button'
-                            aria-label='Help'
+                            aria-label={t.help}
                             aria-expanded={isHelpOpen}
                             onFocus={preloadHelpDialog}
                             onMouseEnter={preloadHelpDialog}
@@ -499,9 +406,9 @@ export const SettingsMenu: React.FC = () => {
                             <span className='settings-row-icon'>
                                 <HelpCircle className='icon' size={20} />
                             </span>
-                            <span className='settings-row-label'>Help</span>
+                            <span className='settings-row-label'>{t.help}</span>
                             <span className='settings-value'>
-                                {isHelpOpen ? 'Open' : 'Closed'}
+                                {isHelpOpen ? t.open : t.closed}
                             </span>
                         </button>
                         {isHelpOpen ? (

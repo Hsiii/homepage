@@ -13,6 +13,12 @@
     --mountain-hue-rotate: 0deg;
     --clr-swatch-amethyst: hsl(275, 72%, 68%);
     --clr-swatch-azure: hsl(218, 82%, 60%);
+    --clr-aqi-good: hsl(142, 58%, 42%);
+    --clr-aqi-moderate: hsl(48, 92%, 46%);
+    --clr-aqi-sensitive: hsl(32, 94%, 50%);
+    --clr-aqi-unhealthy: hsl(0, 72%, 58%);
+    --clr-aqi-very-unhealthy: hsl(281, 52%, 52%);
+    --clr-aqi-hazardous: hsl(281, 64%, 36%);
 
     accent-color: var(--clr-primary);
     ::selection {
@@ -87,10 +93,13 @@
     --clr-text-alpha-2: hsla(0, 0%, 13%, 0.05);
     --clr-panel-bg: var(--clr-neutral-light-alpha);
     --clr-panel-border: var(--clr-neutral-light-alpha);
+    --clr-weather-location: var(--clr-on-dark);
 
     --clr-overlay: #0005;
     --clr-trigger: #52a5;
     --clr-footer-bg: hsl(0, 0%, 13%);
+    --shadow-search-field: none;
+    --shadow-search-field-hover: none;
 
     --shadow-panel:
         0 0 0 1px rgba(0, 0, 0, 0.06),
@@ -145,6 +154,7 @@
     --clr-text-alpha-2: hsla(218, 21%, 86%, 0.12);
     --clr-panel-bg: hsla(228, 19%, 14%, 0.78);
     --clr-panel-border: hsla(262, 69%, 74%, 0.24);
+    --clr-weather-location: var(--clr-on-dark);
 
     --clr-overlay: #0008;
     --clr-trigger: var(--clr-primary-alpha);
@@ -152,6 +162,8 @@
 
     --shadow-panel: 0 0 0 1px rgba(255, 255, 255, 0.08);
     --shadow-panel-hover: 0 0 0 1px rgba(255, 255, 255, 0.13);
+    --shadow-search-field: var(--shadow-panel);
+    --shadow-search-field-hover: var(--shadow-panel-hover);
 }
 
 :root[data-theme-color='azure'] {

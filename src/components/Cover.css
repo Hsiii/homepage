@@ -79,7 +79,7 @@
     display: flex;
     align-items: center;
     background-color: var(--clr-search-field-bg);
-    box-shadow: var(--shadow-panel);
+    box-shadow: var(--shadow-search-field);
     border-radius: calc(var(--height) / 2);
     overflow: hidden;
     transition:
@@ -102,7 +102,7 @@
     padding-right: calc(var(--height) / 2);
     opacity: 1;
     background-color: var(--clr-search-field-bg-active);
-    box-shadow: var(--shadow-panel-hover);
+    box-shadow: var(--shadow-search-field-hover);
 }
 
 .search-input {

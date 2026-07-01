@@ -10,7 +10,11 @@ import {
 
 import './Weather.css';
 
+import { aqiRankLabels, getAqiRank } from '@/constants/aqi';
+import { getDateLocale } from '@/constants/i18n';
+import { getLocationLabel } from '@/constants/taiwanLocations';
 import { useAqi } from '@/hooks/useAqi';
+import { useLocale } from '@/hooks/useLocale';
 import { useWeather } from '@/hooks/useWeather';
 
 const weatherIcons = {
@@ -25,11 +29,15 @@ const weatherIcons = {
 export const Weather: React.FC = () => {
     const { weather, selectedLocation } = useWeather();
     const { aqi } = useAqi();
+    const { locale, t } = useLocale();
     const hasWeather = weather !== undefined;
     const hasAqi = aqi !== undefined;
+    const locationLabel = getLocationLabel(selectedLocation, locale);
+    const aqiRank = getAqiRank(aqi?.aqi);
+    const aqiRankLabel = aqiRankLabels[locale][aqiRank];
 
     const date = new Date();
-    const dateStr = date.toLocaleDateString('en-US', {
+    const dateStr = date.toLocaleDateString(getDateLocale(locale), {
         month: 'short',
         day: 'numeric',
         weekday: 'short',
@@ -47,23 +55,27 @@ export const Weather: React.FC = () => {
             aria-hidden={!hasWeather && !hasAqi}
         >
             <span className='weather-date'>{dateStr}</span>
-            {hasWeather && (
-                <span className='weather-info' title={selectedLocation.label}>
-                    {weatherIcon}
-                    {`${Math.round(weather.temp)}°C`}
-                </span>
-            )}
-            {hasAqi && (
-                <span
-                    className='aqi-info'
-                    title={`${aqi.county} ${aqi.siteName} · ${aqi.publishTime}`}
-                >
-                    <Gauge size={20} />
-                    <span className='aqi-site'>{aqi.siteName}</span>
-                    <span>AQI {aqi.aqi ?? '--'}</span>
-                    <span className='aqi-status'>{aqi.status}</span>
-                </span>
-            )}
+            <span className='weather-metrics'>
+                <span className='weather-location'>{locationLabel}</span>
+                {hasWeather && (
+                    <span className='weather-info' title={locationLabel}>
+                        {weatherIcon}
+                        {`${Math.round(weather.temp)}°C`}
+                    </span>
+                )}
+                {hasAqi && (
+                    <span
+                        className='aqi-info'
+                        data-aqi-rank={aqiRank}
+                        title={`${locationLabel} · ${aqi.publishTime} · ${aqiRankLabel}`}
+                        aria-label={`${t.aqi} ${aqi.aqi ?? '--'}, ${aqiRankLabel}`}
+                    >
+                        <Gauge size={20} />
+                        <span>{t.aqi}</span>
+                        <span>{aqi.aqi ?? '--'}</span>
+                    </span>
+                )}
+            </span>
         </div>
     );
 };
