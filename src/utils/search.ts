@@ -23,34 +23,6 @@ export interface SlashCommandItem {
 }
 
 const maxSearchResults = 4;
-const latinToBopomofoKeyMap: Partial<Record<string, string>> = {
-    a: 'ㄇ',
-    b: 'ㄖ',
-    c: 'ㄏ',
-    d: 'ㄎ',
-    e: 'ㄍ',
-    f: 'ㄑ',
-    g: 'ㄕ',
-    h: 'ㄘ',
-    i: 'ㄛ',
-    j: 'ㄨ',
-    k: 'ㄜ',
-    l: 'ㄠ',
-    m: 'ㄩ',
-    n: 'ㄙ',
-    o: 'ㄟ',
-    p: 'ㄣ',
-    q: 'ㄆ',
-    r: 'ㄐ',
-    s: 'ㄋ',
-    t: 'ㄔ',
-    u: 'ㄧ',
-    v: 'ㄒ',
-    w: 'ㄊ',
-    x: 'ㄌ',
-    y: 'ㄗ',
-    z: 'ㄈ',
-};
 const bopomofoToLatinKeyMap: Partial<Record<string, string>> = {
     ㄆ: 'q',
     ㄇ: 'a',
@@ -78,45 +50,6 @@ const bopomofoToLatinKeyMap: Partial<Record<string, string>> = {
     ㄟ: 'o',
     ㄠ: 'l',
     ㄣ: 'p',
-};
-const bopomofoKeySlotMap: Partial<Record<string, keyof BopomofoComposition>> = {
-    ㄆ: 'initial',
-    ㄇ: 'initial',
-    ㄈ: 'initial',
-    ㄊ: 'initial',
-    ㄋ: 'initial',
-    ㄌ: 'initial',
-    ㄍ: 'initial',
-    ㄎ: 'initial',
-    ㄏ: 'initial',
-    ㄐ: 'initial',
-    ㄑ: 'initial',
-    ㄒ: 'initial',
-    ㄔ: 'initial',
-    ㄕ: 'initial',
-    ㄖ: 'initial',
-    ㄗ: 'initial',
-    ㄘ: 'initial',
-    ㄙ: 'initial',
-    ㄧ: 'medial',
-    ㄨ: 'medial',
-    ㄩ: 'medial',
-    ㄛ: 'final',
-    ㄜ: 'final',
-    ㄟ: 'final',
-    ㄠ: 'final',
-    ㄣ: 'final',
-};
-
-type BopomofoComposition = {
-    final: string;
-    initial: string;
-    medial: string;
-};
-
-type BopomofoAliasVariant = {
-    alias: string;
-    typedLength: number;
 };
 
 export const slashCommands = [
@@ -153,10 +86,6 @@ export const getSlashCommandResults = (value: string): SlashCommandItem[] => {
     );
 };
 
-const getBopomofoCompositionValue = (
-    composition: BopomofoComposition
-): string => composition.initial + composition.medial + composition.final;
-
 const getLatinKeySequenceAlias = (query: string): string | undefined => {
     let alias = '';
     let hasBopomofo = false;
@@ -173,59 +102,6 @@ const getLatinKeySequenceAlias = (query: string): string | undefined => {
     }
 
     return hasBopomofo ? alias : undefined;
-};
-
-const getBopomofoCompositionAliases = (
-    value: string
-): BopomofoAliasVariant[] => {
-    let compositionAliasBase = '';
-    let typedLength = 0;
-    const variants: BopomofoAliasVariant[] = [];
-    const composition: BopomofoComposition = {
-        final: '',
-        initial: '',
-        medial: '',
-    };
-
-    const flushComposition = (): void => {
-        const compositionValue = getBopomofoCompositionValue(composition);
-        if (compositionValue === '') {
-            return;
-        }
-
-        compositionAliasBase += compositionValue;
-        composition.initial = '';
-        composition.medial = '';
-        composition.final = '';
-    };
-
-    const getCurrentCompositionAlias = (): string =>
-        compositionAliasBase + getBopomofoCompositionValue(composition);
-
-    for (const char of value.toLowerCase()) {
-        const bopomofo = latinToBopomofoKeyMap[char];
-
-        if (bopomofo === undefined) {
-            flushComposition();
-            compositionAliasBase += char;
-            continue;
-        }
-
-        const slot = bopomofoKeySlotMap[bopomofo];
-        if (slot === undefined) {
-            continue;
-        }
-
-        composition[slot] = bopomofo;
-        typedLength++;
-
-        variants.push({
-            alias: getCurrentCompositionAlias(),
-            typedLength,
-        });
-    }
-
-    return variants;
 };
 
 const getTextSearchScore = (
@@ -276,46 +152,16 @@ const getSearchScore = (link: LinkName, query: string): number | undefined => {
         normalizedLink,
         getLatinKeySequenceAlias(normalizedQuery) ?? normalizedQuery
     );
-    let bopomofoAliasScore: number | undefined;
-
-    for (const variant of getBopomofoCompositionAliases(normalizedLink)) {
-        const score = getTextSearchScore(variant.alias, normalizedQuery);
-        const weightedScore =
-            score === undefined
-                ? undefined
-                : score + variant.typedLength / 1000;
-
-        if (weightedScore === undefined) {
-            continue;
-        }
-
-        bopomofoAliasScore =
-            bopomofoAliasScore === undefined
-                ? weightedScore
-                : Math.min(bopomofoAliasScore, weightedScore);
-    }
 
     if (directScore === undefined) {
-        if (latinKeySequenceScore === undefined) {
-            return bopomofoAliasScore;
-        }
-
-        return bopomofoAliasScore === undefined
-            ? latinKeySequenceScore
-            : Math.min(latinKeySequenceScore, bopomofoAliasScore);
+        return latinKeySequenceScore;
     }
 
     if (latinKeySequenceScore === undefined) {
-        return bopomofoAliasScore === undefined
-            ? directScore
-            : Math.min(directScore, bopomofoAliasScore);
+        return directScore;
     }
 
-    if (bopomofoAliasScore === undefined) {
-        return Math.min(directScore, latinKeySequenceScore);
-    }
-
-    return Math.min(directScore, latinKeySequenceScore, bopomofoAliasScore);
+    return Math.min(directScore, latinKeySequenceScore);
 };
 
 export const getSearchResults = (
