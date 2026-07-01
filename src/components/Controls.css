@@ -173,6 +173,7 @@
         background-color var(--motion-duration-fast) var(--motion-ease-out),
         color var(--motion-duration-fast) var(--motion-ease-out),
         outline-color var(--motion-duration-fast) var(--motion-ease-out),
+        box-shadow var(--motion-duration-fast) var(--motion-ease-out),
         scale var(--motion-duration-fast) var(--motion-ease-out);
 
     display: grid;
@@ -184,16 +185,16 @@
         outline-color: var(--clr-primary-alpha);
     }
 
-    &.selected {
-        background-color: var(--clr-search-field-bg-active);
-        box-shadow: var(--shadow-panel);
-        color: var(--clr-primary);
-        outline-color: var(--clr-text);
-    }
-
     &:active {
         scale: var(--motion-press-scale);
     }
+}
+
+.settings-icon-choice.selected {
+    background-color: var(--clr-primary);
+    box-shadow: var(--shadow-panel-hover);
+    color: var(--clr-on-dark);
+    outline-color: var(--clr-primary);
 }
 
 .settings-color-choice::before {
@@ -203,6 +204,20 @@
     border-radius: 50%;
     background-color: var(--settings-swatch-color);
     box-shadow: var(--shadow-panel);
+    transition:
+        width var(--motion-duration-fast) var(--motion-ease-out),
+        height var(--motion-duration-fast) var(--motion-ease-out),
+        box-shadow var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.settings-color-choice.selected {
+    outline-color: var(--clr-text);
+}
+
+.settings-color-choice.selected::before {
+    width: 2.5rem;
+    height: 2.5rem;
+    box-shadow: none;
 }
 
 .settings-swatch-amethyst {
@@ -284,7 +299,7 @@
     right: 0.75rem;
     z-index: 1;
     translate: 0 -50%;
-    color: var(--clr-text-alpha);
+    color: var(--clr-primary);
     pointer-events: none;
     transition:
         color var(--motion-duration-fast) var(--motion-ease-out),
