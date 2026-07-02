@@ -23,9 +23,9 @@ A fast personal browser homepage for search, bookmarks, weather, and AQI.
 ## Privacy
 
 Core homepage features work without an account. Location is requested only when the
-location control is used; the selected Taiwan location and weather/AQI caches stay in
-browser storage. Wallpaper sync requires sign-in and uses the configured Clerk, Neon,
-and Vercel Blob services.
+location control is used; the selected Taiwan location is stored in a same-site cookie
+for SSR and mirrored in browser storage with the weather/AQI caches. Wallpaper sync
+requires sign-in and uses the configured Clerk, Neon, and Vercel Blob services.
 
 ## Troubleshooting
 
@@ -39,11 +39,12 @@ the personalization environment variables are configured.
 ### Current stack
 
 - **Runtime and package manager:** Bun.
-- **Frontend:** React 19, TypeScript, Vite, and component-level CSS files.
+- **Frontend:** Next.js App Router, React 19, TypeScript, and component-level CSS files.
 - **Icons:** lucide-react.
 - **Auth and personalization:** Clerk for optional sign-in and user identity.
 - **Storage:** Neon Postgres for wallpaper records and Vercel Blob for wallpaper files.
-- **API layer:** Vercel Node functions in `api/`, with Vite dev middleware for weather and AQI.
+- **API layer:** Next route handlers in `src/app/api/`.
+- **Rendering:** SSR for the homepage shell's selected location, weather, AQI, auth state, and signed-in wallpaper.
 - **External data:** OpenWeatherMap for weather and Taiwan MOENV AQI data.
 - **Deployment:** Vercel.
 
@@ -66,7 +67,7 @@ Copy `.env.example` to `.env.local` and fill only the services you want locally:
 
 - `OPENWEATHERMAP_API_KEY` for weather.
 - `MOENV_API_KEY` for AQI.
-- `VITE_CLERK_PUBLISHABLE_KEY` or Vercel's `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, plus `CLERK_SECRET_KEY` and `CLERK_JWT_KEY`, for sign-in.
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` for sign-in.
 - `BLOB_READ_WRITE_TOKEN`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `NEON_BRANCH` for wallpaper persistence.
 
 ### Production
