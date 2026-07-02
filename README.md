@@ -44,7 +44,7 @@ paint, secrets, auth boundaries, and persistence.
 
 ### Setup
 
-Requires Node.js 20.x and Bun.
+Requires Node.js 22 or newer and Bun.
 
 ```bash
 git clone https://github.com/Hsiii/homepage.git
