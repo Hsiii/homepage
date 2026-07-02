@@ -1,16 +1,18 @@
 import React from 'react';
-import { PanelLeft } from 'lucide-react';
+import { PanelLeft, PanelLeftClose } from 'lucide-react';
 
-import { SettingsMenu } from './SettingsMenu';
+import { UserFloatingBar } from './UserFloatingBar';
 
 import './Controls.css';
 
 interface ControlsProps {
+    isClerkEnabled: boolean;
     isLinkPanelLocked: boolean;
     onToggleLinkPanelLocked: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
+    isClerkEnabled,
     isLinkPanelLocked,
     onToggleLinkPanelLocked,
 }) => (
@@ -27,11 +29,13 @@ export const Controls: React.FC<ControlsProps> = ({
                 aria-pressed={isLinkPanelLocked}
                 onClick={onToggleLinkPanelLocked}
             >
-                <PanelLeft className='icon' size={20} />
+                {isLinkPanelLocked ? (
+                    <PanelLeftClose className='icon' size={20} />
+                ) : (
+                    <PanelLeft className='icon' size={20} />
+                )}
             </button>
         </div>
-        <div className='controls'>
-            <SettingsMenu />
-        </div>
+        <UserFloatingBar isClerkEnabled={isClerkEnabled} />
     </>
 );

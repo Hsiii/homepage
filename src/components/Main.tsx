@@ -5,10 +5,14 @@ import { Cover } from './Cover';
 
 import './Main.css';
 
-export const Main: React.FC = () => (
+interface MainProps {
+    isClerkEnabled: boolean;
+}
+
+export const Main: React.FC<MainProps> = ({ isClerkEnabled }) => (
     <>
         <main>
-            <Cover />
+            <Cover isClerkEnabled={isClerkEnabled} />
         </main>
         <footer>
             <a href={footerLink}>{footerCredit}</a>

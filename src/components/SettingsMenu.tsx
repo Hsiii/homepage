@@ -277,7 +277,13 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
     );
 };
 
-export const SettingsMenu: React.FC = () => {
+interface SettingsMenuProps {
+    placement?: 'above' | 'below';
+}
+
+export const SettingsMenu: React.FC<SettingsMenuProps> = ({
+    placement = 'below',
+}) => {
     const {
         isSyncingLocation,
         selectLocationId,
@@ -440,7 +446,7 @@ export const SettingsMenu: React.FC = () => {
     };
 
     return (
-        <div className='settings-control' ref={menuRef}>
+        <div className={`settings-control ${placement}`} ref={menuRef}>
             <button
                 className='settings-trigger'
                 type='button'

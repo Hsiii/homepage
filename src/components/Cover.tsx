@@ -24,7 +24,11 @@ const Weather = lazy(
         }))
 );
 
-export const Cover: React.FC = () => {
+interface CoverProps {
+    isClerkEnabled: boolean;
+}
+
+export const Cover: React.FC<CoverProps> = ({ isClerkEnabled }) => {
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
     const [isLinkPanelLocked, setIsLinkPanelLocked] = useState(false);
@@ -65,6 +69,7 @@ export const Cover: React.FC = () => {
         <section className='cover'>
             <Mountains />
             <Controls
+                isClerkEnabled={isClerkEnabled}
                 isLinkPanelLocked={isLinkPanelLocked}
                 onToggleLinkPanelLocked={() => {
                     setIsLinkPanelLocked((current) => !current);
