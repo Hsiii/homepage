@@ -23,7 +23,7 @@ interface UseWeatherOptions {
 const BASE_API_URL = '/api/weather';
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 const WEATHER_CACHE_KEY_PREFIX = 'weather_cache';
-const weatherRequests = new Map<string, Promise<WeatherData>>();
+const weatherRequests = new Map<string, Promise<WeatherData | undefined>>();
 
 function readJson(key: string): unknown {
     if (!isBrowser()) {
@@ -67,7 +67,9 @@ function getCachedWeather(locationId: string): CachedWeather | undefined {
     return cached;
 }
 
-async function requestWeather(location: TaiwanLocation): Promise<WeatherData> {
+async function requestWeather(
+    location: TaiwanLocation
+): Promise<WeatherData | undefined> {
     const pendingRequest = weatherRequests.get(location.id);
 
     if (pendingRequest !== undefined) {
@@ -80,6 +82,10 @@ async function requestWeather(location: TaiwanLocation): Promise<WeatherData> {
             lon: String(location.lon),
         });
         const res = await fetch(`${BASE_API_URL}?${params.toString()}`);
+
+        if (res.status === 204) {
+            return undefined;
+        }
 
         if (!res.ok) {
             throw new Error('Failed to fetch weather data');
@@ -170,7 +176,10 @@ export const useWeatherWithInitialData = ({
             setIsLoading(true);
             try {
                 const data = await requestWeather(location);
-                updateCache(data, location);
+
+                if (data !== undefined) {
+                    updateCache(data, location);
+                }
             } catch (error) {
                 console.error(error);
             } finally {

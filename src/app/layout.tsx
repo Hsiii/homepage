@@ -28,7 +28,7 @@ export default function RootLayout({
     children: ReactNode;
 }>): ReactNode {
     const documentMarkup = (
-        <html lang='en'>
+        <html lang='en' suppressHydrationWarning>
             <body>
                 <Script src='/theme-init.js' strategy='beforeInteractive' />
                 {children}

@@ -107,6 +107,11 @@ export const useAqiWithInitialData = ({
             });
             const res = await fetch(`${BASE_API_URL}?${params.toString()}`);
 
+            if (res.status === 204) {
+                setAqi(undefined);
+                return;
+            }
+
             if (!res.ok) {
                 throw new Error('Failed to fetch AQI data');
             }

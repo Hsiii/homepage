@@ -42,10 +42,7 @@ export const GET = async (request: Request): Promise<Response> => {
         const payload = await fetchAqiData(siteName);
 
         if (payload === undefined) {
-            return Response.json(
-                { error: 'MOENV API key not configured' },
-                { status: 500 }
-            );
+            return new Response(undefined, { status: 204 });
         }
 
         return Response.json(payload, {
