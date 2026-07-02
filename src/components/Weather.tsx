@@ -5,8 +5,8 @@ import {
     CloudLightning,
     CloudRain,
     CloudSnow,
-    LocateFixed,
     MapPinCheck,
+    MapPinOff,
     Sun,
 } from 'lucide-react';
 
@@ -134,8 +134,8 @@ export const Weather: React.FC = () => {
                     onClick={syncCurrentLocation}
                 >
                     <span className='weather-location-sync-icons' aria-hidden>
-                        <LocateFixed
-                            className='weather-location-sync-icon weather-location-sync-icon-locate'
+                        <MapPinOff
+                            className='weather-location-sync-icon weather-location-sync-icon-off'
                             size={20}
                         />
                         <MapPinCheck
