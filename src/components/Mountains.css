@@ -63,7 +63,12 @@ html[data-animation-mode='skip'] .mountains {
 }
 
 html[data-animation-mode='skip'] .mountains img {
-    animation-name: none;
+    animation-name: parallax;
+    animation-duration: auto;
+    animation-timing-function: linear;
+    animation-timeline: scroll(root);
+    animation-range: exit;
+    animation-fill-mode: forwards;
     filter: brightness(var(--tone-brightness, 1))
         saturate(var(--tone-saturation, 1))
         hue-rotate(var(--mountain-hue-rotate));
