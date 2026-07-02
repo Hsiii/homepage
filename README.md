@@ -1,4 +1,4 @@
-# [Homepage](https://homepage.hsichen.dev)
+# Homepage
 
 A personal browser homepage for bookmark search, weather, AQI, routines, and
 signed-in wallpaper personalization.
@@ -7,7 +7,7 @@ signed-in wallpaper personalization.
 
 ## Use
 
-- Set `https://homepage.hsichen.dev` as the browser homepage or new tab page.
+- Set your deployed URL as the browser homepage or new tab page.
 - Press <kbd>Space</kbd> to search, arrow keys to choose, and <kbd>Enter</kbd> to
   open.
 - Type `/feeds` to open the daily feed set.
@@ -25,8 +25,7 @@ sign-in and uses Clerk, Neon, and Vercel Blob.
 ## Development
 
 Architecture takeaway: this is still a client-heavy homepage, but Next now owns first
-paint, secrets, auth boundaries, and persistence. Vercel serves the app; Cloudflare
-manages DNS.
+paint, secrets, auth boundaries, and persistence.
 
 ### Stack Map
 
@@ -76,12 +75,6 @@ bun run lint  # ESLint
 bun run build # Production build
 bun run preview
 ```
-
-### Production
-
-Vercel serves the Next app. Cloudflare owns `hsichen.dev` DNS. Clerk CNAMEs under
-`homepage.hsichen.dev` must stay DNS-only: `accounts`, `clerk`, `clk._domainkey`,
-`clk2._domainkey`, and `clkmail`.
 
 ## Troubleshooting
 
