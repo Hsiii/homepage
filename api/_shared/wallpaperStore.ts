@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import type { NeonQueryFunction } from '@neondatabase/serverless';
 import { del } from '@vercel/blob';
 
 import type { WallpaperAsset } from '../../shared/wallpaper';
@@ -21,7 +22,7 @@ interface WallpaperRow {
     width: number;
 }
 
-let database: ReturnType<typeof neon> | undefined;
+let database: NeonQueryFunction<false, false> | undefined;
 let schemaReady: Promise<void> | undefined;
 
 const getDatabaseUrl = (): string => {
@@ -34,7 +35,7 @@ const getDatabaseUrl = (): string => {
     return databaseUrl;
 };
 
-const getDatabase = (): ReturnType<typeof neon> => {
+const getDatabase = (): NeonQueryFunction<false, false> => {
     database ??= neon(getDatabaseUrl());
     return database;
 };
@@ -142,7 +143,7 @@ export const getUserWallpaper = async (
 ): Promise<WallpaperAsset | undefined> => {
     await ensureSchema();
 
-    const [row] = await getDatabase()<WallpaperRow[]>`
+    const rows = (await getDatabase()`
         select
             url,
             download_url,
@@ -155,7 +156,8 @@ export const getUserWallpaper = async (
         from user_wallpapers
         where user_id = ${userId}
         limit 1
-    `;
+    `) as WallpaperRow[];
+    const row = rows.at(0);
 
     return row === undefined ? undefined : mapWallpaperRow(row);
 };
@@ -167,14 +169,15 @@ export const saveUserWallpaper = async (
     validateWallpaperAsset(userId, asset);
     await ensureSchema();
 
-    const [previousRow] = await getDatabase()<Array<Pick<WallpaperRow, 'url'>>>`
+    const previousRows = (await getDatabase()`
         select url
         from user_wallpapers
         where user_id = ${userId}
         limit 1
-    `;
+    `) as Array<Pick<WallpaperRow, 'url'>>;
+    const previousRow = previousRows.at(0);
 
-    const [row] = await getDatabase()<WallpaperRow[]>`
+    const rows = (await getDatabase()`
         insert into user_wallpapers (
             user_id,
             url,
@@ -213,7 +216,12 @@ export const saveUserWallpaper = async (
             width,
             height,
             updated_at::text
-    `;
+    `) as WallpaperRow[];
+    const row = rows.at(0);
+
+    if (row === undefined) {
+        throw new ApiError('Wallpaper could not be saved.', 500);
+    }
 
     if (
         previousRow?.url !== undefined &&
@@ -231,11 +239,12 @@ export const saveUserWallpaper = async (
 export const clearUserWallpaper = async (userId: string): Promise<void> => {
     await ensureSchema();
 
-    const [row] = await getDatabase()<Array<Pick<WallpaperRow, 'url'>>>`
+    const rows = (await getDatabase()`
         delete from user_wallpapers
         where user_id = ${userId}
         returning url
-    `;
+    `) as Array<Pick<WallpaperRow, 'url'>>;
+    const row = rows.at(0);
 
     if (
         row?.url !== undefined &&
