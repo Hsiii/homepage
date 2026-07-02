@@ -6,6 +6,7 @@ import {
     findTaiwanLocation,
     findTaiwanLocationByAqiSiteName,
     findTaiwanLocationByWeatherName,
+    taiwanLocationCookieName,
 } from '@/constants/taiwanLocations';
 import { isBrowser } from '@/utils/browserEnv';
 
@@ -13,6 +14,7 @@ const LOCATION_CHANGE_EVENT = 'homepage-location-change';
 const LOCATION_STORAGE_KEY = 'homepage_location_id';
 const LEGACY_AQI_SITE_STORAGE_KEY = 'aqi_site';
 const LEGACY_WEATHER_LOCATION_STORAGE_KEY = 'weather_location';
+const locationCookieMaxAgeSeconds = 60 * 60 * 24 * 365;
 const locationSyncTimeout = 10_000;
 const unsupportedGeolocationPermission = 'unsupported';
 
@@ -61,7 +63,12 @@ function getLegacyWeatherName(): string | undefined {
     return undefined;
 }
 
-function getInitialLocation(): TaiwanLocation {
+interface UseTaiwanLocationOptions {
+    hasInitialLocationCookie?: boolean;
+    initialLocationId?: string;
+}
+
+function getStoredLocation(): TaiwanLocation {
     if (!isBrowser()) {
         return findTaiwanLocation(undefined);
     }
@@ -86,6 +93,24 @@ function getInitialLocation(): TaiwanLocation {
     );
 }
 
+function getInitialLocation(
+    initialLocationId: string | undefined
+): TaiwanLocation {
+    return initialLocationId === undefined
+        ? getStoredLocation()
+        : findTaiwanLocation(initialLocationId);
+}
+
+function writeLocationCookie(locationId: string) {
+    const secureAttribute =
+        globalThis.location.protocol === 'https:' ? '; Secure' : '';
+
+    // eslint-disable-next-line unicorn/no-document-cookie -- Cookie Store API is not available in all target browsers.
+    globalThis.document.cookie = `${taiwanLocationCookieName}=${encodeURIComponent(
+        locationId
+    )}; Path=/; Max-Age=${locationCookieMaxAgeSeconds}; SameSite=Lax${secureAttribute}`;
+}
+
 function getLocationFromEvent(event: Event): TaiwanLocation | undefined {
     if (
         !(event instanceof CustomEvent) ||
@@ -100,7 +125,10 @@ function getLocationFromEvent(event: Event): TaiwanLocation | undefined {
     return typeof id === 'string' ? findTaiwanLocation(id) : undefined;
 }
 
-export const useTaiwanLocation = (): {
+export const useTaiwanLocation = ({
+    hasInitialLocationCookie,
+    initialLocationId,
+}: UseTaiwanLocationOptions = {}): {
     selectedLocation: TaiwanLocation;
     geolocationPermission: GeolocationPermissionState;
     isGeolocationAvailable: boolean;
@@ -109,8 +137,9 @@ export const useTaiwanLocation = (): {
     selectLocationId: (locationId: string) => void;
     syncCurrentLocation: () => void;
 } => {
-    const [selectedLocation, setSelectedLocation] =
-        useState(getInitialLocation);
+    const [selectedLocation, setSelectedLocation] = useState(() =>
+        getInitialLocation(initialLocationId)
+    );
     const [geolocationPermission, setGeolocationPermission] =
         useState<GeolocationPermissionState>(
             typeof navigator !== 'undefined' && 'geolocation' in navigator
@@ -123,6 +152,7 @@ export const useTaiwanLocation = (): {
 
     const selectLocation = useCallback((location: TaiwanLocation) => {
         globalThis.localStorage.setItem(LOCATION_STORAGE_KEY, location.id);
+        writeLocationCookie(location.id);
         setSelectedLocation(location);
         globalThis.dispatchEvent(
             new CustomEvent(LOCATION_CHANGE_EVENT, { detail: location })
@@ -164,6 +194,25 @@ export const useTaiwanLocation = (): {
             }
         );
     }, [selectLocation]);
+
+    useEffect(() => {
+        if (hasInitialLocationCookie === true) {
+            globalThis.localStorage.setItem(
+                LOCATION_STORAGE_KEY,
+                selectedLocation.id
+            );
+            return;
+        }
+
+        const storedLocation = getStoredLocation();
+
+        if (storedLocation.id !== selectedLocation.id) {
+            selectLocation(storedLocation);
+            return;
+        }
+
+        writeLocationCookie(selectedLocation.id);
+    }, [hasInitialLocationCookie, selectLocation, selectedLocation]);
 
     useEffect(() => {
         if (!('geolocation' in navigator)) {

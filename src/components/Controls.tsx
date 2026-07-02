@@ -1,17 +1,22 @@
 import React from 'react';
 import { PanelLeft, PanelLeftClose } from 'lucide-react';
 
+import type { WallpaperAsset } from '../../shared/wallpaper';
 import { UserFloatingBar } from './UserFloatingBar';
 
 interface ControlsProps {
+    initialWallpaper: WallpaperAsset | undefined;
     isClerkEnabled: boolean;
     isLinkPanelLocked: boolean;
+    onWallpaperChange: (wallpaper: WallpaperAsset | undefined) => void;
     onToggleLinkPanelLocked: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
+    initialWallpaper,
     isClerkEnabled,
     isLinkPanelLocked,
+    onWallpaperChange,
     onToggleLinkPanelLocked,
 }) => (
     <>
@@ -34,6 +39,10 @@ export const Controls: React.FC<ControlsProps> = ({
                 )}
             </button>
         </div>
-        <UserFloatingBar isClerkEnabled={isClerkEnabled} />
+        <UserFloatingBar
+            initialWallpaper={initialWallpaper}
+            isClerkEnabled={isClerkEnabled}
+            onWallpaperChange={onWallpaperChange}
+        />
     </>
 );

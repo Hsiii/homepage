@@ -4,6 +4,8 @@ import { Search, X } from 'lucide-react';
 import { useBookmarkSearch } from '@/hooks/useBookmarkSearch';
 import { useHideLinks } from '@/hooks/useHideLinks';
 import { useTime } from '@/hooks/useTime';
+import type { AqiData, WeatherData } from '@/types/environment';
+import type { WallpaperAsset } from '../../shared/wallpaper';
 import { Mountains } from './Mountains';
 import { SearchSuggestions } from './SearchSuggestions';
 
@@ -22,10 +24,24 @@ const Weather = lazy(
 );
 
 interface CoverProps {
+    hasInitialLocationCookie: boolean;
+    initialAqi: AqiData | undefined;
+    initialLocationId: string;
+    initialWallpaper: WallpaperAsset | undefined;
+    initialWeather: WeatherData | undefined;
     isClerkEnabled: boolean;
+    onWallpaperChange: (wallpaper: WallpaperAsset | undefined) => void;
 }
 
-export const Cover: React.FC<CoverProps> = ({ isClerkEnabled }) => {
+export const Cover: React.FC<CoverProps> = ({
+    hasInitialLocationCookie,
+    initialAqi,
+    initialLocationId,
+    initialWallpaper,
+    initialWeather,
+    isClerkEnabled,
+    onWallpaperChange,
+}) => {
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
     const [isLinkPanelLocked, setIsLinkPanelLocked] = useState(false);
@@ -64,12 +80,19 @@ export const Cover: React.FC<CoverProps> = ({ isClerkEnabled }) => {
 
     return (
         <section className='cover'>
-            <Mountains />
+            <Mountains initialWallpaper={initialWallpaper} />
             <div className={`cover-content ${inputFocused ? 'focused' : ''}`}>
                 <div className='title-container'>
                     <div className='weather-slot'>
                         <Suspense fallback={undefined}>
-                            <Weather />
+                            <Weather
+                                hasInitialLocationCookie={
+                                    hasInitialLocationCookie
+                                }
+                                initialAqi={initialAqi}
+                                initialLocationId={initialLocationId}
+                                initialWeather={initialWeather}
+                            />
                         </Suspense>
                     </div>
                     <span className='title'>{time}</span>
@@ -165,6 +188,7 @@ export const Cover: React.FC<CoverProps> = ({ isClerkEnabled }) => {
             <Suspense fallback={undefined}>
                 <LinkPanel
                     hidden={hideLinks}
+                    initialWallpaper={initialWallpaper}
                     isClerkEnabled={isClerkEnabled}
                     isLockedOpen={isLinkPanelLocked}
                     isSearchNav={inputFocused}
@@ -174,6 +198,7 @@ export const Cover: React.FC<CoverProps> = ({ isClerkEnabled }) => {
                     onToggleLockedOpen={() => {
                         setIsLinkPanelLocked((current) => !current);
                     }}
+                    onWallpaperChange={onWallpaperChange}
                 />
             </Suspense>
         </section>

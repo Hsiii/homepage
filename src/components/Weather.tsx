@@ -13,9 +13,10 @@ import {
 import { aqiRankLabels, getAqiRank } from '@/constants/aqi';
 import { getDateLocale } from '@/constants/i18n';
 import { getLocationLabel } from '@/constants/taiwanLocations';
-import { useAqi } from '@/hooks/useAqi';
+import { useAqiWithInitialData } from '@/hooks/useAqi';
 import { useLocale } from '@/hooks/useLocale';
-import { useWeather } from '@/hooks/useWeather';
+import { useWeatherWithInitialData } from '@/hooks/useWeather';
+import type { AqiData, WeatherData } from '@/types/environment';
 
 const weatherIcons = {
     Thunderstorm: <CloudLightning size={20} />,
@@ -27,7 +28,19 @@ const weatherIcons = {
 };
 const locationGrantFeedbackDuration = 1600;
 
-export const Weather: React.FC = () => {
+interface WeatherProps {
+    hasInitialLocationCookie: boolean;
+    initialAqi: AqiData | undefined;
+    initialLocationId: string;
+    initialWeather: WeatherData | undefined;
+}
+
+export const Weather: React.FC<WeatherProps> = ({
+    hasInitialLocationCookie,
+    initialAqi,
+    initialLocationId,
+    initialWeather,
+}) => {
     const {
         weather,
         geolocationPermission,
@@ -36,8 +49,16 @@ export const Weather: React.FC = () => {
         lastLocationSyncSucceededAt,
         selectedLocation,
         syncCurrentLocation,
-    } = useWeather();
-    const { aqi } = useAqi();
+    } = useWeatherWithInitialData({
+        hasInitialLocationCookie,
+        initialLocationId,
+        initialWeather,
+    });
+    const { aqi } = useAqiWithInitialData({
+        hasInitialLocationCookie,
+        initialAqi,
+        initialLocationId,
+    });
     const { locale, t } = useLocale();
     const [showLocationGranted, setShowLocationGranted] = useState(false);
     const hasWeather = weather !== undefined;

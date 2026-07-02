@@ -75,7 +75,7 @@ export default defineConfig(
             'import-x/no-unassigned-import': [
                 'error',
                 {
-                    allow: ['**/*.css'],
+                    allow: ['**/*.css', 'server-only'],
                 },
             ],
         },

@@ -10,6 +10,7 @@ export type TaiwanLocation = {
 };
 
 export const defaultLocationId = 'taipei-city';
+export const taiwanLocationCookieName = 'homepage_location_id';
 
 export const taiwanLocations = [
     {

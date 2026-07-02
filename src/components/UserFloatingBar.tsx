@@ -2,16 +2,21 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useClerk, useUser } from '@clerk/nextjs';
 import { LogIn, LogOut, Mail, UserRound, UserRoundPlus } from 'lucide-react';
 
+import type { WallpaperAsset } from '../../shared/wallpaper';
 import { SettingsMenu } from './SettingsMenu';
 import { WallpaperSettingsMenu } from './WallpaperSettingsMenu';
 
 interface UserFloatingBarProps {
     closeMenusSignal?: number;
+    initialWallpaper: WallpaperAsset | undefined;
     isClerkEnabled: boolean;
+    onWallpaperChange: (wallpaper: WallpaperAsset | undefined) => void;
 }
 
 interface CloseableMenuProps {
     closeMenusSignal?: number;
+    initialWallpaper?: WallpaperAsset | undefined;
+    onWallpaperChange?: (wallpaper: WallpaperAsset | undefined) => void;
 }
 
 const getDisplayName = (emailAddress?: string, name?: string | null) => {
@@ -28,6 +33,8 @@ const getDisplayName = (emailAddress?: string, name?: string | null) => {
 
 const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
     closeMenusSignal,
+    initialWallpaper,
+    onWallpaperChange,
 }) => {
     const { isLoaded, isSignedIn, user } = useUser();
     const { openSignIn, openSignUp, signOut } = useClerk();
@@ -159,6 +166,8 @@ const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
             </div>
             <WallpaperSettingsMenu
                 closeSignal={closeMenusSignal}
+                initialWallpaper={initialWallpaper}
+                onWallpaperChange={onWallpaperChange}
                 placement='above'
             />
         </div>
@@ -237,10 +246,18 @@ const UserFloatingBarFallback: React.FC<CloseableMenuProps> = ({
 
 export const UserFloatingBar: React.FC<UserFloatingBarProps> = ({
     closeMenusSignal,
+    initialWallpaper,
     isClerkEnabled,
+    onWallpaperChange,
 }) => {
     if (isClerkEnabled) {
-        return <UserFloatingBarContent closeMenusSignal={closeMenusSignal} />;
+        return (
+            <UserFloatingBarContent
+                closeMenusSignal={closeMenusSignal}
+                initialWallpaper={initialWallpaper}
+                onWallpaperChange={onWallpaperChange}
+            />
+        );
     }
 
     return <UserFloatingBarFallback closeMenusSignal={closeMenusSignal} />;

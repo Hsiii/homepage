@@ -1,19 +1,23 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { TaiwanLocation } from '@/constants/taiwanLocations';
 import type { GeolocationPermissionState } from '@/hooks/useTaiwanLocation';
 import { useTaiwanLocation } from '@/hooks/useTaiwanLocation';
+import type { WeatherData } from '@/types/environment';
 import { isBrowser } from '@/utils/browserEnv';
 
-export type WeatherData = {
-    weatherType: string;
-    temp: number;
-};
+export type { WeatherData } from '@/types/environment';
 
 interface CachedWeather {
     data: WeatherData;
     locationId: string;
     timestamp: number;
+}
+
+interface UseWeatherOptions {
+    hasInitialLocationCookie?: boolean;
+    initialLocationId?: string;
+    initialWeather?: WeatherData;
 }
 
 const BASE_API_URL = '/api/weather';
@@ -99,6 +103,21 @@ export const useWeather = (): {
     lastLocationSyncSucceededAt: number | undefined;
     selectedLocation: TaiwanLocation;
     syncCurrentLocation: () => void;
+} => useWeatherWithInitialData({});
+
+export const useWeatherWithInitialData = ({
+    hasInitialLocationCookie,
+    initialLocationId,
+    initialWeather,
+}: UseWeatherOptions): {
+    weather: WeatherData | undefined;
+    geolocationPermission: GeolocationPermissionState;
+    isLoading: boolean;
+    isGeolocationAvailable: boolean;
+    isSyncingLocation: boolean;
+    lastLocationSyncSucceededAt: number | undefined;
+    selectedLocation: TaiwanLocation;
+    syncCurrentLocation: () => void;
 } => {
     const {
         selectedLocation,
@@ -107,10 +126,26 @@ export const useWeather = (): {
         isSyncingLocation,
         lastLocationSyncSucceededAt,
         syncCurrentLocation,
-    } = useTaiwanLocation();
+    } = useTaiwanLocation({
+        hasInitialLocationCookie,
+        initialLocationId,
+    });
+    const initialCachedWeatherRef = useRef<CachedWeather | undefined>(
+        initialWeather === undefined
+            ? undefined
+            : {
+                  data: initialWeather,
+                  locationId: selectedLocation.id,
+                  timestamp: Date.now(),
+              }
+    );
     const [cachedWeather, setCachedWeather] = useState<
         CachedWeather | undefined
-    >(() => getCachedWeather(selectedLocation.id));
+    >(
+        () =>
+            initialCachedWeatherRef.current ??
+            getCachedWeather(selectedLocation.id)
+    );
     const weather = cachedWeather?.data;
     const [isLoading, setIsLoading] = useState(false);
 
@@ -154,9 +189,18 @@ export const useWeather = (): {
             return;
         }
 
+        if (
+            initialCachedWeatherRef.current?.locationId === selectedLocation.id
+        ) {
+            updateCache(initialCachedWeatherRef.current.data, selectedLocation);
+            initialCachedWeatherRef.current = undefined;
+            setIsLoading(false);
+            return;
+        }
+
         setCachedWeather(undefined);
         fetchWeather(selectedLocation).catch(console.error);
-    }, [fetchWeather, selectedLocation]);
+    }, [fetchWeather, selectedLocation, updateCache]);
 
     return {
         weather,

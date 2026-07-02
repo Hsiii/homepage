@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { upload } from '@vercel/blob/client';
 
+import { getCssUrlValue } from '@/utils/wallpaperStyle';
 import type {
     WallpaperAsset,
     WallpaperContentType,
@@ -49,15 +50,6 @@ const outputQualities = [0.92, 0.86, 0.8] as const;
 const getWallpaperCacheKey = (userId: string): string =>
     `${wallpaperCacheKeyPrefix}.${userId}`;
 
-const backslashCharacter = String.fromCodePoint(92);
-const escapedBackslash = `${backslashCharacter}${backslashCharacter}`;
-const escapedDoubleQuote = `${backslashCharacter}"`;
-
-const escapeCssUrl = (url: string): string =>
-    url
-        .replaceAll(backslashCharacter, escapedBackslash)
-        .replaceAll('"', escapedDoubleQuote);
-
 const applyWallpaper = (wallpaper: WallpaperAsset | undefined): void => {
     const root = globalThis.document.documentElement;
 
@@ -68,10 +60,7 @@ const applyWallpaper = (wallpaper: WallpaperAsset | undefined): void => {
     }
 
     root.dataset.wallpaper = 'custom';
-    root.style.setProperty(
-        '--wallpaper-image',
-        `url("${escapeCssUrl(wallpaper.url)}")`
-    );
+    root.style.setProperty('--wallpaper-image', getCssUrlValue(wallpaper.url));
 };
 
 const readCachedWallpaper = (userId: string): WallpaperAsset | undefined => {
@@ -243,13 +232,26 @@ const readWallpaperResponse = async (
     return payload as WallpaperApiResponse;
 };
 
-export const useWallpaper = (): WallpaperControls => {
+export const useWallpaper = (
+    initialWallpaper?: WallpaperAsset,
+    onWallpaperChange?: (wallpaper: WallpaperAsset | undefined) => void
+): WallpaperControls => {
     const { getToken, isLoaded, isSignedIn, userId } = useAuth();
-    const [wallpaper, setWallpaper] = useState<WallpaperAsset>();
+    const [wallpaper, setWallpaper] = useState<WallpaperAsset | undefined>(
+        initialWallpaper
+    );
     const [error, setError] = useState<string>();
     const [isBusy, setIsBusy] = useState(false);
     const [progress, setProgress] = useState<number>();
     const isAvailable = isLoaded && isSignedIn && typeof userId === 'string';
+
+    const updateWallpaper = useCallback(
+        (nextWallpaper: WallpaperAsset | undefined) => {
+            setWallpaper(nextWallpaper);
+            onWallpaperChange?.(nextWallpaper);
+        },
+        [onWallpaperChange]
+    );
 
     const getAuthHeaders = useCallback(async (): Promise<
         Record<'Authorization', string>
@@ -271,13 +273,13 @@ export const useWallpaper = (): WallpaperControls => {
         }
 
         if (!isSignedIn || typeof userId !== 'string') {
-            setWallpaper(undefined);
+            updateWallpaper(undefined);
             applyWallpaper(undefined);
             return undefined;
         }
 
-        const cached = readCachedWallpaper(userId);
-        setWallpaper(cached);
+        const cached = readCachedWallpaper(userId) ?? initialWallpaper;
+        updateWallpaper(cached);
         applyWallpaper(cached);
 
         let isCurrent = true;
@@ -293,7 +295,7 @@ export const useWallpaper = (): WallpaperControls => {
                     return;
                 }
 
-                setWallpaper(payload.wallpaper);
+                updateWallpaper(payload.wallpaper);
                 writeCachedWallpaper(userId, payload.wallpaper);
                 applyWallpaper(payload.wallpaper);
                 setError(undefined);
@@ -315,7 +317,14 @@ export const useWallpaper = (): WallpaperControls => {
         return () => {
             isCurrent = false;
         };
-    }, [getAuthHeaders, isLoaded, isSignedIn, userId]);
+    }, [
+        getAuthHeaders,
+        initialWallpaper,
+        isLoaded,
+        isSignedIn,
+        updateWallpaper,
+        userId,
+    ]);
 
     const uploadWallpaper = useCallback(
         async (file: File) => {
@@ -366,7 +375,7 @@ export const useWallpaper = (): WallpaperControls => {
                 });
                 const payload = await readWallpaperResponse(response);
 
-                setWallpaper(payload.wallpaper);
+                updateWallpaper(payload.wallpaper);
                 writeCachedWallpaper(userId, payload.wallpaper);
                 applyWallpaper(payload.wallpaper);
             } catch (uploadError) {
@@ -380,7 +389,7 @@ export const useWallpaper = (): WallpaperControls => {
                 setProgress(undefined);
             }
         },
-        [getAuthHeaders, isAvailable, userId]
+        [getAuthHeaders, isAvailable, updateWallpaper, userId]
     );
 
     const clearWallpaper = useCallback(async () => {
@@ -402,7 +411,7 @@ export const useWallpaper = (): WallpaperControls => {
                 await readWallpaperResponse(response);
             }
 
-            setWallpaper(undefined);
+            updateWallpaper(undefined);
             writeCachedWallpaper(userId, undefined);
             applyWallpaper(undefined);
         } catch (clearError) {
@@ -414,7 +423,7 @@ export const useWallpaper = (): WallpaperControls => {
         } finally {
             setIsBusy(false);
         }
-    }, [getAuthHeaders, isAvailable, userId]);
+    }, [getAuthHeaders, isAvailable, updateWallpaper, userId]);
 
     return {
         clearWallpaper,

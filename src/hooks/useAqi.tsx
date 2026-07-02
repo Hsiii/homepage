@@ -1,23 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useTaiwanLocation } from '@/hooks/useTaiwanLocation';
+import type { AqiData } from '@/types/environment';
 import { isBrowser } from '@/utils/browserEnv';
 
-export type AqiData = {
-    siteName: string;
-    county: string;
-    aqi: number | undefined;
-    status: string;
-    pollutant: string | undefined;
-    pm25: number | undefined;
-    pm10: number | undefined;
-    publishTime: string;
-};
+export type { AqiData } from '@/types/environment';
 
 interface CachedAqi {
     data: AqiData;
     locationId: string;
     timestamp: number;
+}
+
+interface UseAqiOptions {
+    hasInitialLocationCookie?: boolean;
+    initialAqi?: AqiData;
+    initialLocationId?: string;
 }
 
 const AQI_CACHE_KEY_PREFIX = 'aqi_cache';
@@ -70,10 +68,34 @@ export const useAqi = (): {
     aqi: AqiData | undefined;
     isLoading: boolean;
     refreshAqi: () => void;
+} => useAqiWithInitialData({});
+
+export const useAqiWithInitialData = ({
+    hasInitialLocationCookie,
+    initialAqi,
+    initialLocationId,
+}: UseAqiOptions): {
+    aqi: AqiData | undefined;
+    isLoading: boolean;
+    refreshAqi: () => void;
 } => {
-    const { selectedLocation } = useTaiwanLocation();
-    const [aqi, setAqi] = useState<AqiData | undefined>(() =>
-        getCachedAqi(selectedLocation.id)
+    const { selectedLocation } = useTaiwanLocation({
+        hasInitialLocationCookie,
+        initialLocationId,
+    });
+    const initialCachedAqiRef = useRef<CachedAqi | undefined>(
+        initialAqi === undefined
+            ? undefined
+            : {
+                  data: initialAqi,
+                  locationId: selectedLocation.id,
+                  timestamp: Date.now(),
+              }
+    );
+    const [aqi, setAqi] = useState<AqiData | undefined>(
+        () =>
+            initialCachedAqiRef.current?.data ??
+            getCachedAqi(selectedLocation.id)
     );
     const [isLoading, setIsLoading] = useState(false);
 
@@ -116,6 +138,15 @@ export const useAqi = (): {
 
         if (cached !== undefined) {
             setAqi(cached);
+            return;
+        }
+
+        if (initialCachedAqiRef.current?.locationId === selectedLocation.id) {
+            globalThis.localStorage.setItem(
+                getAqiCacheKey(selectedLocation.id),
+                JSON.stringify(initialCachedAqiRef.current)
+            );
+            initialCachedAqiRef.current = undefined;
             return;
         }
 

@@ -20,6 +20,7 @@ import { useTaiwanLocation } from '@/hooks/useTaiwanLocation';
 import type { WallpaperControls } from '@/hooks/useWallpaper';
 import { isBrowser } from '@/utils/browserEnv';
 import { runThemeTransition } from '@/utils/themeTransition';
+import { getCssUrlValue } from '@/utils/wallpaperStyle';
 import { wallpaperAcceptedContentTypes } from '../../shared/wallpaper';
 
 const animationStorageKey = 'animation-mode';
@@ -713,7 +714,11 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                                             undefined
                                                 ? undefined
                                                 : ({
-                                                      '--settings-wallpaper-preview': `url("${wallpaperControls.wallpaper.url}")`,
+                                                      '--settings-wallpaper-preview':
+                                                          getCssUrlValue(
+                                                              wallpaperControls
+                                                                  .wallpaper.url
+                                                          ),
                                                   } as React.CSSProperties &
                                                       Record<
                                                           '--settings-wallpaper-preview',

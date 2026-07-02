@@ -29,13 +29,15 @@ html[data-animation-mode='skip'] .mountains {
     background-position: center 100%;
 }
 
-:root[data-wallpaper='custom'] .mountains {
+:root[data-wallpaper='custom'] .mountains,
+.mountains[data-wallpaper='custom'] {
     background: var(--wallpaper-image) center / cover no-repeat
         var(--clr-neutral-dark);
     animation: none;
 }
 
-:root[data-wallpaper='custom'] .mountains::after {
+:root[data-wallpaper='custom'] .mountains::after,
+.mountains[data-wallpaper='custom']::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -70,7 +72,8 @@ html[data-animation-mode='skip'] .mountains {
     animation-fill-mode: forwards;
 }
 
-:root[data-wallpaper='custom'] .mountains img {
+:root[data-wallpaper='custom'] .mountains img,
+.mountains[data-wallpaper='custom'] img {
     opacity: 0;
 }
 

@@ -6,6 +6,7 @@ import { linkTree } from '@/constants/linkTree';
 import { useLinkNavigation } from '@/hooks/useLinkNavigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { isBrowser } from '@/utils/browserEnv';
+import type { WallpaperAsset } from '../../shared/wallpaper';
 import { LinkCategory } from './LinkCategory';
 import { MobileBookmarks } from './MobileBookmarks';
 import { UserFloatingBar } from './UserFloatingBar';
@@ -19,6 +20,8 @@ interface LinkPanelProps {
     highlightedCategory?: number;
     onClearSearch: () => void;
     onToggleLockedOpen: () => void;
+    initialWallpaper: WallpaperAsset | undefined;
+    onWallpaperChange: (wallpaper: WallpaperAsset | undefined) => void;
 }
 
 export const LinkPanel: React.FC<LinkPanelProps> = ({
@@ -30,6 +33,8 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
     highlightedCategory,
     onClearSearch,
     onToggleLockedOpen,
+    initialWallpaper,
+    onWallpaperChange,
 }) => {
     const {
         selectedCategory,
@@ -146,7 +151,9 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                 ))}
                 <UserFloatingBar
                     closeMenusSignal={mouseLeaveCloseSignal}
+                    initialWallpaper={initialWallpaper}
                     isClerkEnabled={isClerkEnabled}
+                    onWallpaperChange={onWallpaperChange}
                 />
             </div>
         </nav>
