@@ -42,11 +42,6 @@
     }
 }
 
-.weather-location {
-    color: var(--clr-weather-location);
-    font: inherit;
-}
-
 .weather-info {
     color: var(--clr-primary);
     font-variant-numeric: tabular-nums;
@@ -86,10 +81,4 @@
 
 .aqi-info[data-aqi-rank='hazardous']:hover {
     color: var(--clr-aqi-hazardous);
-}
-
-@media (width < 37.5rem) {
-    .weather-location {
-        display: none;
-    }
 }

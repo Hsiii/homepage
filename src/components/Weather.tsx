@@ -55,7 +55,6 @@ export const Weather: React.FC = () => {
         >
             <span className='weather-date'>{dateStr}</span>
             <span className='weather-metrics'>
-                <span className='weather-location'>{locationLabel}</span>
                 {hasWeather && (
                     <span className='weather-info' title={locationLabel}>
                         {weatherIcon}
