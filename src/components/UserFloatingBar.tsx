@@ -4,6 +4,8 @@ import { LogIn, LogOut, Mail, UserRound, UserRoundPlus } from 'lucide-react';
 
 import { SettingsMenu } from './SettingsMenu';
 
+import './Controls.css';
+
 interface UserFloatingBarProps {
     isClerkEnabled: boolean;
 }
@@ -69,6 +71,9 @@ const UserFloatingBarContent: React.FC = () => {
                         ) : (
                             <UserRound className='icon' size={20} />
                         )}
+                    </span>
+                    <span className='user-card-name'>
+                        {isLoaded ? displayName : 'Loading'}
                     </span>
                 </button>
                 {isMenuOpen ? (
@@ -181,6 +186,7 @@ const UserFloatingBarFallback: React.FC = () => {
                     <span className='user-avatar' aria-hidden>
                         <UserRound className='icon' size={20} />
                     </span>
+                    <span className='user-card-name'>Guest</span>
                 </button>
                 {isMenuOpen ? (
                     <div className='user-menu' role='menu'>

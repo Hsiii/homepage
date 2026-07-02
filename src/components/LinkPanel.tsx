@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Bookmark } from 'lucide-react';
+import { PanelLeft, PanelLeftClose } from 'lucide-react';
 
 import { mobileViewportQuery } from '@/constants/breakpoints';
 import { linkTree } from '@/constants/linkTree';
@@ -7,25 +7,30 @@ import { useLinkNavigation } from '@/hooks/useLinkNavigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { LinkCategory } from './LinkCategory';
 import { MobileBookmarks } from './MobileBookmarks';
+import { UserFloatingBar } from './UserFloatingBar';
 
 import './LinkPanel.css';
 
 interface LinkPanelProps {
     hidden: boolean;
+    isClerkEnabled: boolean;
     isLockedOpen: boolean;
     isSearchNav: boolean;
     highlightedLink?: string;
     highlightedCategory?: number;
     onClearSearch: () => void;
+    onToggleLockedOpen: () => void;
 }
 
 export const LinkPanel: React.FC<LinkPanelProps> = ({
     hidden,
+    isClerkEnabled,
     isLockedOpen,
     isSearchNav,
     highlightedLink,
     highlightedCategory,
     onClearSearch,
+    onToggleLockedOpen,
 }) => {
     const { selectedCategory, isMouseNav, startMouseNav, endMouseNav } =
         useLinkNavigation(isSearchNav, onClearSearch, highlightedCategory);
@@ -79,7 +84,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                 e.preventDefault();
             }}
             onMouseMove={startMouseNav}
-            onMouseOut={endMouseNav}
+            onMouseLeave={endMouseNav}
             aria-hidden={hidden}
             aria-expanded={
                 isLockedOpen || isExpanded || (isMobileViewport && isMobileOpen)
@@ -93,9 +98,25 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                     onOpenChange={setIsMobileOpen}
                 />
             )}
-            <div className={`trigger ${hidden && 'hidden'}`}>
-                <div className='indicator' />
-                <Bookmark className='icon' />
+            <div className={`trigger ${hidden && 'hidden'}`} />
+            <div className='panel-lock-control'>
+                <button
+                    className='panel-lock-trigger'
+                    type='button'
+                    aria-label={
+                        isLockedOpen
+                            ? 'Unlock bookmark panel'
+                            : 'Lock bookmark panel open'
+                    }
+                    aria-pressed={isLockedOpen}
+                    onClick={onToggleLockedOpen}
+                >
+                    {isLockedOpen ? (
+                        <PanelLeftClose className='icon' size={20} />
+                    ) : (
+                        <PanelLeft className='icon' size={20} />
+                    )}
+                </button>
             </div>
             <div
                 className={[
@@ -117,6 +138,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                         highlightedLink={highlightedLink}
                     />
                 ))}
+                <UserFloatingBar isClerkEnabled={isClerkEnabled} />
             </div>
         </nav>
     );

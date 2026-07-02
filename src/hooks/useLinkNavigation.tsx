@@ -47,7 +47,7 @@ export const useLinkNavigation = (
         hoverExitTimeoutRef.current = setTimeout(() => {
             setIsMouseNav(false);
             hoverExitTimeoutRef.current = undefined;
-        }, 150);
+        }, 40);
     }, []);
 
     return {

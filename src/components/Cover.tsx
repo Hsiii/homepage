@@ -4,7 +4,6 @@ import { Search, X } from 'lucide-react';
 import { useBookmarkSearch } from '@/hooks/useBookmarkSearch';
 import { useHideLinks } from '@/hooks/useHideLinks';
 import { useTime } from '@/hooks/useTime';
-import { Controls } from './Controls';
 import { Mountains } from './Mountains';
 import { SearchSuggestions } from './SearchSuggestions';
 
@@ -68,13 +67,6 @@ export const Cover: React.FC<CoverProps> = ({ isClerkEnabled }) => {
     return (
         <section className='cover'>
             <Mountains />
-            <Controls
-                isClerkEnabled={isClerkEnabled}
-                isLinkPanelLocked={isLinkPanelLocked}
-                onToggleLinkPanelLocked={() => {
-                    setIsLinkPanelLocked((current) => !current);
-                }}
-            />
             <div className={`cover-content ${inputFocused ? 'focused' : ''}`}>
                 <div className='title-container'>
                     <div className='weather-slot'>
@@ -175,11 +167,15 @@ export const Cover: React.FC<CoverProps> = ({ isClerkEnabled }) => {
             <Suspense fallback={undefined}>
                 <LinkPanel
                     hidden={hideLinks}
+                    isClerkEnabled={isClerkEnabled}
                     isLockedOpen={isLinkPanelLocked}
                     isSearchNav={inputFocused}
                     highlightedLink={selectedSearchResult?.link}
                     highlightedCategory={selectedSearchResult?.category}
                     onClearSearch={clearSearch}
+                    onToggleLockedOpen={() => {
+                        setIsLinkPanelLocked((current) => !current);
+                    }}
                 />
             </Suspense>
         </section>

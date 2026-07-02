@@ -1,5 +1,5 @@
 .panel-lock-control {
-    position: fixed;
+    position: absolute;
     top: 0.5rem;
     left: 0.5rem;
     z-index: 21;
@@ -38,13 +38,13 @@
 }
 
 .user-floating-bar {
-    position: fixed;
+    position: absolute;
     left: 1rem;
+    right: 1rem;
     bottom: 1rem;
     z-index: 22;
 
     min-height: 3.5rem;
-    max-width: calc(100vw - 2rem);
     padding: 0.5rem;
     border-radius: 1rem;
     background-color: var(--clr-panel-bg);
@@ -63,9 +63,10 @@
 }
 
 .user-menu-trigger {
-    width: 2.5rem;
+    flex: 1 1 auto;
+    min-width: 0;
     height: 2.5rem;
-    padding: 0.25rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.25rem;
     border-radius: 0.75rem;
     background-color: transparent;
     color: var(--clr-text);
@@ -131,6 +132,14 @@
 }
 
 .user-menu-profile .user-menu-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: var(--fontBoldSm);
+}
+
+.user-card-name {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -220,7 +229,12 @@
 }
 
 .user-floating-bar .settings-trigger {
+    border-radius: 0.75rem;
     color: var(--clr-text-alpha);
+    transition:
+        background-color var(--motion-duration-fast) var(--motion-ease-out),
+        color var(--motion-duration-fast) var(--motion-ease-out),
+        scale var(--motion-duration-fast) var(--motion-ease-out);
 
     animation: none;
 
@@ -229,6 +243,11 @@
         background-color: var(--clr-text-alpha-2);
         color: var(--clr-primary);
     }
+}
+
+.user-floating-bar .settings-control {
+    flex: 0 0 auto;
+    margin-left: auto;
 }
 
 .settings-trigger {

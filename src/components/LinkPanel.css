@@ -6,6 +6,11 @@
     --font-size: var(--fs-lg);
     --height: 100vh;
     --height: 100svh;
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: var(--indicator-width);
+    height: var(--height);
+    z-index: 19;
 }
 
 .mobile-bookmark-button,
@@ -16,7 +21,6 @@
 .trigger {
     position: absolute;
     left: 0;
-    padding-left: var(--indicator-gap);
 
     width: var(--indicator-width);
     height: 100%;
@@ -32,23 +36,7 @@
 
     z-index: 19;
 
-    .indicator {
-        width: 0.25rem;
-        height: 14rem;
-
-        background-color: var(--clr-trigger);
-        backdrop-filter: saturate(1.2) blur(0.5rem);
-        border-radius: 0.3rem;
-    }
-
-    .icon {
-        position: absolute;
-        left: 1rem;
-        color: transparent;
-        fill: var(--clr-trigger);
-    }
-
-    &:has(+ :is(.link-tree.expanded, .link-tree:has(:focus-visible))) {
+    &:has(~ :is(.link-tree.expanded, .link-tree:has(:focus-visible))) {
         opacity: 0;
     }
 
@@ -236,7 +224,7 @@
     justify-content: center;
 
     translate: calc(-1 * var(--width));
-    transition: translate var(--motion-duration-base) var(--motion-ease-out);
+    transition: translate var(--motion-duration-fast) var(--motion-ease-out);
 
     z-index: 20;
 
@@ -263,7 +251,7 @@
     }
 }
 
-.link-panel.hoverEffective:hover .link-tree,
+.link-panel.hoverEffective .link-tree,
 .link-tree.expanded,
 .link-tree.focus-within {
     translate: 0;
@@ -420,6 +408,7 @@
 
 @media (width < 37.5rem) {
     .link-panel .trigger,
+    .link-panel .panel-lock-control,
     .link-panel .link-tree {
         display: none;
         pointer-events: none;
