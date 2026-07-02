@@ -47,8 +47,6 @@
     font-size: var(--fs-xl);
     font-variant-numeric: tabular-nums;
 
-    letter-spacing: 0.5rem;
-
     animation: rise-show var(--rise-show-duration) ease-in;
 
     z-index: 1;
