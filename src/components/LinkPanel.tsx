@@ -12,6 +12,7 @@ import './LinkPanel.css';
 
 interface LinkPanelProps {
     hidden: boolean;
+    isLockedOpen: boolean;
     isSearchNav: boolean;
     highlightedLink?: string;
     highlightedCategory?: number;
@@ -20,6 +21,7 @@ interface LinkPanelProps {
 
 export const LinkPanel: React.FC<LinkPanelProps> = ({
     hidden,
+    isLockedOpen,
     isSearchNav,
     highlightedLink,
     highlightedCategory,
@@ -79,7 +81,9 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
             onMouseMove={startMouseNav}
             onMouseOut={endMouseNav}
             aria-hidden={hidden}
-            aria-expanded={isExpanded || (isMobileViewport && isMobileOpen)}
+            aria-expanded={
+                isLockedOpen || isExpanded || (isMobileViewport && isMobileOpen)
+            }
         >
             {isMobileViewport && (
                 <MobileBookmarks
@@ -93,7 +97,14 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                 <div className='indicator' />
                 <Bookmark className='icon' />
             </div>
-            <div className={`link-tree ${isExpanded && 'expanded'}`}>
+            <div
+                className={[
+                    'link-tree',
+                    (isExpanded || isLockedOpen) && 'expanded',
+                ]
+                    .filter(Boolean)
+                    .join(' ')}
+            >
                 <div className='panel' />
                 {linkTree.map((categoryData, i) => (
                     <LinkCategory

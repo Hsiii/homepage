@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { Search, X } from 'lucide-react';
 
 import { useBookmarkSearch } from '@/hooks/useBookmarkSearch';
@@ -27,6 +27,7 @@ const Weather = lazy(
 export const Cover: React.FC = () => {
     const { time } = useTime();
     const { hideLinks } = useHideLinks();
+    const [isLinkPanelLocked, setIsLinkPanelLocked] = useState(false);
     const {
         blockedFeedsLinks,
         clearSearch,
@@ -63,7 +64,12 @@ export const Cover: React.FC = () => {
     return (
         <section className='cover'>
             <Mountains />
-            <Controls />
+            <Controls
+                isLinkPanelLocked={isLinkPanelLocked}
+                onToggleLinkPanelLocked={() => {
+                    setIsLinkPanelLocked((current) => !current);
+                }}
+            />
             <div className={`cover-content ${inputFocused ? 'focused' : ''}`}>
                 <div className='title-container'>
                     <div className='weather-slot'>
@@ -164,6 +170,7 @@ export const Cover: React.FC = () => {
             <Suspense fallback={undefined}>
                 <LinkPanel
                     hidden={hideLinks}
+                    isLockedOpen={isLinkPanelLocked}
                     isSearchNav={inputFocused}
                     highlightedLink={selectedSearchResult?.link}
                     highlightedCategory={selectedSearchResult?.category}
