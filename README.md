@@ -1,16 +1,38 @@
 # [Homepage](https://homepage.hsichen.dev)
 
-A fast personal browser homepage for search, bookmarks, weather, and quick daily links.
+A fast personal browser homepage for search, bookmarks, weather, AQI, and daily links.
 
 ![Homepage](https://raw.githubusercontent.com/Hsiii/homepage/main/docs/demo.webp)
 
-## What it does
+## Why
 
-- Opens with the current time, local weather, and Taiwan AQI at a glance.
-- Searches saved bookmarks instantly, with Google fallback when no bookmark matches.
-- Keeps bookmark groups close by in a hoverable, lockable side panel and a mobile-friendly drawer.
-- Supports slash commands for repeat routines, including opening daily feed tabs.
-- Lets signed-in users upload a personal wallpaper while keeping the default mountain scene for guests.
+- **Fast start:** Opens with the current time, local weather, and Taiwan AQI.
+- **Bookmark-first search:** Finds saved links instantly, then falls back to Google.
+- **Low-friction navigation:** Keeps bookmark groups in a hoverable, lockable side panel and a mobile drawer.
+- **Daily routines:** Runs repeat actions with slash commands like `/feeds`.
+- **Optional personalization:** Lets signed-in users upload a wallpaper while guests keep the default mountain scene.
+
+## Use it
+
+- Set `https://homepage.hsichen.dev` as the browser homepage or new tab page.
+- Press <kbd>Space</kbd> to search, use arrow keys to pick a result, and press <kbd>Enter</kbd> to open it.
+- Type `/feeds` to open the daily feed set.
+- Hover the side panel for bookmark groups, or lock it open when browsing through links.
+- Click the location control to sync the nearest Taiwan weather and AQI station.
+
+## Privacy
+
+Core homepage features work without an account. Location is requested only when the
+location control is used; the selected Taiwan location and weather/AQI caches stay in
+browser storage. Wallpaper sync requires sign-in and uses the configured Clerk, Neon,
+and Vercel Blob services.
+
+## Troubleshooting
+
+If weather or AQI is missing, the relevant API key may be absent or the external API
+may be unavailable. If location does not update, re-enable browser geolocation
+permission and sync again. If wallpaper controls are unavailable, sign in and confirm
+the personalization environment variables are configured.
 
 ## Development
 
