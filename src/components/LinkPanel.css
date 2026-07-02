@@ -344,8 +344,6 @@
     place-items: center;
 }
 
-.link-panel.hoverEffective .category-icon-edit,
-.link-tree.expanded .category-icon-edit,
 .hoverEffective .category:hover .category-icon-edit,
 .hoverEffective .category:has(+ .links:hover) .category-icon-edit,
 .category:hover .category-icon-edit,
