@@ -3,6 +3,17 @@ import type { BookmarkCategoryData, BookmarkLinkData } from '@/types/bookmarks';
 const defaultCategoryName = 'Bookmarks';
 const folderSeparator = ' / ';
 
+const browserRootFolderNames = new Set([
+    'bookmarks',
+    'bookmarks bar',
+    'bookmarks menu',
+    'bookmarks toolbar',
+    'favorites',
+    'favorites bar',
+    'mobile bookmarks',
+    'other bookmarks',
+]);
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null;
 
@@ -170,6 +181,32 @@ const getDirectChild = <TagName extends keyof HTMLElementTagNameMap>(
 const getElementText = (element: Element): string =>
     normalizeText(element.textContent);
 
+const isBrowserRootFolderName = (folderName: string): boolean =>
+    browserRootFolderNames.has(folderName.toLowerCase());
+
+const getImportedBookmarkPlacement = (
+    path: readonly string[],
+    title: string
+): { category: string; title: string } => {
+    const normalizedPath = path
+        .map((folderName) => normalizeText(folderName))
+        .filter((folderName) => folderName !== '');
+    const categoryPath =
+        normalizedPath.length > 1 && isBrowserRootFolderName(normalizedPath[0])
+            ? normalizedPath.slice(1)
+            : normalizedPath;
+    const category = categoryPath[0] ?? defaultCategoryName;
+    const titlePrefix = categoryPath.slice(1).join(folderSeparator);
+
+    return {
+        category,
+        title:
+            titlePrefix === ''
+                ? title
+                : `${titlePrefix}${folderSeparator}${title}`,
+    };
+};
+
 const findFolderList = (heading: Element): HTMLDListElement | undefined => {
     const parent = heading.parentElement;
     if (parent === null) {
@@ -206,8 +243,27 @@ export const parseBrowserBookmarks = (html: string): BookmarkCategoryData[] => {
     const document = new DOMParser().parseFromString(html, 'text/html');
     const rootList = document.querySelector('dl');
     const visitedLists = new WeakSet<HTMLDListElement>();
-    const categories: BookmarkCategoryData[] = [];
+    const categories = new Map<string, BookmarkLinkData[]>();
     let importedBookmarkIndex = 0;
+
+    const addBookmarks = (
+        path: readonly string[],
+        bookmarks: readonly BookmarkLinkData[]
+    ) => {
+        for (const bookmark of bookmarks) {
+            const placement = getImportedBookmarkPlacement(
+                path,
+                bookmark.title
+            );
+            const categoryLinks = categories.get(placement.category) ?? [];
+
+            categoryLinks.push({
+                ...bookmark,
+                title: placement.title,
+            });
+            categories.set(placement.category, categoryLinks);
+        }
+    };
 
     const createBookmark = (anchor: HTMLAnchorElement): BookmarkLinkData => {
         const url = anchor.getAttribute('href')?.trim() ?? '';
@@ -268,13 +324,7 @@ export const parseBrowserBookmarks = (html: string): BookmarkCategoryData[] => {
         }
 
         if (directLinks.length > 0) {
-            categories.push({
-                category:
-                    path.length > 0
-                        ? path.join(folderSeparator)
-                        : defaultCategoryName,
-                links: directLinks,
-            });
+            addBookmarks(path, directLinks);
         }
     };
 
@@ -282,20 +332,22 @@ export const parseBrowserBookmarks = (html: string): BookmarkCategoryData[] => {
         parseList(rootList, []);
     }
 
-    if (categories.length === 0) {
+    if (categories.size === 0) {
         const links = [
             ...document.querySelectorAll<HTMLAnchorElement>('a[href]'),
         ].map((anchor) => createBookmark(anchor));
 
         if (links.length > 0) {
-            categories.push({
-                category: defaultCategoryName,
-                links,
-            });
+            addBookmarks([], links);
         }
     }
 
-    return normalizeBookmarkTree(categories);
+    return normalizeBookmarkTree(
+        [...categories].map(([category, links]) => ({
+            category,
+            links,
+        }))
+    );
 };
 
 const escapeHtml = (value: string): string =>
