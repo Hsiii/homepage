@@ -374,7 +374,6 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
 
         setIsOpen(false);
         setOpenDropdownId(undefined);
-        setIsBookmarkManagerOpen(false);
     }, [closeSignal]);
 
     useEffect(() => {
