@@ -9,7 +9,6 @@ import '@/components/Controls.css';
 import '@/components/Cover.css';
 import '@/components/LinkPanel.css';
 import '@/components/Main.css';
-import '@/components/MobileWarning.css';
 import '@/components/Mountains.css';
 import '@/components/Weather.css';
 
