@@ -5,7 +5,7 @@ import type { NeonQueryFunction } from '@neondatabase/serverless';
 
 import { ApiError } from '@/server/apiError';
 import type { BookmarkCategoryData } from '@/types/bookmarks';
-import { coerceBookmarkTree, normalizeBookmarkTree } from '@/utils/bookmarks';
+import { coerceBookmarkTree } from '@/utils/bookmarks';
 
 interface BookmarkRow {
     categories: unknown;
@@ -67,7 +67,7 @@ const validateBookmarkTree = (value: unknown): BookmarkCategoryData[] => {
         throw new ApiError('Bookmarks are empty or invalid.', 400);
     }
 
-    return normalizeBookmarkTree(bookmarkTree);
+    return bookmarkTree;
 };
 
 export const getUserBookmarks = async (
