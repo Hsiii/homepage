@@ -106,6 +106,10 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
             (iconOption) => iconOption.iconName === categoryIconName
         ) ?? categoryIconOptions[0];
     const SelectedIcon = selectedIconOption.Icon;
+    const confirmDeleteCategoryData =
+        confirmDeleteCategoryIndex === undefined
+            ? undefined
+            : decoratedBookmarkTree.at(confirmDeleteCategoryIndex);
     const visibleIconOptions = useMemo(() => {
         const normalizedSearch = normalizeCategoryIconSearch(iconSearch);
         const filteredIconOptions =
@@ -416,41 +420,6 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                             >
                                                 <Trash2 size={16} aria-hidden />
                                             </button>
-                                            {isConfirming ? (
-                                                <div
-                                                    className='bookmark-manager-category-confirm'
-                                                    role='dialog'
-                                                    aria-label={`${t.deleteCategory}: ${categoryData.category}`}
-                                                >
-                                                    <span>
-                                                        {
-                                                            t.deleteCategoryConfirm
-                                                        }
-                                                    </span>
-                                                    <div className='bookmark-manager-category-confirm-actions'>
-                                                        <button
-                                                            type='button'
-                                                            onClick={() => {
-                                                                setConfirmDeleteCategoryIndex(
-                                                                    undefined
-                                                                );
-                                                            }}
-                                                        >
-                                                            {t.cancel}
-                                                        </button>
-                                                        <button
-                                                            type='button'
-                                                            onClick={() => {
-                                                                confirmDeleteCategory(
-                                                                    categoryIndex
-                                                                );
-                                                            }}
-                                                        >
-                                                            {t.deleteCategory}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ) : undefined}
                                         </div>
                                     );
                                 }
@@ -776,6 +745,55 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                         )}
                     </main>
                 </div>
+                {confirmDeleteCategoryIndex === undefined ||
+                confirmDeleteCategoryData === undefined ? undefined : (
+                    <div
+                        className='bookmark-manager-category-confirm-backdrop'
+                        onClick={() => {
+                            setConfirmDeleteCategoryIndex(undefined);
+                        }}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Escape') {
+                                event.stopPropagation();
+                                setConfirmDeleteCategoryIndex(undefined);
+                            }
+                        }}
+                    >
+                        <div
+                            className='bookmark-manager-category-confirm-dialog'
+                            role='dialog'
+                            aria-modal='true'
+                            aria-label={`${t.deleteCategory}: ${confirmDeleteCategoryData.category}`}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                            }}
+                        >
+                            <span>{t.deleteCategoryConfirm}</span>
+                            <div className='bookmark-manager-category-confirm-actions'>
+                                <button
+                                    type='button'
+                                    onClick={() => {
+                                        setConfirmDeleteCategoryIndex(
+                                            undefined
+                                        );
+                                    }}
+                                >
+                                    {t.cancel}
+                                </button>
+                                <button
+                                    type='button'
+                                    onClick={() => {
+                                        confirmDeleteCategory(
+                                            confirmDeleteCategoryIndex
+                                        );
+                                    }}
+                                >
+                                    {t.deleteCategory}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>,
         document.body

@@ -645,6 +645,7 @@
 }
 
 .bookmark-manager-dialog {
+    position: relative;
     width: min(60rem, calc(100vw - 2rem));
     height: min(40rem, calc(100svh - 2rem));
     min-height: 0;
@@ -653,6 +654,7 @@
     box-shadow: var(--shadow-panel-hover);
     backdrop-filter: blur(0.75rem);
     color: var(--clr-text);
+    font: var(--fontBaseSm);
     overflow: hidden;
     outline: none;
 
@@ -735,8 +737,6 @@
 .bookmark-manager-category-card {
     position: relative;
     min-width: 0;
-    display: grid;
-    gap: 0.25rem;
 }
 
 .bookmark-manager-category-option,
@@ -760,9 +760,9 @@
 }
 
 .bookmark-manager-category-option {
-    padding-right: 2.75rem;
-    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+    grid-template-columns: 1.25rem minmax(0, 1fr) 2.5rem;
     cursor: pointer;
+    font: var(--fontBoldSm);
 }
 
 .bookmark-manager-category-option .icon {
@@ -795,7 +795,7 @@
 }
 
 .bookmark-manager-category-count {
-    min-width: 1.5rem;
+    width: 2.5rem;
     min-height: 1.5rem;
     padding: 0 0.5rem;
     border-radius: 999px;
@@ -807,6 +807,7 @@
         translate var(--motion-duration-fast) var(--motion-ease-out);
 
     display: grid;
+    justify-self: end;
     place-items: center;
 }
 
@@ -815,7 +816,7 @@
 .bookmark-manager-category-card[data-confirming='true']
     .bookmark-manager-category-count {
     opacity: 0;
-    translate: 0.25rem 0;
+    translate: -0.25rem 0;
 }
 
 .bookmark-manager-icon-button,
@@ -846,14 +847,15 @@
 
 .bookmark-manager-category-delete-button {
     position: absolute;
-    top: 0.125rem;
-    right: 0.25rem;
+    top: 0;
+    right: 0.5rem;
     width: 2.5rem;
+    min-height: 2.75rem;
     padding: 0.5rem;
     opacity: 0;
     pointer-events: none;
     color: var(--clr-aqi-unhealthy);
-    translate: 0.25rem 0;
+    translate: 0.5rem 0;
     transition:
         background-color var(--motion-duration-fast) var(--motion-ease-out),
         color var(--motion-duration-fast) var(--motion-ease-out),
@@ -938,7 +940,6 @@
     display: grid;
     gap: 0.25rem;
     color: var(--clr-text-alpha);
-    font: var(--fontBaseSm);
 }
 
 .bookmark-manager-field-label {
@@ -956,7 +957,7 @@
     background-color: var(--clr-search-field-bg-active);
     box-shadow: var(--shadow-panel);
     color: var(--clr-search-field-text);
-    font: var(--fontBaseSm);
+    font: inherit;
     outline: 2px solid transparent;
     outline-offset: 2px;
     transition:
@@ -1083,15 +1084,27 @@
     color: var(--clr-primary);
 }
 
-.bookmark-manager-category-confirm {
-    padding: 0.75rem;
-    border-radius: 0.75rem;
-    background-color: var(--clr-text-alpha-2);
-    color: var(--clr-text);
-    font: var(--fontBaseSm);
+.bookmark-manager-category-confirm-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    padding: 1rem;
+    background-color: var(--clr-overlay);
 
     display: grid;
-    gap: 0.5rem;
+    place-items: center;
+}
+
+.bookmark-manager-category-confirm-dialog {
+    width: min(20rem, 100%);
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: var(--clr-text-alpha-2);
+    color: var(--clr-text);
+    box-shadow: var(--shadow-panel-hover);
+
+    display: grid;
+    gap: 0.75rem;
 }
 
 .bookmark-manager-category-confirm-actions {
@@ -1101,7 +1114,7 @@
     gap: 0.5rem;
 }
 
-.bookmark-manager-category-confirm button {
+.bookmark-manager-category-confirm-actions button {
     min-height: 2rem;
     padding: 0.25rem 0.5rem;
     border-radius: 0.5rem;
@@ -1140,7 +1153,6 @@
 
 .bookmark-manager-error {
     grid-column: 1 / -1;
-    font: var(--fontBaseSm);
 }
 
 .bookmark-manager-link-row {
@@ -1164,7 +1176,6 @@
 
 .bookmark-manager-link-copy a {
     color: var(--clr-text-alpha);
-    font: var(--fontBaseSm);
     text-decoration: none;
 }
 
@@ -1172,7 +1183,6 @@
     min-height: 5rem;
     border-radius: 1rem;
     color: var(--clr-text-alpha);
-    font: var(--fontBaseSm);
 
     display: grid;
     place-items: center;
