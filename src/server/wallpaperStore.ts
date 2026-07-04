@@ -38,11 +38,17 @@ const ensureWallpaperSchema = async (): Promise<void> => {
             pathname text not null,
             content_type text not null,
             size_bytes integer not null
-                check (size_bytes > 0 and size_bytes <= ${wallpaperMaxFileSizeBytes}),
+                check (size_bytes > 0 and size_bytes <= ${sql.unsafe(
+                    String(wallpaperMaxFileSizeBytes)
+                )}),
             width integer not null
-                check (width > 0 and width <= ${wallpaperMaxDimensionPx}),
+                check (width > 0 and width <= ${sql.unsafe(
+                    String(wallpaperMaxDimensionPx)
+                )}),
             height integer not null
-                check (height > 0 and height <= ${wallpaperMaxDimensionPx}),
+                check (height > 0 and height <= ${sql.unsafe(
+                    String(wallpaperMaxDimensionPx)
+                )}),
             created_at timestamptz not null default now(),
             updated_at timestamptz not null default now()
         )
