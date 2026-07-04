@@ -40,7 +40,7 @@ const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
     initialWallpaper,
     onWallpaperChange,
 }) => {
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { isSignedIn, user } = useUser();
     const { openSignIn, openSignUp, signOut } = useClerk();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -49,6 +49,7 @@ const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
         emailAddress,
         user?.username ?? user?.fullName ?? user?.firstName
     );
+    const profileLabel = isSignedIn === true ? displayName : 'Guest';
 
     useEffect(() => {
         if (!isMenuOpen) {
@@ -97,9 +98,7 @@ const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
                             <UserRound className='icon' size={20} />
                         )}
                     </span>
-                    <span className='user-card-name'>
-                        {isLoaded ? displayName : 'Loading'}
-                    </span>
+                    <span className='user-card-name'>{profileLabel}</span>
                 </button>
                 {isMenuOpen ? (
                     <div className='user-menu' role='menu'>
@@ -113,7 +112,7 @@ const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
                                 )}
                             </span>
                             <span className='user-menu-name'>
-                                {isLoaded ? displayName : 'Loading'}
+                                {profileLabel}
                             </span>
                         </div>
                         {isSignedIn ? (
