@@ -75,6 +75,7 @@ interface BookmarkAuthState {
 
 interface UseBookmarksOptions {
     auth?: BookmarkAuthState;
+    initialBookmarkTree?: BookmarkCategoryData[];
 }
 
 const getBookmarkStorageKey = (userId: string | undefined): string =>
@@ -186,6 +187,7 @@ const readBookmarkResponse = async (
 export const useBookmarks = (
     options: UseBookmarksOptions = {}
 ): BookmarkControls => {
+    const { initialBookmarkTree } = options;
     const getToken = options.auth?.getToken;
     const isAuthLoaded = options.auth?.isLoaded === true;
     const remoteUserId =
@@ -194,13 +196,18 @@ export const useBookmarks = (
         typeof options.auth.userId === 'string'
             ? options.auth.userId
             : undefined;
-    const [bookmarkTree, setBookmarkTree] =
-        useState<BookmarkCategoryData[]>(defaultBookmarkTree);
-    const [isCustom, setIsCustom] = useState(false);
+    const [bookmarkTree, setBookmarkTree] = useState<BookmarkCategoryData[]>(
+        initialBookmarkTree ?? defaultBookmarkTree
+    );
+    const [isCustom, setIsCustom] = useState(initialBookmarkTree !== undefined);
     const [status, setStatus] = useState<BookmarkStatus>();
     const mutationVersionRef = useRef(0);
 
     useEffect(() => {
+        if (initialBookmarkTree !== undefined) {
+            return;
+        }
+
         const storedBookmarkTree = getStoredBookmarkTree();
         if (storedBookmarkTree === undefined) {
             return;
@@ -208,7 +215,7 @@ export const useBookmarks = (
 
         setBookmarkTree(storedBookmarkTree);
         setIsCustom(true);
-    }, []);
+    }, [initialBookmarkTree]);
 
     const getAuthHeaders = useCallback(async (): Promise<
         Record<'Authorization', string> | undefined
@@ -333,6 +340,18 @@ export const useBookmarks = (
             return undefined;
         }
 
+        if (initialBookmarkTree !== undefined) {
+            setBookmarkTree(initialBookmarkTree);
+            setIsCustom(true);
+
+            try {
+                storeBookmarkTree(initialBookmarkTree, remoteUserId);
+            } catch {
+                // Keep the server copy as the source of truth.
+            }
+            return undefined;
+        }
+
         const cachedBookmarkTree = getStoredBookmarkTree(remoteUserId);
         if (cachedBookmarkTree !== undefined) {
             setBookmarkTree(cachedBookmarkTree);
@@ -387,6 +406,7 @@ export const useBookmarks = (
     }, [
         getAuthHeaders,
         getToken,
+        initialBookmarkTree,
         isAuthLoaded,
         remoteUserId,
         saveRemoteBookmarkTree,
