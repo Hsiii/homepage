@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { auth } from '@clerk/nextjs/server';
+import { preload } from 'react-dom';
 
 import { findTaiwanLocation } from '@/constants/taiwanLocations';
 import { getUserBookmarks } from '@/server/bookmarkStore';
@@ -88,6 +89,13 @@ export default async function Page(): Promise<ReactNode> {
         ),
         readInitialUserData(),
     ]);
+
+    if (initialUserData.wallpaper !== undefined) {
+        preload(initialUserData.wallpaper.url, {
+            as: 'image',
+            fetchPriority: 'high',
+        });
+    }
 
     return (
         <HomePageClient

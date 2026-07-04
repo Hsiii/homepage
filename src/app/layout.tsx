@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Quicksand as loadQuicksand } from 'next/font/google';
 
 import '@/index.css';
@@ -41,6 +41,27 @@ export const metadata: Metadata = {
         icon: '/assets/favicon.ico',
     },
     title: 'Homepage',
+};
+
+const getViewportThemeColor = ({
+    resolvedTheme,
+    themeColor,
+}: Awaited<ReturnType<typeof readInitialAppPreferences>>): string => {
+    if (resolvedTheme === 'dark') {
+        return themeColor === 'azure'
+            ? 'hsl(212, 54%, 18%)'
+            : 'hsl(220, 54%, 18%)';
+    }
+
+    return themeColor === 'azure' ? 'hsl(212, 42%, 82%)' : 'hsl(316, 42%, 82%)';
+};
+
+export const generateViewport = async (): Promise<Viewport> => {
+    const initialPreferences = await readInitialAppPreferences();
+
+    return {
+        themeColor: getViewportThemeColor(initialPreferences),
+    };
 };
 
 const themeInitScript = `
