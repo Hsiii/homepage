@@ -116,25 +116,6 @@
     }
 }
 
-.user-menu-profile {
-    min-height: 2.5rem;
-    padding: 0.25rem;
-    border-radius: 0.75rem;
-    background-color: var(--clr-text-alpha-2);
-
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.user-menu-profile .user-menu-name {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font: var(--fontBoldSm);
-}
-
 .user-card-name {
     min-width: 0;
     overflow: hidden;

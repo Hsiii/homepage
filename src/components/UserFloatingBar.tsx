@@ -106,19 +106,6 @@ const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
                 </button>
                 {isMenuOpen ? (
                     <div className='user-menu' role='menu'>
-                        <div className='user-menu-profile'>
-                            <span className='user-avatar' aria-hidden>
-                                {user?.imageUrl !== undefined &&
-                                user.imageUrl !== '' ? (
-                                    <img src={user.imageUrl} alt='' />
-                                ) : (
-                                    <UserRound className='icon' size={20} />
-                                )}
-                            </span>
-                            <span className='user-menu-name'>
-                                {profileLabel}
-                            </span>
-                        </div>
                         {isSignedIn ? (
                             <>
                                 <div className='user-menu-email'>
@@ -237,12 +224,6 @@ const UserFloatingBarFallback: React.FC<CloseableMenuProps> = ({
                 </button>
                 {isMenuOpen ? (
                     <div className='user-menu' role='menu'>
-                        <div className='user-menu-profile'>
-                            <span className='user-avatar' aria-hidden>
-                                <UserRound className='icon' size={20} />
-                            </span>
-                            <span className='user-menu-name'>Guest</span>
-                        </div>
                         <div className='user-menu-email'>
                             <Mail className='icon' size={16} />
                             <span>Missing Clerk publishable key</span>
