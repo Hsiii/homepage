@@ -1,4 +1,6 @@
 export const defaultLocale = 'en';
+export const localeCookieName = 'homepage_locale';
+export const localeStorageKey = 'homepage_locale';
 
 export const localeOptions = [
     {
@@ -122,7 +124,9 @@ const messages = {
 
 export type I18nMessages = (typeof messages)[AppLocale];
 
-export function isAppLocale(value: string | null): value is AppLocale {
+export function isAppLocale(
+    value: string | null | undefined
+): value is AppLocale {
     return localeOptions.some((option) => option.value === value);
 }
 

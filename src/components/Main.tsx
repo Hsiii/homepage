@@ -2,13 +2,13 @@ import React from 'react';
 
 import { footerCredit, footerLink } from '@/constants/footer';
 import type { AqiData, WeatherData } from '@/types/environment';
+import type { InitialAppPreferences } from '@/types/preferences';
 import type { WallpaperAsset } from '../../shared/wallpaper';
 import { Cover } from './Cover';
 
 interface MainProps {
-    hasInitialLocationCookie: boolean;
     initialAqi: AqiData | undefined;
-    initialLocationId: string;
+    initialPreferences: InitialAppPreferences;
     initialWallpaper: WallpaperAsset | undefined;
     initialWeather: WeatherData | undefined;
     isClerkEnabled: boolean;
@@ -16,9 +16,8 @@ interface MainProps {
 }
 
 export const Main: React.FC<MainProps> = ({
-    hasInitialLocationCookie,
     initialAqi,
-    initialLocationId,
+    initialPreferences,
     initialWallpaper,
     initialWeather,
     isClerkEnabled,
@@ -27,9 +26,8 @@ export const Main: React.FC<MainProps> = ({
     <>
         <main>
             <Cover
-                hasInitialLocationCookie={hasInitialLocationCookie}
                 initialAqi={initialAqi}
-                initialLocationId={initialLocationId}
+                initialPreferences={initialPreferences}
                 initialWallpaper={initialWallpaper}
                 initialWeather={initialWeather}
                 isClerkEnabled={isClerkEnabled}

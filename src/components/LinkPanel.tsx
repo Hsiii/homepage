@@ -6,6 +6,7 @@ import { decorateBookmarkTree } from '@/constants/linkTree';
 import type { BookmarkControls } from '@/hooks/useBookmarks';
 import { useLinkNavigation } from '@/hooks/useLinkNavigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import type { InitialAppPreferences } from '@/types/preferences';
 import { isBrowser } from '@/utils/browserEnv';
 import type { WallpaperAsset } from '../../shared/wallpaper';
 import { LinkCategory } from './LinkCategory';
@@ -20,6 +21,7 @@ interface LinkPanelProps {
     isSearchNav: boolean;
     highlightedLink?: string;
     highlightedCategory?: number;
+    initialPreferences: InitialAppPreferences;
     onClearSearch: () => void;
     onToggleLockedOpen: () => void;
     initialWallpaper: WallpaperAsset | undefined;
@@ -34,6 +36,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
     isSearchNav,
     highlightedLink,
     highlightedCategory,
+    initialPreferences,
     onClearSearch,
     onToggleLockedOpen,
     initialWallpaper,
@@ -164,6 +167,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                 <UserFloatingBar
                     bookmarkControls={bookmarkControls}
                     closeMenusSignal={mouseLeaveCloseSignal}
+                    initialPreferences={initialPreferences}
                     initialWallpaper={initialWallpaper}
                     isClerkEnabled={isClerkEnabled}
                     onWallpaperChange={onWallpaperChange}

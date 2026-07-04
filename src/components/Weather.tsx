@@ -17,6 +17,7 @@ import { useAqiWithInitialData } from '@/hooks/useAqi';
 import { useLocale } from '@/hooks/useLocale';
 import { useWeatherWithInitialData } from '@/hooks/useWeather';
 import type { AqiData, WeatherData } from '@/types/environment';
+import type { InitialAppPreferences } from '@/types/preferences';
 
 const weatherIcons = {
     Thunderstorm: <CloudLightning size={20} />,
@@ -29,16 +30,14 @@ const weatherIcons = {
 const locationGrantFeedbackDuration = 1600;
 
 interface WeatherProps {
-    hasInitialLocationCookie: boolean;
     initialAqi: AqiData | undefined;
-    initialLocationId: string;
+    initialPreferences: InitialAppPreferences;
     initialWeather: WeatherData | undefined;
 }
 
 export const Weather: React.FC<WeatherProps> = ({
-    hasInitialLocationCookie,
     initialAqi,
-    initialLocationId,
+    initialPreferences,
     initialWeather,
 }) => {
     const {
@@ -50,16 +49,16 @@ export const Weather: React.FC<WeatherProps> = ({
         selectedLocation,
         syncCurrentLocation,
     } = useWeatherWithInitialData({
-        hasInitialLocationCookie,
-        initialLocationId,
+        hasInitialLocationCookie: initialPreferences.hasLocationCookie,
+        initialLocationId: initialPreferences.locationId,
         initialWeather,
     });
     const { aqi } = useAqiWithInitialData({
-        hasInitialLocationCookie,
+        hasInitialLocationCookie: initialPreferences.hasLocationCookie,
         initialAqi,
-        initialLocationId,
+        initialLocationId: initialPreferences.locationId,
     });
-    const { locale, t } = useLocale();
+    const { locale, t } = useLocale(initialPreferences.locale);
     const [showLocationGranted, setShowLocationGranted] = useState(false);
     const hasWeather = weather !== undefined;
     const hasAqi = aqi !== undefined;

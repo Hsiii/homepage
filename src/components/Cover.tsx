@@ -8,6 +8,7 @@ import { useBookmarkSearch } from '@/hooks/useBookmarkSearch';
 import { useHideLinks } from '@/hooks/useHideLinks';
 import { useTime } from '@/hooks/useTime';
 import type { AqiData, WeatherData } from '@/types/environment';
+import type { InitialAppPreferences } from '@/types/preferences';
 import type { WallpaperAsset } from '../../shared/wallpaper';
 import { Mountains } from './Mountains';
 import { SearchSuggestions } from './SearchSuggestions';
@@ -27,9 +28,8 @@ const Weather = lazy(
 );
 
 interface CoverProps {
-    hasInitialLocationCookie: boolean;
     initialAqi: AqiData | undefined;
-    initialLocationId: string;
+    initialPreferences: InitialAppPreferences;
     initialWallpaper: WallpaperAsset | undefined;
     initialWeather: WeatherData | undefined;
     isClerkEnabled: boolean;
@@ -42,9 +42,8 @@ interface CoverContentProps extends CoverProps {
 
 const CoverContent: React.FC<CoverContentProps> = ({
     bookmarkControls,
-    hasInitialLocationCookie,
     initialAqi,
-    initialLocationId,
+    initialPreferences,
     initialWallpaper,
     initialWeather,
     isClerkEnabled,
@@ -94,11 +93,8 @@ const CoverContent: React.FC<CoverContentProps> = ({
                     <div className='weather-slot'>
                         <Suspense fallback={undefined}>
                             <Weather
-                                hasInitialLocationCookie={
-                                    hasInitialLocationCookie
-                                }
                                 initialAqi={initialAqi}
-                                initialLocationId={initialLocationId}
+                                initialPreferences={initialPreferences}
                                 initialWeather={initialWeather}
                             />
                         </Suspense>
@@ -197,6 +193,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
                 <LinkPanel
                     bookmarkControls={bookmarkControls}
                     hidden={hideLinks}
+                    initialPreferences={initialPreferences}
                     initialWallpaper={initialWallpaper}
                     isClerkEnabled={isClerkEnabled}
                     isLockedOpen={isLinkPanelLocked}

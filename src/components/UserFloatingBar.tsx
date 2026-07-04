@@ -3,6 +3,7 @@ import { useClerk, useUser } from '@clerk/nextjs';
 import { LogIn, LogOut, Mail, UserRound, UserRoundPlus } from 'lucide-react';
 
 import type { BookmarkControls } from '@/hooks/useBookmarks';
+import type { InitialAppPreferences } from '@/types/preferences';
 import type { WallpaperAsset } from '../../shared/wallpaper';
 import { SettingsMenu } from './SettingsMenu';
 import { WallpaperSettingsMenu } from './WallpaperSettingsMenu';
@@ -10,6 +11,7 @@ import { WallpaperSettingsMenu } from './WallpaperSettingsMenu';
 interface UserFloatingBarProps {
     bookmarkControls: BookmarkControls;
     closeMenusSignal?: number;
+    initialPreferences: InitialAppPreferences;
     initialWallpaper: WallpaperAsset | undefined;
     isClerkEnabled: boolean;
     onWallpaperChange: (wallpaper: WallpaperAsset | undefined) => void;
@@ -18,6 +20,7 @@ interface UserFloatingBarProps {
 interface CloseableMenuProps {
     bookmarkControls: BookmarkControls;
     closeMenusSignal?: number;
+    initialPreferences: InitialAppPreferences;
     initialWallpaper?: WallpaperAsset | undefined;
     onWallpaperChange?: (wallpaper: WallpaperAsset | undefined) => void;
 }
@@ -37,6 +40,7 @@ const getDisplayName = (emailAddress?: string, name?: string | null) => {
 const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
     bookmarkControls,
     closeMenusSignal,
+    initialPreferences,
     initialWallpaper,
     onWallpaperChange,
 }) => {
@@ -170,6 +174,7 @@ const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
             <WallpaperSettingsMenu
                 bookmarkControls={bookmarkControls}
                 closeSignal={closeMenusSignal}
+                initialPreferences={initialPreferences}
                 initialWallpaper={initialWallpaper}
                 onWallpaperChange={onWallpaperChange}
                 placement='above'
@@ -181,6 +186,7 @@ const UserFloatingBarContent: React.FC<CloseableMenuProps> = ({
 const UserFloatingBarFallback: React.FC<CloseableMenuProps> = ({
     bookmarkControls,
     closeMenusSignal,
+    initialPreferences,
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -247,6 +253,7 @@ const UserFloatingBarFallback: React.FC<CloseableMenuProps> = ({
             <SettingsMenu
                 bookmarkControls={bookmarkControls}
                 closeSignal={closeMenusSignal}
+                initialPreferences={initialPreferences}
                 placement='above'
             />
         </div>
@@ -256,6 +263,7 @@ const UserFloatingBarFallback: React.FC<CloseableMenuProps> = ({
 export const UserFloatingBar: React.FC<UserFloatingBarProps> = ({
     bookmarkControls,
     closeMenusSignal,
+    initialPreferences,
     initialWallpaper,
     isClerkEnabled,
     onWallpaperChange,
@@ -265,6 +273,7 @@ export const UserFloatingBar: React.FC<UserFloatingBarProps> = ({
             <UserFloatingBarContent
                 bookmarkControls={bookmarkControls}
                 closeMenusSignal={closeMenusSignal}
+                initialPreferences={initialPreferences}
                 initialWallpaper={initialWallpaper}
                 onWallpaperChange={onWallpaperChange}
             />
@@ -275,6 +284,7 @@ export const UserFloatingBar: React.FC<UserFloatingBarProps> = ({
         <UserFloatingBarFallback
             bookmarkControls={bookmarkControls}
             closeMenusSignal={closeMenusSignal}
+            initialPreferences={initialPreferences}
         />
     );
 };

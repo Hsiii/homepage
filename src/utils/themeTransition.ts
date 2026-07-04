@@ -1,7 +1,7 @@
 import type { ThemeMode } from '@/constants/theme';
 import { themeResolvedStorageKey, themeStorageKey } from '@/constants/theme';
 import { createBlobPath } from '@/hooks/themeTransitionUtils';
-import { writePreferenceCookie } from '@/utils/themeCookies';
+import { writePreferenceCookie } from '@/utils/preferenceCookies';
 
 interface ThemeTransitionOptions {
     button: HTMLButtonElement;

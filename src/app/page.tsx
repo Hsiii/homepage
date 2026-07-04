@@ -1,12 +1,9 @@
 import type { ReactNode } from 'react';
 import { auth } from '@clerk/nextjs/server';
-import { cookies } from 'next/headers';
 
-import {
-    findTaiwanLocation,
-    taiwanLocationCookieName,
-} from '@/constants/taiwanLocations';
+import { findTaiwanLocation } from '@/constants/taiwanLocations';
 import { fetchAqiData, fetchWeatherData } from '@/server/environmentData';
+import { readInitialAppPreferences } from '@/server/preferences';
 import { getUserWallpaper } from '@/server/wallpaperStore';
 import type { WallpaperAsset } from '../../shared/wallpaper';
 import { HomePageClient } from './HomePageClient';
@@ -33,9 +30,8 @@ const readInitialWallpaper = async (): Promise<WallpaperAsset | undefined> => {
 export const dynamic = 'force-dynamic';
 
 export default async function Page(): Promise<ReactNode> {
-    const cookieStore = await cookies();
-    const locationCookie = cookieStore.get(taiwanLocationCookieName);
-    const initialLocation = findTaiwanLocation(locationCookie?.value);
+    const initialPreferences = await readInitialAppPreferences();
+    const initialLocation = findTaiwanLocation(initialPreferences.locationId);
     const [initialWeather, initialAqi, initialWallpaper] = await Promise.all([
         fetchWeatherData(initialLocation).catch((error: unknown) => {
             console.error('Failed to read initial weather:', error);
@@ -50,9 +46,8 @@ export default async function Page(): Promise<ReactNode> {
 
     return (
         <HomePageClient
-            hasInitialLocationCookie={locationCookie !== undefined}
             initialAqi={initialAqi}
-            initialLocationId={initialLocation.id}
+            initialPreferences={initialPreferences}
             initialWallpaper={initialWallpaper}
             initialWeather={initialWeather}
             isClerkEnabled={isClerkEnabled}

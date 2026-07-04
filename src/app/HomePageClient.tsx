@@ -4,21 +4,20 @@ import { useState } from 'react';
 
 import { Main } from '@/components/Main';
 import type { AqiData, WeatherData } from '@/types/environment';
+import type { InitialAppPreferences } from '@/types/preferences';
 import type { WallpaperAsset } from '../../shared/wallpaper';
 
 interface HomePageClientProps {
-    hasInitialLocationCookie: boolean;
     initialAqi: AqiData | undefined;
-    initialLocationId: string;
+    initialPreferences: InitialAppPreferences;
     initialWallpaper: WallpaperAsset | undefined;
     initialWeather: WeatherData | undefined;
     isClerkEnabled: boolean;
 }
 
 export const HomePageClient: React.FC<HomePageClientProps> = ({
-    hasInitialLocationCookie,
     initialAqi,
-    initialLocationId,
+    initialPreferences,
     initialWallpaper,
     initialWeather,
     isClerkEnabled,
@@ -27,9 +26,8 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({
 
     return (
         <Main
-            hasInitialLocationCookie={hasInitialLocationCookie}
             initialAqi={initialAqi}
-            initialLocationId={initialLocationId}
+            initialPreferences={initialPreferences}
             initialWallpaper={wallpaper}
             initialWeather={initialWeather}
             isClerkEnabled={isClerkEnabled}

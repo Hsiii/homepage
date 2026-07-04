@@ -37,11 +37,12 @@ import type { BookmarkControls } from '@/hooks/useBookmarks';
 import { useLocale } from '@/hooks/useLocale';
 import { useTaiwanLocation } from '@/hooks/useTaiwanLocation';
 import type { WallpaperControls } from '@/hooks/useWallpaper';
+import type { InitialAppPreferences } from '@/types/preferences';
 import { isBrowser } from '@/utils/browserEnv';
 import {
     clearPreferenceCookie,
     writePreferenceCookie,
-} from '@/utils/themeCookies';
+} from '@/utils/preferenceCookies';
 import { runThemeTransition } from '@/utils/themeTransition';
 import { getCssUrlValue } from '@/utils/wallpaperStyle';
 import { wallpaperAcceptedContentTypes } from '../../shared/wallpaper';
@@ -66,9 +67,11 @@ interface SettingsDropdownProps {
     value: string;
 }
 
-const getInitialAnimationMode = (): AnimationMode => {
+const getInitialAnimationMode = (
+    initialAnimationMode: AnimationMode
+): AnimationMode => {
     if (!isBrowser()) {
-        return normalAnimationMode;
+        return initialAnimationMode;
     }
 
     const savedAnimationMode =
@@ -77,19 +80,19 @@ const getInitialAnimationMode = (): AnimationMode => {
 
     return isAnimationMode(savedAnimationMode)
         ? savedAnimationMode
-        : normalAnimationMode;
+        : initialAnimationMode;
 };
 
-const getInitialThemeMode = (): ThemeMode => {
+const getInitialThemeMode = (initialThemeMode: ThemeMode): ThemeMode => {
     if (!isBrowser()) {
-        return 'system';
+        return initialThemeMode;
     }
 
     const savedThemeMode =
         globalThis.document.documentElement.dataset.themeMode ??
         globalThis.localStorage.getItem(themeStorageKey);
 
-    return isThemeMode(savedThemeMode) ? savedThemeMode : 'system';
+    return isThemeMode(savedThemeMode) ? savedThemeMode : initialThemeMode;
 };
 
 const getSystemTheme = (): Exclude<ThemeMode, 'system'> =>
@@ -296,6 +299,7 @@ const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
 interface SettingsMenuProps {
     bookmarkControls: BookmarkControls;
     closeSignal?: number;
+    initialPreferences: InitialAppPreferences;
     placement?: 'above' | 'below';
     wallpaperControls?: WallpaperControls;
 }
@@ -303,6 +307,7 @@ interface SettingsMenuProps {
 export const SettingsMenu: React.FC<SettingsMenuProps> = ({
     bookmarkControls,
     closeSignal,
+    initialPreferences,
     placement = 'below',
     wallpaperControls,
 }) => {
@@ -311,12 +316,17 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
         selectLocationId,
         selectedLocation,
         syncCurrentLocation,
-    } = useTaiwanLocation();
-    const { locale, setLocale, t } = useLocale();
+    } = useTaiwanLocation({
+        hasInitialLocationCookie: initialPreferences.hasLocationCookie,
+        initialLocationId: initialPreferences.locationId,
+    });
+    const { locale, setLocale, t } = useLocale(initialPreferences.locale);
     const [isOpen, setIsOpen] = useState(false);
-    const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialThemeMode);
-    const [animationMode, setAnimationMode] = useState<AnimationMode>(
-        getInitialAnimationMode
+    const [themeMode, setThemeMode] = useState<ThemeMode>(() =>
+        getInitialThemeMode(initialPreferences.themeMode)
+    );
+    const [animationMode, setAnimationMode] = useState<AnimationMode>(() =>
+        getInitialAnimationMode(initialPreferences.animationMode)
     );
     const [isBookmarkManagerOpen, setIsBookmarkManagerOpen] = useState(false);
     const [selectedThemeColor, setSelectedThemeColor] = useState<ThemeColor>(
@@ -331,7 +341,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
 
             return isThemeColor(savedThemeColor)
                 ? savedThemeColor
-                : defaultThemeColor;
+                : initialPreferences.themeColor;
         }
     );
     const [openDropdownId, setOpenDropdownId] = useState<string>();

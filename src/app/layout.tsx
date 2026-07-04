@@ -2,7 +2,6 @@ import type { CSSProperties, ReactNode } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Quicksand as loadQuicksand } from 'next/font/google';
-import { cookies } from 'next/headers';
 
 import '@/index.css';
 import '@/components/Controls.css';
@@ -12,25 +11,20 @@ import '@/components/Main.css';
 import '@/components/Mountains.css';
 import '@/components/Weather.css';
 
-import type {
-    AnimationMode,
-    ResolvedTheme,
-    ThemeColor,
-    ThemeMode,
-} from '@/constants/theme';
+import {
+    defaultLocale,
+    localeCookieName,
+    localeStorageKey,
+} from '@/constants/i18n';
 import {
     animationStorageKey,
     defaultThemeColor,
-    isAnimationMode,
-    isResolvedTheme,
-    isThemeColor,
-    isThemeMode,
-    normalAnimationMode,
     themeColorStorageKey,
     themePreferenceCookieMaxAgeSeconds,
     themeResolvedStorageKey,
     themeStorageKey,
 } from '@/constants/theme';
+import { readInitialAppPreferences } from '@/server/preferences';
 
 const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 const quicksand = loadQuicksand({
@@ -54,11 +48,16 @@ const themeInitScript = `
     try {
         var animationStorageKey = ${JSON.stringify(animationStorageKey)};
         var defaultThemeColor = ${JSON.stringify(defaultThemeColor)};
+        var defaultLocale = ${JSON.stringify(defaultLocale)};
+        var localeCookieName = ${JSON.stringify(localeCookieName)};
+        var localeStorageKey = ${JSON.stringify(localeStorageKey)};
         var themeColorStorageKey = ${JSON.stringify(themeColorStorageKey)};
         var themeResolvedStorageKey = ${JSON.stringify(themeResolvedStorageKey)};
         var themeStorageKey = ${JSON.stringify(themeStorageKey)};
         var cookieMaxAge = ${themePreferenceCookieMaxAgeSeconds};
         var root = document.documentElement;
+        var secureAttribute =
+            location.protocol === 'https:' ? '; Secure' : '';
         var readCookie = function (key) {
             return document.cookie
                 .split('; ')
@@ -94,10 +93,14 @@ const themeInitScript = `
                 encodeURIComponent(value) +
                 '; Path=/; Max-Age=' +
                 cookieMaxAge +
-                '; SameSite=Lax';
+                '; SameSite=Lax' +
+                secureAttribute;
         };
         var clearCookie = function (key) {
-            document.cookie = key + '=; Path=/; Max-Age=0; SameSite=Lax';
+            document.cookie =
+                key +
+                '=; Path=/; Max-Age=0; SameSite=Lax' +
+                secureAttribute;
         };
         var writeStorage = function (key, value) {
             try {
@@ -118,10 +121,15 @@ const themeInitScript = `
         var isThemeMode = function (value) {
             return value === 'system' || value === 'light' || value === 'dark';
         };
+        var isLocale = function (value) {
+            return value === 'en' || value === 'zh-TW';
+        };
         var storedAnimationMode = readStorage(animationStorageKey);
+        var storedLocale = readStorage(localeStorageKey);
         var storedThemeColor = readStorage(themeColorStorageKey);
         var storedThemeMode = readStorage(themeStorageKey);
         var cookieAnimationMode = readCookie(animationStorageKey);
+        var cookieLocale = readCookie(localeCookieName);
         var cookieThemeColor = readCookie(themeColorStorageKey);
         var cookieThemeMode = readCookie(themeStorageKey);
         var animationMode = isAnimationMode(storedAnimationMode)
@@ -139,6 +147,11 @@ const themeInitScript = `
             : isThemeColor(cookieThemeColor)
               ? cookieThemeColor
               : defaultThemeColor;
+        var locale = isLocale(storedLocale)
+            ? storedLocale
+            : isLocale(cookieLocale)
+              ? cookieLocale
+              : defaultLocale;
         var systemDark =
             typeof matchMedia === 'function' &&
             matchMedia('(prefers-color-scheme: dark)').matches;
@@ -150,10 +163,13 @@ const themeInitScript = `
         root.dataset.animationMode = animationMode;
         root.dataset.theme = resolvedTheme;
         root.dataset.themeMode = themeMode;
+        root.lang = locale;
         root.style.colorScheme = resolvedTheme;
         writeStorage(animationStorageKey, animationMode);
+        writeStorage(localeStorageKey, locale);
         writeStorage(themeStorageKey, themeMode);
         writeCookie(animationStorageKey, animationMode);
+        writeCookie(localeCookieName, locale);
         writeCookie(themeStorageKey, themeMode);
         writeCookie(themeResolvedStorageKey, resolvedTheme);
 
@@ -170,76 +186,27 @@ const themeInitScript = `
 })();
 `;
 
-interface InitialThemePreferences {
-    animationMode: AnimationMode;
-    resolvedTheme: ResolvedTheme;
-    themeColor?: ThemeColor;
-    themeMode: ThemeMode;
-}
-
-const getInitialResolvedTheme = (
-    themeMode: ThemeMode,
-    resolvedThemeCookie: string | undefined
-): ResolvedTheme => {
-    if (isResolvedTheme(themeMode)) {
-        return themeMode;
-    }
-
-    if (isResolvedTheme(resolvedThemeCookie)) {
-        return resolvedThemeCookie;
-    }
-
-    return 'light';
-};
-
-const getInitialThemePreferences =
-    async (): Promise<InitialThemePreferences> => {
-        const cookieStore = await cookies();
-        const themeModeCookie = cookieStore.get(themeStorageKey)?.value;
-        const resolvedThemeCookie = cookieStore.get(
-            themeResolvedStorageKey
-        )?.value;
-        const animationModeCookie = cookieStore.get(animationStorageKey)?.value;
-        const themeColorCookie = cookieStore.get(themeColorStorageKey)?.value;
-        const themeMode = isThemeMode(themeModeCookie)
-            ? themeModeCookie
-            : 'system';
-        const resolvedTheme = getInitialResolvedTheme(
-            themeMode,
-            resolvedThemeCookie
-        );
-        const themeColor = isThemeColor(themeColorCookie)
-            ? themeColorCookie
-            : defaultThemeColor;
-
-        return {
-            animationMode: isAnimationMode(animationModeCookie)
-                ? animationModeCookie
-                : normalAnimationMode,
-            resolvedTheme,
-            themeColor:
-                themeColor === defaultThemeColor ? undefined : themeColor,
-            themeMode,
-        };
-    };
-
 export default async function RootLayout({
     children,
 }: Readonly<{
     children: ReactNode;
 }>): Promise<ReactNode> {
-    const themePreferences = await getInitialThemePreferences();
+    const initialPreferences = await readInitialAppPreferences();
     const htmlStyle = {
-        colorScheme: themePreferences.resolvedTheme,
+        colorScheme: initialPreferences.resolvedTheme,
     } satisfies CSSProperties;
     const documentMarkup = (
         <html
-            lang='en'
+            lang={initialPreferences.locale}
             className={quicksand.variable}
-            data-animation-mode={themePreferences.animationMode}
-            data-theme={themePreferences.resolvedTheme}
-            data-theme-color={themePreferences.themeColor}
-            data-theme-mode={themePreferences.themeMode}
+            data-animation-mode={initialPreferences.animationMode}
+            data-theme={initialPreferences.resolvedTheme}
+            data-theme-color={
+                initialPreferences.themeColor === defaultThemeColor
+                    ? undefined
+                    : initialPreferences.themeColor
+            }
+            data-theme-mode={initialPreferences.themeMode}
             style={htmlStyle}
             suppressHydrationWarning
         >

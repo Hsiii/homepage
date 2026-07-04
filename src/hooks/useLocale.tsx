@@ -1,20 +1,31 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import type { AppLocale } from '@/constants/i18n';
-import { defaultLocale, getMessages, isAppLocale } from '@/constants/i18n';
+import {
+    defaultLocale,
+    getMessages,
+    isAppLocale,
+    localeCookieName,
+    localeStorageKey,
+} from '@/constants/i18n';
 import { isBrowser } from '@/utils/browserEnv';
+import { writePreferenceCookie } from '@/utils/preferenceCookies';
 
 const LOCALE_CHANGE_EVENT = 'homepage-locale-change';
-const LOCALE_STORAGE_KEY = 'homepage_locale';
 
-function getInitialLocale(): AppLocale {
+function getInitialLocale(initialLocale: AppLocale = defaultLocale): AppLocale {
     if (!isBrowser()) {
-        return defaultLocale;
+        return initialLocale;
     }
 
-    const savedLocale = globalThis.localStorage.getItem(LOCALE_STORAGE_KEY);
+    const documentLocale = globalThis.document.documentElement.lang;
+    if (isAppLocale(documentLocale)) {
+        return documentLocale;
+    }
 
-    return isAppLocale(savedLocale) ? savedLocale : defaultLocale;
+    const savedLocale = globalThis.localStorage.getItem(localeStorageKey);
+
+    return isAppLocale(savedLocale) ? savedLocale : initialLocale;
 }
 
 function getLocaleFromEvent(event: Event): AppLocale | undefined {
@@ -25,15 +36,20 @@ function getLocaleFromEvent(event: Event): AppLocale | undefined {
     return event.detail;
 }
 
-export const useLocale = (): {
+export const useLocale = (
+    initialLocale: AppLocale = defaultLocale
+): {
     locale: AppLocale;
     setLocale: (locale: AppLocale) => void;
     t: ReturnType<typeof getMessages>;
 } => {
-    const [locale, setLocaleState] = useState(getInitialLocale);
+    const [locale, setLocaleState] = useState(() =>
+        getInitialLocale(initialLocale)
+    );
 
     const setLocale = useCallback((nextLocale: AppLocale) => {
-        globalThis.localStorage.setItem(LOCALE_STORAGE_KEY, nextLocale);
+        globalThis.localStorage.setItem(localeStorageKey, nextLocale);
+        writePreferenceCookie(localeCookieName, nextLocale);
         globalThis.document.documentElement.lang = nextLocale;
         setLocaleState(nextLocale);
         globalThis.dispatchEvent(
