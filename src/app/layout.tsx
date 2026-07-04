@@ -23,6 +23,9 @@ const quicksand = loadQuicksand({
 export const metadata: Metadata = {
     description:
         'A fast personal browser homepage for search, bookmarks, weather, and AQI.',
+    icons: {
+        icon: '/assets/favicon.ico',
+    },
     title: 'Homepage',
 };
 
