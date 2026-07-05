@@ -626,6 +626,7 @@
 }
 
 .bookmark-manager-dialog {
+    --bookmark-manager-action-reveal-offset: 0.5rem;
     --bookmark-manager-dialog-width: 44rem;
     --bookmark-manager-pane-padding: 0.75rem;
     --bookmark-manager-row-gap: 0.25rem;
@@ -860,6 +861,24 @@
     display: flex;
     align-items: center;
     gap: var(--bookmark-manager-row-gap);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .bookmark-manager-row-actions {
+        opacity: 0;
+        pointer-events: none;
+        translate: var(--bookmark-manager-action-reveal-offset) 0;
+        transition:
+            opacity var(--motion-duration-fast) var(--motion-ease-out),
+            translate var(--motion-duration-fast) var(--motion-ease-out);
+    }
+
+    .bookmark-manager-browser-row:hover .bookmark-manager-row-actions,
+    .bookmark-manager-browser-row:focus-within .bookmark-manager-row-actions {
+        opacity: 1;
+        pointer-events: auto;
+        translate: 0 0;
+    }
 }
 
 .bookmark-manager-icon-button,
