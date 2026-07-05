@@ -40,6 +40,13 @@ body {
     line-height: 1.5;
 }
 
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
 p,
 li {
     text-wrap: pretty;
