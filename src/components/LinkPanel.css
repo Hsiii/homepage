@@ -453,15 +453,19 @@
     }
 }
 
-.hoverEffective .category:hover,
-.hoverEffective .category:has(+ .links:hover),
+.link-panel:not(.category-layer-locked) .hoverEffective .category:hover,
+.link-panel:not(.category-layer-locked)
+    .hoverEffective
+    .category:has(+ .links:hover),
 .category.selected,
 .category.clicked {
     translate: 1rem;
 }
 
-.hoverEffective .category:hover::before,
-.hoverEffective .category:has(+ .links:hover)::before {
+.link-panel:not(.category-layer-locked) .hoverEffective .category:hover::before,
+.link-panel:not(.category-layer-locked)
+    .hoverEffective
+    .category:has(+ .links:hover)::before {
     width: calc(var(--width) + 1rem);
     translate: -1rem;
     opacity: var(--bookmark-category-hover-opacity);
@@ -628,7 +632,8 @@
         border-bottom-right-radius: var(--bookmark-row-radius);
     }
 
-    .folder-node:hover > .bookmark-submenu,
+    .folder-node:not(.layer-locked):hover > .bookmark-submenu,
+    .folder-node.clicked:hover > .bookmark-submenu,
     .folder-node:focus-within > .bookmark-submenu,
     .folder-node.expanded > .bookmark-submenu {
         opacity: 1;
@@ -641,7 +646,10 @@
     }
 }
 
-.hoverEffective .category:hover + .links,
+.link-panel:not(.category-layer-locked)
+    .hoverEffective
+    .category:hover
+    + .links,
 .category.selected + .links,
 .category.clicked + .links,
 .hoverEffective .links:hover,
@@ -659,7 +667,8 @@
     background: var(--bookmark-item-clicked-bg);
 }
 
-.hoverEffective .link:hover {
+.hoverEffective .bookmark-node:not(.layer-locked) > .link:hover,
+.hoverEffective .bookmark-node.layer-locked.clicked > .link:hover {
     text-decoration: none;
     color: var(--clr-secondary);
     background: var(--bookmark-item-hover-bg);

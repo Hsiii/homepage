@@ -86,6 +86,13 @@ const isFolderPathPrefix = (
     candidatePath.length >= folderPath.length &&
     folderPath.every((folderId, index) => folderId === candidatePath[index]);
 
+const areFolderPathsEqual = (
+    firstPath: readonly string[],
+    secondPath: readonly string[]
+): boolean =>
+    firstPath.length === secondPath.length &&
+    firstPath.every((folderId, index) => folderId === secondPath[index]);
+
 const getFlattenedBookmarkLinks = (
     nodes: readonly BookmarkNodeData[],
     path: readonly string[] = []
@@ -125,6 +132,13 @@ const BookmarkFolderNode: React.FC<BookmarkFolderNodeProps> = ({
     const submenuRef = useRef<HTMLDivElement>(null);
     const folderPath = [...currentFolderPath, node.id];
     const isClicked = isFolderPathPrefix(folderPath, clickedFolderPath);
+    const isFolderLayerLocked =
+        isFolderPathPrefix(currentFolderPath, clickedFolderPath) &&
+        clickedFolderPath.length > currentFolderPath.length;
+    const isLinkLayerLocked =
+        clickedLinkId !== undefined &&
+        areFolderPathsEqual(currentFolderPath, clickedFolderPath);
+    const isLayerLocked = isFolderLayerLocked || isLinkLayerLocked;
     const isHighlighted = highlightedFolderPath?.[depth] === node.id;
     const isExpanded = isHighlighted || isClicked;
     const updateSubmenuPlacement = useCallback(() => {
@@ -173,6 +187,7 @@ const BookmarkFolderNode: React.FC<BookmarkFolderNodeProps> = ({
                 'folder-node',
                 isExpanded && 'expanded',
                 isClicked && 'clicked',
+                isLayerLocked && 'layer-locked',
             ]
                 .filter(Boolean)
                 .join(' ')}
@@ -239,6 +254,13 @@ const BookmarkNodeList: React.FC<BookmarkNodeListProps> = ({
 }) => {
     const visibleNodes =
         depth >= maxCascadeDepth ? getFlattenedBookmarkLinks(nodes) : nodes;
+    const isFolderLayerLocked =
+        isFolderPathPrefix(currentFolderPath, clickedFolderPath) &&
+        clickedFolderPath.length > currentFolderPath.length;
+    const isLinkLayerLocked =
+        clickedLinkId !== undefined &&
+        areFolderPathsEqual(currentFolderPath, clickedFolderPath);
+    const isLayerLocked = isFolderLayerLocked || isLinkLayerLocked;
 
     return (
         <>
@@ -278,7 +300,14 @@ const BookmarkNodeList: React.FC<BookmarkNodeListProps> = ({
 
                 return (
                     <div
-                        className='bookmark-node'
+                        className={[
+                            'bookmark-node',
+                            'link-node',
+                            isClicked && 'clicked',
+                            isLayerLocked && 'layer-locked',
+                        ]
+                            .filter(Boolean)
+                            .join(' ')}
                         key={`${node.id}-${node.title}`}
                     >
                         <a

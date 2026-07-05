@@ -136,12 +136,16 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
             folderPath: readonly string[],
             linkId: string
         ) => {
+            const isSameLockedLink =
+                clickedLinkId === linkId &&
+                areFolderPathsEqual(clickedFolderPath, folderPath);
+
             setClickedCategory(categoryIndex);
             setClickedFolderPath([...folderPath]);
-            setClickedLinkId(linkId);
+            setClickedLinkId(isSameLockedLink ? undefined : linkId);
             onClearSearch();
         },
-        [onClearSearch]
+        [clickedFolderPath, clickedLinkId, onClearSearch]
     );
 
     const panelPaddings = useMemo(() => {
@@ -172,6 +176,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                 'link-panel',
                 isMouseNav && 'hoverEffective',
                 isSearchNav && 'search-nav',
+                clickedCategory !== undefined && 'category-layer-locked',
             ]
                 .filter(Boolean)
                 .join(' ')}
