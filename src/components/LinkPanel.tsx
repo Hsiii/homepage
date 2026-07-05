@@ -5,10 +5,12 @@ import { mobileViewportQuery } from '@/constants/breakpoints';
 import { decorateBookmarkTree } from '@/constants/linkTree';
 import type { BookmarkControls } from '@/hooks/useBookmarks';
 import { useLinkNavigation } from '@/hooks/useLinkNavigation';
+import { useLocale } from '@/hooks/useLocale';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import type { InitialAppPreferences } from '@/types/preferences';
 import { isBrowser } from '@/utils/browserEnv';
 import type { WallpaperAsset } from '../../shared/wallpaper';
+import { BookmarkEmptyState } from './BookmarkEmptyState';
 import { LinkCategory } from './LinkCategory';
 import { MobileBookmarks } from './MobileBookmarks';
 import { UserFloatingBar } from './UserFloatingBar';
@@ -49,6 +51,7 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
         startMouseNav,
         endMouseNav,
     } = useLinkNavigation(isSearchNav, onClearSearch, highlightedCategory);
+    const { t } = useLocale(initialPreferences.locale);
 
     const [windowHeight, setWindowHeight] = useState(() =>
         isBrowser() ? globalThis.innerHeight : 768
@@ -60,6 +63,10 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
         () => decorateBookmarkTree(bookmarkControls.bookmarkTree),
         [bookmarkControls.bookmarkTree]
     );
+    const bookmarkStatusMessage =
+        bookmarkControls.status === undefined
+            ? undefined
+            : t[bookmarkControls.status.messageKey];
 
     useEffect(() => {
         const onResize = () => {
@@ -115,7 +122,19 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
             {isMobileViewport && (
                 <MobileBookmarks
                     bookmarkTree={bookmarkTree}
+                    bookmarksLabel={t.bookmarks}
                     disabled={isSearchNav}
+                    emptyState={
+                        <BookmarkEmptyState
+                            bookmarkControls={bookmarkControls}
+                            className='mobile-bookmark-empty-state'
+                            ctaLabel={t.importBookmarksFromBrowser}
+                            description={t.bookmarksEmptyDescription}
+                            statusMessage={bookmarkStatusMessage}
+                            statusType={bookmarkControls.status?.type}
+                            title={t.bookmarksEmpty}
+                        />
+                    }
                     hidden={hidden}
                     onClearSearch={onClearSearch}
                     onOpenChange={setIsMobileOpen}
@@ -150,17 +169,29 @@ export const LinkPanel: React.FC<LinkPanelProps> = ({
                     .join(' ')}
             >
                 <div className='panel' />
-                {bookmarkTree.map((categoryData, i) => (
-                    <LinkCategory
-                        key={`${categoryData.category}-${i}`}
-                        categoryData={categoryData}
-                        index={i}
-                        selectedCategory={selectedCategory}
-                        isMouseNav={isMouseNav}
-                        padding={panelPaddings[i]}
-                        highlightedLinkId={highlightedLink}
+                {bookmarkTree.length === 0 ? (
+                    <BookmarkEmptyState
+                        bookmarkControls={bookmarkControls}
+                        className='bookmark-panel-empty-state'
+                        ctaLabel={t.importBookmarksFromBrowser}
+                        description={t.bookmarksEmptyDescription}
+                        statusMessage={bookmarkStatusMessage}
+                        statusType={bookmarkControls.status?.type}
+                        title={t.bookmarksEmpty}
                     />
-                ))}
+                ) : (
+                    bookmarkTree.map((categoryData, i) => (
+                        <LinkCategory
+                            key={`${categoryData.category}-${i}`}
+                            categoryData={categoryData}
+                            index={i}
+                            selectedCategory={selectedCategory}
+                            isMouseNav={isMouseNav}
+                            padding={panelPaddings[i]}
+                            highlightedLinkId={highlightedLink}
+                        />
+                    ))
+                )}
                 <UserFloatingBar
                     bookmarkControls={bookmarkControls}
                     closeMenusSignal={mouseLeaveCloseSignal}

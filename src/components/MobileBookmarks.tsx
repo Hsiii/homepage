@@ -1,10 +1,13 @@
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bookmark, ChevronLeft } from 'lucide-react';
 
 import type { CategoryData } from '@/constants/linkTree';
 
 interface MobileBookmarksProps {
+    bookmarksLabel: string;
     disabled: boolean;
+    emptyState: ReactNode;
     hidden: boolean;
     bookmarkTree: CategoryData[];
     onClearSearch: () => void;
@@ -14,7 +17,9 @@ interface MobileBookmarksProps {
 const closeSwipeThreshold = 72;
 
 export const MobileBookmarks: React.FC<MobileBookmarksProps> = ({
+    bookmarksLabel,
     disabled,
+    emptyState,
     hidden,
     bookmarkTree,
     onClearSearch,
@@ -98,31 +103,40 @@ export const MobileBookmarks: React.FC<MobileBookmarksProps> = ({
                     >
                         <ChevronLeft className='icon' size={24} />
                     </button>
-                    <span>Bookmarks</span>
+                    <span>{bookmarksLabel}</span>
                 </div>
-                <div className='mobile-bookmark-list'>
-                    {bookmarkTree.map((categoryData, categoryIndex) => (
-                        <section
-                            className='mobile-bookmark-category'
-                            key={`${categoryData.category}-${categoryIndex}`}
-                        >
-                            <div className='mobile-bookmark-category-title'>
-                                {categoryData.icon}
-                                <span>{categoryData.category}</span>
-                            </div>
-                            <div className='mobile-bookmark-links'>
-                                {categoryData.links.map((bookmark) => (
-                                    <a
-                                        className='mobile-bookmark-link'
-                                        href={bookmark.url}
-                                        key={bookmark.id}
-                                    >
-                                        {bookmark.title}
-                                    </a>
-                                ))}
-                            </div>
-                        </section>
-                    ))}
+                <div
+                    className={[
+                        'mobile-bookmark-list',
+                        bookmarkTree.length === 0 && 'empty',
+                    ]
+                        .filter(Boolean)
+                        .join(' ')}
+                >
+                    {bookmarkTree.length === 0
+                        ? emptyState
+                        : bookmarkTree.map((categoryData, categoryIndex) => (
+                              <section
+                                  className='mobile-bookmark-category'
+                                  key={`${categoryData.category}-${categoryIndex}`}
+                              >
+                                  <div className='mobile-bookmark-category-title'>
+                                      {categoryData.icon}
+                                      <span>{categoryData.category}</span>
+                                  </div>
+                                  <div className='mobile-bookmark-links'>
+                                      {categoryData.links.map((bookmark) => (
+                                          <a
+                                              className='mobile-bookmark-link'
+                                              href={bookmark.url}
+                                              key={bookmark.id}
+                                          >
+                                              {bookmark.title}
+                                          </a>
+                                      ))}
+                                  </div>
+                              </section>
+                          ))}
                 </div>
             </div>
         </>
