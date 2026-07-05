@@ -453,18 +453,16 @@
     }
 }
 
-.link-panel:not(.category-layer-locked) .hoverEffective .category:hover,
-.link-panel:not(.category-layer-locked)
-    .hoverEffective
+.link-panel.hoverEffective:not(.category-layer-locked) .category:hover,
+.link-panel.hoverEffective:not(.category-layer-locked)
     .category:has(+ .links:hover),
 .category.selected,
 .category.clicked {
     translate: 1rem;
 }
 
-.link-panel:not(.category-layer-locked) .hoverEffective .category:hover::before,
-.link-panel:not(.category-layer-locked)
-    .hoverEffective
+.link-panel.hoverEffective:not(.category-layer-locked) .category:hover::before,
+.link-panel.hoverEffective:not(.category-layer-locked)
     .category:has(+ .links:hover)::before {
     width: calc(var(--width) + 1rem);
     translate: -1rem;
@@ -646,10 +644,7 @@
     }
 }
 
-.link-panel:not(.category-layer-locked)
-    .hoverEffective
-    .category:hover
-    + .links,
+.link-panel.hoverEffective:not(.category-layer-locked) .category:hover + .links,
 .category.selected + .links,
 .category.clicked + .links,
 .hoverEffective .links:hover,
