@@ -841,6 +841,30 @@
     flex: 1 1 auto;
 }
 
+.bookmark-manager-empty-state {
+    min-height: 10rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: var(--clr-text-alpha-2);
+    color: var(--clr-text-alpha);
+    text-align: center;
+
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.75rem;
+}
+
+.bookmark-manager-empty-copy {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.bookmark-manager-empty-title {
+    color: var(--clr-text);
+    font: var(--fontBoldMd);
+}
+
 .bookmark-manager-category-card {
     position: relative;
     min-width: 0;
@@ -1670,35 +1694,121 @@
     }
 
     .bookmark-manager-dialog {
+        --bookmark-manager-pane-padding: 1rem;
+        --bookmark-manager-row-gap: 0.5rem;
+
         width: 100vw;
         height: 100svh;
         border-radius: 0;
+        background-color: var(--clr-neutral-light);
+        backdrop-filter: none;
+        box-shadow: none;
+    }
+
+    .bookmark-manager-header {
+        min-height: 4rem;
+        padding-inline: 1rem;
+        background-color: var(--clr-neutral-light);
     }
 
     .bookmark-manager-body {
         grid-template-columns: 1fr;
-        grid-template-rows: auto minmax(0, 1fr);
     }
 
     .bookmark-manager-sidebar {
-        border-right: 0;
-        border-bottom: 1px solid var(--clr-text-alpha-2);
+        padding: 0.75rem var(--bookmark-manager-pane-padding)
+            max(1rem, env(safe-area-inset-bottom));
+        border: 0;
+        gap: 0.75rem;
     }
 
-    .bookmark-manager-category-list {
-        grid-auto-flow: column;
-        grid-auto-columns: minmax(10rem, 1fr);
-        overflow-x: auto;
-        overflow-y: hidden;
+    .bookmark-manager-browser-header {
+        min-height: 3rem;
+    }
+
+    .bookmark-manager-browser-list {
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+    }
+
+    .bookmark-manager-browser-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        padding: 0.25rem;
+        border-radius: 1rem;
+        background-color: var(--clr-text-alpha-2);
+        gap: 0.25rem;
+    }
+
+    .bookmark-manager-browser-option {
+        min-height: 3.5rem;
+        padding: 0.75rem;
+        grid-template-columns: 1.25rem minmax(0, 1fr);
+        grid-template-rows: auto auto;
+    }
+
+    .bookmark-manager-browser-option > .bookmark-manager-category-count,
+    .bookmark-manager-browser-option > .bookmark-manager-browser-url {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .bookmark-manager-category-count {
+        width: auto;
+        min-width: 2.5rem;
+    }
+
+    .bookmark-manager-browser-url {
+        max-width: 100%;
+    }
+
+    .bookmark-manager-row-actions {
+        opacity: 1;
+        pointer-events: auto;
+        translate: 0 0;
+        align-self: stretch;
+    }
+
+    .bookmark-manager-icon-button {
+        width: 2.75rem;
+        min-height: 2.75rem;
+    }
+
+    .bookmark-manager-empty-state {
+        min-height: 14rem;
+    }
+
+    .bookmark-manager-editor-backdrop,
+    .bookmark-manager-category-confirm-backdrop {
+        padding: 1rem;
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        place-items: end center;
+    }
+
+    .bookmark-manager-editor-dialog,
+    .bookmark-manager-category-confirm-dialog {
+        width: 100%;
+        max-height: calc(100svh - 2rem);
+        overflow-y: auto;
+        border-radius: 1rem;
+        background-color: var(--clr-neutral-light);
     }
 
     .bookmark-manager-category-editor,
-    .bookmark-manager-bookmark-form {
+    .bookmark-manager-bookmark-form,
+    .bookmark-manager-editor-grid {
         grid-template-columns: 1fr;
     }
 
-    .bookmark-manager-bookmark-toolbar {
+    .bookmark-manager-form-actions,
+    .bookmark-manager-category-confirm-actions {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .bookmark-manager-action-button,
+    .bookmark-manager-secondary-button,
+    .bookmark-manager-category-confirm-actions button {
+        width: 100%;
+        min-height: 2.75rem;
     }
 }

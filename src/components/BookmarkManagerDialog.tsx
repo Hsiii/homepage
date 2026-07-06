@@ -320,6 +320,9 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         confirmDeleteCategoryIndex === undefined
             ? undefined
             : decoratedBookmarkTree.at(confirmDeleteCategoryIndex);
+    const hasVisibleRows = isRootLocation
+        ? decoratedBookmarkTree.length > 0
+        : selectedNodes.length > 0;
     const visibleIconOptions = useMemo(() => {
         const normalizedSearch = normalizeCategoryIconSearch(iconSearch);
         const filteredIconOptions =
@@ -886,6 +889,38 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                             role='listbox'
                             aria-label={currentTitle}
                         >
+                            {hasVisibleRows ? undefined : (
+                                <div
+                                    className='bookmark-manager-empty-state'
+                                    role='presentation'
+                                >
+                                    <div className='bookmark-manager-empty-copy'>
+                                        <span className='bookmark-manager-empty-title'>
+                                            {t.bookmarksEmpty}
+                                        </span>
+                                    </div>
+                                    <button
+                                        className='bookmark-manager-action-button'
+                                        type='button'
+                                        onClick={
+                                            isRootLocation
+                                                ? createCategory
+                                                : startAddBookmark
+                                        }
+                                    >
+                                        {isRootLocation ? (
+                                            <FolderPlus size={16} aria-hidden />
+                                        ) : (
+                                            <Plus size={16} aria-hidden />
+                                        )}
+                                        <span>
+                                            {isRootLocation
+                                                ? t.addCategory
+                                                : t.addBookmark}
+                                        </span>
+                                    </button>
+                                </div>
+                            )}
                             {isRootLocation
                                 ? decoratedBookmarkTree.map(
                                       (categoryData, categoryIndex) => (
