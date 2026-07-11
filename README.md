@@ -6,7 +6,7 @@ A personal browser homepage for fast bookmark access across browsers with instan
 
 ## Use
 
-- Set your browser homepage as <https:/homepage.hsichen.dev>.
+- Set your browser homepage as <https://homepage.hsichen.dev>.
 - Press <kbd>Space</kbd> to start searching, and <kbd>Enter</kbd> to
   open.
 - Sign in to upload a wallpaper; guests keep the default mountain scene.
@@ -34,9 +34,23 @@ bun dev
 
 ### Stack Map
 
-- **Runtime:** Bun, Next.js 16 App Router, React 19, TypeScript, Turbopack in dev.
+- **Runtime:** Bun, Next.js 16 App Router, React 19, TypeScript, Turbopack in dev,
+  Node.js standalone server in production.
 - **SSR:** Hydrates location, weather, AQI, Clerk state, and signed-in wallpaper.
 - **Auth:** Clerk auth
-- **Storage:** Neon wallpaper metadata, Vercel Blob image
-  storage.
+- **Storage:** Neon wallpaper metadata, Vercel Blob image storage.
 - **External data:** OpenWeatherMap or Open-Meteo for weather; Taiwan MOENV for AQI.
+
+### Oracle Deployment
+
+Production runs on the Oracle VM behind Caddy. The app is built with Next.js
+standalone output and served from the Docker image in this repo.
+
+The Oracle deployment repo expects this checkout at:
+
+```text
+/home/ubuntu/bots/apps/homepage
+```
+
+The container listens on `0.0.0.0:3102` and exposes `/api/health` for Compose
+health checks.

@@ -14,7 +14,8 @@
         "dev": "next dev --turbopack",
         "lint": "eslint .",
         "preview": "bun run build && next start",
-        "prepare": "husky"
+        "prepare": "husky",
+        "start": "next start"
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx,css,scss,html,json,md,yml,yaml}": [

@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
         ];
     },
     distDir: 'dist',
+    output: 'standalone',
     poweredByHeader: false,
     reactStrictMode: true,
 };
