@@ -44,13 +44,14 @@ bun dev
 ### Oracle Deployment
 
 Production runs on the Oracle VM behind Caddy. The app is built with Next.js
-standalone output and served from the Docker image in this repo.
+standalone output locally, uploaded over SSH, and served by the Oracle Compose
+service from `/home/ubuntu/bots/artifacts/homepage`.
 
-The Oracle deployment repo expects this checkout at:
+Deploy from a clean local checkout:
 
-```text
-/home/ubuntu/bots/apps/homepage
+```bash
+bun run deploy:oracle
 ```
 
-The container listens on `0.0.0.0:3102` and exposes `/api/health` for Compose
-health checks.
+The container listens on `0.0.0.0:3102` and exposes `/api/health` for health
+checks.

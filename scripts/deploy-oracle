@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+host="${ORACLE_HOST:-oracle}"
+remote_artifact_dir="${ORACLE_HOMEPAGE_ARTIFACT_DIR:-/home/ubuntu/bots/artifacts/homepage}"
+remote_deploy_script="${ORACLE_HOMEPAGE_DEPLOY_SCRIPT:-/home/ubuntu/bots/oracle/scripts/deploy-homepage}"
+tmp_dir="$(mktemp -d)"
+
+cleanup() {
+    rm -rf "$tmp_dir"
+}
+
+trap cleanup EXIT
+
+bun run build:oracle
+
+cp -R dist/standalone/. "$tmp_dir/"
+mkdir -p "$tmp_dir/dist"
+cp -R dist/static "$tmp_dir/dist/static"
+cp -R public "$tmp_dir/public"
+
+tar -C "$tmp_dir" -czf - . | ssh "$host" "
+    set -euo pipefail
+    mkdir -p \"$(dirname "$remote_artifact_dir")\"
+    next_dir=\"\$(mktemp -d \"${remote_artifact_dir}.XXXXXX\")\"
+    tar -xzf - -C \"\$next_dir\"
+    rm -rf \"${remote_artifact_dir}.previous\"
+    if [ -d \"$remote_artifact_dir\" ]; then
+        mv \"$remote_artifact_dir\" \"${remote_artifact_dir}.previous\"
+    fi
+    mv \"\$next_dir\" \"$remote_artifact_dir\"
+"
+
+ssh "$host" "$remote_deploy_script"
