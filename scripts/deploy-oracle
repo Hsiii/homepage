@@ -19,7 +19,7 @@ mkdir -p "$tmp_dir/dist"
 cp -R dist/static "$tmp_dir/dist/static"
 cp -R public "$tmp_dir/public"
 
-tar -C "$tmp_dir" -czf - . | ssh "$host" "
+COPYFILE_DISABLE=1 tar -C "$tmp_dir" -czf - . | ssh "$host" "
     set -euo pipefail
     mkdir -p \"$(dirname "$remote_artifact_dir")\"
     next_dir=\"\$(mktemp -d \"${remote_artifact_dir}.XXXXXX\")\"
