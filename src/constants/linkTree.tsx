@@ -82,7 +82,14 @@ const defaultCategoryData = [
     {
         category: 'SNS',
         iconName: 'MessagesSquare',
-        links: ['Instagram', 'Threads', 'Messenger', 'Twitter', 'Facebook'],
+        links: [
+            'Instagram',
+            'Threads',
+            'Messenger',
+            'Twitter',
+            'Facebook',
+            'LinkedIn',
+        ],
     },
     {
         category: 'Media',
@@ -103,6 +110,7 @@ const defaultCategoryData = [
             'Vercel',
             'Clerk',
             'Cloudflare',
+            'Oracle',
             'Supabase',
             'Neon',
             'Crx',
@@ -110,6 +118,7 @@ const defaultCategoryData = [
             'Moz Add-on',
             'Search Console',
             'LeetCode',
+            'Artificial Analysis',
         ],
     },
     {

@@ -3,6 +3,7 @@ export const links = {
     'Algo Ans': 'https://walkccc.me/CLRS/',
     'Anigamer': 'https://ani.gamer.com.tw/',
     'AQI TW': 'https://airtw.moenv.gov.tw/',
+    'Artificial Analysis': 'https://artificialanalysis.ai/',
     'ASC': 'https://appstoreconnect.apple.com/',
     'Awwwards': 'https://www.awwwards.com/',
     'Badgical': 'https://badgical.hsichen.dev',
@@ -40,6 +41,7 @@ export const links = {
         'https://hackmd.io/@tropical08842/B1_YN_-kp/https%3A%2F%2Fhackmd.io%2F%40tropical08842%2FHJEHlK-kT%2F%252Fp7Ti7wARSoq9GKGdiLh0xg',
     'LeetCode': 'https://leetcode.com/problemset/',
     'Line of Action': 'https://line-of-action.com/',
+    'LinkedIn': 'https://www.linkedin.com/feed/',
     'Lucide': 'https://lucide.dev/icons/',
     'maimai': 'https://maimaidx-eng.com/maimai-mobile/home/',
     'maimaiJP': 'https://maimaidx.jp/',
@@ -54,6 +56,7 @@ export const links = {
     'NMSL': 'https://nmsl.cs.nthu.edu.tw/cs5262-schedule-2024/',
     'NotebookLM': 'https://notebooklm.google.com/',
     'OnTrack': 'https://ontrack.hsichen.dev/',
+    'Oracle': 'https://www.oracle.com/tw/cloud/sign-in.html',
     'Overleaf': 'https://www.overleaf.com/project',
     'Past Exam':
         'https://drive.google.com/drive/folders/1zoRayCwbnTJIZ_WJSXRyR0Z5-BThec8X',
