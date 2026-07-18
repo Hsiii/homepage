@@ -12,7 +12,6 @@ import {
     FolderPlus,
     Link as LinkIcon,
     LoaderCircle,
-    MoreVertical,
     Pencil,
     Plus,
     Search,
@@ -253,7 +252,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
     const [editorDraft, setEditorDraft] = useState<EditorDraft>();
     const [draftBaseline, setDraftBaseline] = useState('');
     const [formErrors, setFormErrors] = useState<FormErrors>({});
-    const [openMenuKey, setOpenMenuKey] = useState<string>();
+    const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
     const [iconQuery, setIconQuery] = useState('');
     const [deleteRequest, setDeleteRequest] = useState<DeleteRequest>();
@@ -292,6 +291,14 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                 ? [categoryIndex]
                 : []
     );
+    const rootCategoryIndex = bookmarkTree.findIndex(
+        (category) =>
+            category.category.trim().toLocaleLowerCase(locale) ===
+            t.bookmarks.toLocaleLowerCase(locale)
+    );
+    const visibleTreeCategoryIndexes = visibleCategoryIndexes.filter(
+        (categoryIndex) => categoryIndex !== rootCategoryIndex
+    );
     const isDraftDirty =
         editorDraft !== undefined &&
         serializeDraft(editorDraft) !== draftBaseline;
@@ -306,7 +313,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         setDraftBaseline(serializeDraft(draft));
         setFormErrors({});
         setIsIconPickerOpen(false);
-        setOpenMenuKey(undefined);
+        setIsAddMenuOpen(false);
     };
 
     const editCategory = (categoryIndex: number) => {
@@ -656,6 +663,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
             }
 
             const folderPath = [...parentPath, node.id];
+            const hasChildFolders = node.children.some(isBookmarkFolder);
             const isExpanded =
                 normalizedQuery !== '' || expandedKeys.has(node.id);
             const isSelected =
@@ -673,21 +681,25 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                             } as React.CSSProperties
                         }
                     >
-                        <button
-                            className='bookmark-workspace-tree-toggle'
-                            type='button'
-                            aria-label={node.title}
-                            aria-expanded={isExpanded}
-                            onClick={() => {
-                                toggleExpanded(node.id);
-                            }}
-                        >
-                            {isExpanded ? (
-                                <ChevronDown aria-hidden='true' />
-                            ) : (
-                                <ChevronRight aria-hidden='true' />
-                            )}
-                        </button>
+                        {hasChildFolders ? (
+                            <button
+                                className='bookmark-workspace-tree-toggle'
+                                type='button'
+                                aria-label={node.title}
+                                aria-expanded={isExpanded}
+                                onClick={() => {
+                                    toggleExpanded(node.id);
+                                }}
+                            >
+                                {isExpanded ? (
+                                    <ChevronDown aria-hidden='true' />
+                                ) : (
+                                    <ChevronRight aria-hidden='true' />
+                                )}
+                            </button>
+                        ) : (
+                            <span className='bookmark-workspace-tree-toggle-spacer' />
+                        )}
                         <button
                             className='bookmark-workspace-tree-item'
                             type='button'
@@ -701,7 +713,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                             <small>{countBookmarks(node.children)}</small>
                         </button>
                     </div>
-                    {isExpanded
+                    {hasChildFolders && isExpanded
                         ? renderFolderTree(
                               node.children,
                               categoryIndex,
@@ -811,10 +823,10 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                         setDeleteRequest(undefined);
                     } else if (discardTarget !== undefined) {
                         setDiscardTarget(undefined);
-                    } else if (openMenuKey === undefined) {
-                        requestDialogClose();
+                    } else if (isAddMenuOpen) {
+                        setIsAddMenuOpen(false);
                     } else {
-                        setOpenMenuKey(undefined);
+                        requestDialogClose();
                     }
                 }}
             >
@@ -824,13 +836,6 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                         <h2 id={titleId}>{t.manageBookmarks}</h2>
                     </div>
                     <div className='bookmark-workspace-header-actions'>
-                        <span
-                            className={`bookmark-workspace-save-status ${saveStatus.tone}`}
-                            role='status'
-                        >
-                            {saveStatus.icon}
-                            {saveStatus.label}
-                        </span>
                         <input
                             ref={importInputRef}
                             id={importInputId}
@@ -909,14 +914,26 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                             />
                         </label>
                         <div className='bookmark-workspace-tree-heading'>
-                            <span>{t.bookmarks}</span>
-                            <button
-                                type='button'
-                                aria-label={t.addCategory}
-                                onClick={beginAddCategory}
-                            >
-                                <Plus aria-hidden='true' />
-                            </button>
+                            {rootCategoryIndex === -1 ? (
+                                <span>{t.bookmarks}</span>
+                            ) : (
+                                <button
+                                    className='bookmark-workspace-tree-root-button'
+                                    type='button'
+                                    aria-current={
+                                        location.categoryIndex ===
+                                            rootCategoryIndex &&
+                                        location.folderPath.length === 0
+                                            ? 'page'
+                                            : undefined
+                                    }
+                                    onClick={() => {
+                                        editCategory(rootCategoryIndex);
+                                    }}
+                                >
+                                    {t.bookmarks}
+                                </button>
+                            )}
                         </div>
                         <nav
                             className='bookmark-workspace-tree'
@@ -931,7 +948,8 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                         <span key={index} />
                                     ))}
                                 </div>
-                            ) : visibleCategoryIndexes.length === 0 ? (
+                            ) : visibleTreeCategoryIndexes.length === 0 &&
+                              rootCategoryIndex === -1 ? (
                                 <div className='bookmark-workspace-empty compact'>
                                     <Search aria-hidden='true' />
                                     <strong>
@@ -944,135 +962,170 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                             ? t.bookmarksEmptyDescription
                                             : t.bookmarkSearchEmptyDescription}
                                     </span>
-                                    {normalizedQuery === '' ? (
-                                        <button
-                                            type='button'
-                                            onClick={beginAddCategory}
-                                        >
-                                            <Plus aria-hidden='true' />
-                                            {t.addCategory}
-                                        </button>
-                                    ) : undefined}
                                 </div>
                             ) : (
-                                visibleCategoryIndexes.map((categoryIndex) => {
-                                    const category =
-                                        bookmarkTree.at(categoryIndex);
-                                    const decoratedCategory =
-                                        decoratedTree.at(categoryIndex);
-                                    if (
-                                        category === undefined ||
-                                        decoratedCategory === undefined
-                                    ) {
-                                        return undefined;
-                                    }
+                                visibleTreeCategoryIndexes.map(
+                                    (categoryIndex) => {
+                                        const category =
+                                            bookmarkTree.at(categoryIndex);
+                                        const decoratedCategory =
+                                            decoratedTree.at(categoryIndex);
+                                        if (
+                                            category === undefined ||
+                                            decoratedCategory === undefined
+                                        ) {
+                                            return undefined;
+                                        }
 
-                                    const isExpanded =
-                                        normalizedQuery !== '' ||
-                                        expandedKeys.has(category.id);
-                                    const isSelected =
-                                        location.categoryIndex ===
-                                            categoryIndex &&
-                                        location.folderPath.length === 0;
+                                        const isExpanded =
+                                            normalizedQuery !== '' ||
+                                            expandedKeys.has(category.id);
+                                        const hasChildFolders =
+                                            category.children.some(
+                                                isBookmarkFolder
+                                            );
+                                        const isSelected =
+                                            location.categoryIndex ===
+                                                categoryIndex &&
+                                            location.folderPath.length === 0;
 
-                                    return (
-                                        <React.Fragment key={category.id}>
-                                            <div className='bookmark-workspace-tree-row root'>
-                                                <button
-                                                    className='bookmark-workspace-tree-toggle'
-                                                    type='button'
-                                                    aria-label={
-                                                        category.category
-                                                    }
-                                                    aria-expanded={isExpanded}
-                                                    onClick={() => {
-                                                        toggleExpanded(
-                                                            category.id
-                                                        );
-                                                    }}
-                                                >
-                                                    {isExpanded ? (
-                                                        <ChevronDown aria-hidden='true' />
+                                        return (
+                                            <React.Fragment key={category.id}>
+                                                <div className='bookmark-workspace-tree-row root'>
+                                                    {hasChildFolders ? (
+                                                        <button
+                                                            className='bookmark-workspace-tree-toggle'
+                                                            type='button'
+                                                            aria-label={
+                                                                category.category
+                                                            }
+                                                            aria-expanded={
+                                                                isExpanded
+                                                            }
+                                                            onClick={() => {
+                                                                toggleExpanded(
+                                                                    category.id
+                                                                );
+                                                            }}
+                                                        >
+                                                            {isExpanded ? (
+                                                                <ChevronDown aria-hidden='true' />
+                                                            ) : (
+                                                                <ChevronRight aria-hidden='true' />
+                                                            )}
+                                                        </button>
                                                     ) : (
-                                                        <ChevronRight aria-hidden='true' />
+                                                        <span className='bookmark-workspace-tree-toggle-spacer' />
                                                     )}
-                                                </button>
-                                                <button
-                                                    className='bookmark-workspace-tree-item'
-                                                    type='button'
-                                                    aria-current={
-                                                        isSelected
-                                                            ? 'page'
-                                                            : undefined
-                                                    }
-                                                    onClick={() => {
-                                                        editCategory(
-                                                            categoryIndex
-                                                        );
-                                                    }}
-                                                >
-                                                    {decoratedCategory.icon}
-                                                    <span>
-                                                        {category.category}
-                                                    </span>
-                                                    <small>
-                                                        {countBookmarks(
-                                                            category.children
-                                                        )}
-                                                    </small>
-                                                </button>
-                                            </div>
-                                            {isExpanded
-                                                ? renderFolderTree(
-                                                      category.children,
-                                                      categoryIndex,
-                                                      [],
-                                                      1
-                                                  )
-                                                : undefined}
-                                        </React.Fragment>
-                                    );
-                                })
+                                                    <button
+                                                        className='bookmark-workspace-tree-item'
+                                                        type='button'
+                                                        aria-current={
+                                                            isSelected
+                                                                ? 'page'
+                                                                : undefined
+                                                        }
+                                                        onClick={() => {
+                                                            editCategory(
+                                                                categoryIndex
+                                                            );
+                                                        }}
+                                                    >
+                                                        {decoratedCategory.icon}
+                                                        <span>
+                                                            {category.category}
+                                                        </span>
+                                                        <small>
+                                                            {countBookmarks(
+                                                                category.children
+                                                            )}
+                                                        </small>
+                                                    </button>
+                                                </div>
+                                                {hasChildFolders && isExpanded
+                                                    ? renderFolderTree(
+                                                          category.children,
+                                                          categoryIndex,
+                                                          [],
+                                                          1
+                                                      )
+                                                    : undefined}
+                                            </React.Fragment>
+                                        );
+                                    }
+                                )
                             )}
                         </nav>
                     </aside>
 
-                    <main className='bookmark-workspace-list-pane'>
+                    <main
+                        className={`bookmark-workspace-list-pane ${
+                            breadcrumbLabels.length > 1 ? 'has-breadcrumb' : ''
+                        }`}
+                    >
                         <div className='bookmark-workspace-list-header'>
-                            <div>
-                                <h3>
-                                    {currentFolder?.title ??
-                                        currentCategory?.category ??
-                                        t.bookmarks}
-                                </h3>
-                                <span>
-                                    {itemCountLabel(visibleNodes.length)}
-                                </span>
-                            </div>
+                            <h3>
+                                {currentFolder?.title ??
+                                    currentCategory?.category ??
+                                    t.bookmarks}
+                            </h3>
                             <div className='bookmark-workspace-list-actions'>
                                 <button
                                     className='bookmark-workspace-primary-button'
                                     type='button'
-                                    disabled={currentCategory === undefined}
-                                    onClick={beginAddBookmark}
+                                    aria-haspopup='menu'
+                                    aria-expanded={isAddMenuOpen}
+                                    onClick={() => {
+                                        setIsAddMenuOpen((isOpen) => !isOpen);
+                                    }}
                                 >
                                     <Plus aria-hidden='true' />
                                     {t.addBookmark}
                                 </button>
-                                <button
-                                    className='bookmark-workspace-icon-button'
-                                    type='button'
-                                    aria-label={t.addFolder}
-                                    disabled={currentCategory === undefined}
-                                    onClick={beginAddFolder}
-                                >
-                                    <FolderPlus aria-hidden='true' />
-                                </button>
+                                {isAddMenuOpen ? (
+                                    <div
+                                        className='bookmark-workspace-add-menu'
+                                        role='menu'
+                                    >
+                                        <button
+                                            type='button'
+                                            role='menuitem'
+                                            disabled={
+                                                currentCategory === undefined
+                                            }
+                                            onClick={beginAddBookmark}
+                                        >
+                                            <Bookmark aria-hidden='true' />
+                                            {t.bookmark}
+                                        </button>
+                                        <button
+                                            type='button'
+                                            role='menuitem'
+                                            disabled={
+                                                currentCategory === undefined
+                                            }
+                                            onClick={beginAddFolder}
+                                        >
+                                            <FolderPlus aria-hidden='true' />
+                                            {t.folder}
+                                        </button>
+                                        <button
+                                            type='button'
+                                            role='menuitem'
+                                            onClick={beginAddCategory}
+                                        >
+                                            <Plus aria-hidden='true' />
+                                            {t.category}
+                                        </button>
+                                    </div>
+                                ) : undefined}
                             </div>
                         </div>
-                        <div className='bookmark-workspace-breadcrumb'>
-                            {breadcrumbLabels.filter(Boolean).join(' / ')}
-                        </div>
+                        {breadcrumbLabels.length > 1 ? (
+                            <div className='bookmark-workspace-breadcrumb'>
+                                {breadcrumbLabels.slice(1).join(' / ')}
+                            </div>
+                        ) : undefined}
                         <div className='bookmark-workspace-list'>
                             {bookmarkControls.isLoading ? (
                                 <div className='bookmark-workspace-skeleton-list large'>
@@ -1085,13 +1138,6 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                     <Bookmark aria-hidden='true' />
                                     <strong>{t.bookmarksEmpty}</strong>
                                     <span>{t.bookmarksEmptyDescription}</span>
-                                    <button
-                                        type='button'
-                                        onClick={beginAddCategory}
-                                    >
-                                        <Plus aria-hidden='true' />
-                                        {t.addCategory}
-                                    </button>
                                 </div>
                             ) : visibleNodes.length === 0 ? (
                                 <div className='bookmark-workspace-empty'>
@@ -1110,24 +1156,6 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                             ? t.noItemsDescription
                                             : t.bookmarkSearchEmptyDescription}
                                     </span>
-                                    {normalizedQuery === '' ? (
-                                        <div>
-                                            <button
-                                                type='button'
-                                                onClick={beginAddBookmark}
-                                            >
-                                                <Plus aria-hidden='true' />
-                                                {t.addBookmark}
-                                            </button>
-                                            <button
-                                                type='button'
-                                                onClick={beginAddFolder}
-                                            >
-                                                <FolderPlus aria-hidden='true' />
-                                                {t.addFolder}
-                                            </button>
-                                        </div>
-                                    ) : undefined}
                                 </div>
                             ) : (
                                 visibleNodes.map((node) => {
@@ -1170,7 +1198,14 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                                     }
                                                 }}
                                             >
-                                                <span className='bookmark-workspace-item-icon'>
+                                                <span
+                                                    className='bookmark-workspace-item-icon'
+                                                    data-kind={
+                                                        isFolder
+                                                            ? 'folder'
+                                                            : 'bookmark'
+                                                    }
+                                                >
                                                     {isFolder ? (
                                                         createBookmarkIcon(
                                                             node.icon,
@@ -1208,78 +1243,6 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                                     <ExternalLink aria-hidden='true' />
                                                 </a>
                                             )}
-                                            <button
-                                                className='bookmark-workspace-row-menu-button'
-                                                type='button'
-                                                aria-label={t.moreActions}
-                                                aria-haspopup='menu'
-                                                aria-expanded={
-                                                    openMenuKey === rowKey
-                                                }
-                                                onClick={() => {
-                                                    setOpenMenuKey(
-                                                        openMenuKey === rowKey
-                                                            ? undefined
-                                                            : rowKey
-                                                    );
-                                                }}
-                                            >
-                                                <MoreVertical aria-hidden='true' />
-                                            </button>
-                                            {openMenuKey === rowKey ? (
-                                                <div
-                                                    className='bookmark-workspace-row-menu'
-                                                    role='menu'
-                                                >
-                                                    <button
-                                                        type='button'
-                                                        role='menuitem'
-                                                        onClick={() => {
-                                                            if (isFolder) {
-                                                                editFolder(
-                                                                    folderLocation
-                                                                );
-                                                            } else {
-                                                                editBookmark(
-                                                                    location,
-                                                                    node
-                                                                );
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Pencil aria-hidden='true' />
-                                                        {t.edit}
-                                                    </button>
-                                                    <button
-                                                        className='danger'
-                                                        type='button'
-                                                        role='menuitem'
-                                                        onClick={() => {
-                                                            setDeleteRequest({
-                                                                ...(isFolder
-                                                                    ? folderLocation
-                                                                    : location),
-                                                                bookmarkId:
-                                                                    isFolder
-                                                                        ? undefined
-                                                                        : node.id,
-                                                                kind: isFolder
-                                                                    ? 'folder'
-                                                                    : 'bookmark',
-                                                                label: node.title,
-                                                            });
-                                                            setOpenMenuKey(
-                                                                undefined
-                                                            );
-                                                        }}
-                                                    >
-                                                        <Trash2 aria-hidden='true' />
-                                                        {isFolder
-                                                            ? t.deleteFolder
-                                                            : t.deleteBookmark}
-                                                    </button>
-                                                </div>
-                                            ) : undefined}
                                         </div>
                                     );
                                 })
