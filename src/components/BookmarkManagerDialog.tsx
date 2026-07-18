@@ -64,6 +64,12 @@ interface DeleteRequest extends BookmarkLocation {
     label: string;
 }
 
+interface DraggedNode {
+    id: string;
+    isFolder: boolean;
+    source: BookmarkLocation;
+}
+
 interface DestinationOption {
     key: string;
     label: string;
@@ -261,6 +267,8 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         label: string;
         tree: readonly BookmarkCategoryData[];
     }>();
+    const [draggedNode, setDraggedNode] = useState<DraggedNode>();
+    const [dropTargetKey, setDropTargetKey] = useState<string>();
 
     const { bookmarkTree } = bookmarkControls;
     const decoratedTree = useMemo(
@@ -648,6 +656,74 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         });
     };
 
+    const canDropAt = (destination: BookmarkLocation): boolean => {
+        if (draggedNode === undefined) {
+            return false;
+        }
+
+        const isSameLocation =
+            getLocationKey(
+                draggedNode.source.categoryIndex,
+                draggedNode.source.folderPath
+            ) ===
+            getLocationKey(destination.categoryIndex, destination.folderPath);
+        const isOwnDescendant =
+            draggedNode.isFolder &&
+            destination.folderPath.includes(draggedNode.id);
+
+        return !isSameLocation && !isOwnDescendant;
+    };
+
+    const dragOverLocation = (
+        event: React.DragEvent<HTMLElement>,
+        destination: BookmarkLocation
+    ) => {
+        if (!canDropAt(destination)) {
+            return;
+        }
+
+        event.preventDefault();
+        const { dataTransfer } = event;
+        dataTransfer.dropEffect = 'move';
+        setDropTargetKey(
+            getLocationKey(destination.categoryIndex, destination.folderPath)
+        );
+    };
+
+    const leaveDropTarget = (event: React.DragEvent<HTMLElement>) => {
+        const nextTarget = event.relatedTarget;
+        if (
+            nextTarget instanceof Node &&
+            event.currentTarget.contains(nextTarget)
+        ) {
+            return;
+        }
+
+        setDropTargetKey(undefined);
+    };
+
+    const dropAtLocation = (
+        event: React.DragEvent<HTMLElement>,
+        destination: BookmarkLocation
+    ) => {
+        event.preventDefault();
+        if (
+            draggedNode !== undefined &&
+            canDropAt(destination) &&
+            bookmarkControls.moveBookmarkNode(
+                draggedNode.source,
+                draggedNode.id,
+                destination
+            )
+        ) {
+            setLocation(destination);
+            setEditorDraft(undefined);
+        }
+
+        setDraggedNode(undefined);
+        setDropTargetKey(undefined);
+    };
+
     const renderFolderTree = (
         nodes: readonly BookmarkNodeData[],
         categoryIndex: number,
@@ -664,6 +740,8 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
             }
 
             const folderPath = [...parentPath, node.id];
+            const folderLocation = { categoryIndex, folderPath };
+            const folderLocationKey = getLocationKey(categoryIndex, folderPath);
             const hasChildFolders = node.children.some(isBookmarkFolder);
             const isExpanded =
                 normalizedQuery !== '' || expandedKeys.has(node.id);
@@ -676,11 +754,23 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                 <React.Fragment key={node.id}>
                     <div
                         className='bookmark-workspace-tree-row'
+                        data-drop-target={
+                            dropTargetKey === folderLocationKey
+                                ? 'true'
+                                : undefined
+                        }
                         style={
                             {
                                 '--bookmark-tree-depth': depth,
                             } as React.CSSProperties
                         }
+                        onDragOver={(event) => {
+                            dragOverLocation(event, folderLocation);
+                        }}
+                        onDragLeave={leaveDropTarget}
+                        onDrop={(event) => {
+                            dropAtLocation(event, folderLocation);
+                        }}
                     >
                         {hasChildFolders ? (
                             <button
@@ -706,7 +796,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                             type='button'
                             aria-current={isSelected ? 'page' : undefined}
                             onClick={() => {
-                                editFolder({ categoryIndex, folderPath });
+                                editFolder(folderLocation);
                             }}
                         >
                             {createBookmarkIcon(node.icon, 'icon')}
@@ -928,6 +1018,12 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                 <button
                                     className='bookmark-workspace-tree-root-button'
                                     type='button'
+                                    data-drop-target={
+                                        dropTargetKey ===
+                                        getLocationKey(rootCategoryIndex, [])
+                                            ? 'true'
+                                            : undefined
+                                    }
                                     aria-current={
                                         location.categoryIndex ===
                                             rootCategoryIndex &&
@@ -937,6 +1033,19 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                     }
                                     onClick={() => {
                                         editCategory(rootCategoryIndex);
+                                    }}
+                                    onDragOver={(event) => {
+                                        dragOverLocation(event, {
+                                            categoryIndex: rootCategoryIndex,
+                                            folderPath: [],
+                                        });
+                                    }}
+                                    onDragLeave={leaveDropTarget}
+                                    onDrop={(event) => {
+                                        dropAtLocation(event, {
+                                            categoryIndex: rootCategoryIndex,
+                                            folderPath: [],
+                                        });
                                     }}
                                 >
                                     {t.bookmarks}
@@ -996,10 +1105,39 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                             location.categoryIndex ===
                                                 categoryIndex &&
                                             location.folderPath.length === 0;
+                                        const categoryLocation = {
+                                            categoryIndex,
+                                            folderPath: [],
+                                        };
+                                        const categoryLocationKey =
+                                            getLocationKey(categoryIndex, []);
 
                                         return (
                                             <React.Fragment key={category.id}>
-                                                <div className='bookmark-workspace-tree-row root'>
+                                                <div
+                                                    className='bookmark-workspace-tree-row root'
+                                                    data-drop-target={
+                                                        dropTargetKey ===
+                                                        categoryLocationKey
+                                                            ? 'true'
+                                                            : undefined
+                                                    }
+                                                    onDragOver={(event) => {
+                                                        dragOverLocation(
+                                                            event,
+                                                            categoryLocation
+                                                        );
+                                                    }}
+                                                    onDragLeave={
+                                                        leaveDropTarget
+                                                    }
+                                                    onDrop={(event) => {
+                                                        dropAtLocation(
+                                                            event,
+                                                            categoryLocation
+                                                        );
+                                                    }}
+                                                >
                                                     {hasChildFolders ? (
                                                         <button
                                                             className='bookmark-workspace-tree-toggle'
@@ -1185,10 +1323,34 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                     return (
                                         <div
                                             className='bookmark-workspace-list-row'
+                                            draggable
+                                            data-dragging={
+                                                draggedNode?.id === node.id
+                                                    ? 'true'
+                                                    : undefined
+                                            }
                                             data-selected={
                                                 selectedKey === rowKey
                                             }
                                             key={node.id}
+                                            onDragStart={(event) => {
+                                                const { dataTransfer } = event;
+                                                dataTransfer.effectAllowed =
+                                                    'move';
+                                                dataTransfer.setData(
+                                                    'text/plain',
+                                                    node.id
+                                                );
+                                                setDraggedNode({
+                                                    id: node.id,
+                                                    isFolder,
+                                                    source: location,
+                                                });
+                                            }}
+                                            onDragEnd={() => {
+                                                setDraggedNode(undefined);
+                                                setDropTargetKey(undefined);
+                                            }}
                                         >
                                             <button
                                                 className='bookmark-workspace-list-item'
