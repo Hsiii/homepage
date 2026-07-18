@@ -45,7 +45,7 @@ bun dev
 
 Production runs on the Oracle VM behind Caddy. The app is built with Next.js
 standalone output locally, uploaded over SSH, and served by the Oracle Compose
-service from `/home/ubuntu/bots/artifacts/homepage`.
+service from `/srv/platform/artifacts/homepage`.
 
 Deploy from a clean local checkout:
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-host="${ORACLE_HOST:-oracle}"
-remote_artifact_dir="${ORACLE_HOMEPAGE_ARTIFACT_DIR:-/home/ubuntu/bots/artifacts/homepage}"
-remote_deploy_script="${ORACLE_HOMEPAGE_DEPLOY_SCRIPT:-/home/ubuntu/bots/oracle/scripts/deploy-homepage}"
+host="${PLATFORM_HOST:-platform}"
+remote_artifact_dir="${PLATFORM_HOMEPAGE_ARTIFACT_DIR:-/srv/platform/artifacts/homepage}"
+remote_deploy_script="${PLATFORM_HOMEPAGE_DEPLOY_SCRIPT:-/srv/platform/infra/scripts/deploy-homepage}"
 tmp_dir="$(mktemp -d)"
 
 cleanup() {
