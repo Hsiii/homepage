@@ -16,6 +16,7 @@ export const links = {
     'Coolor': 'https://coolors.co/',
     'Crx': 'https://chrome.google.com/webstore/devconsole/',
     'Dam': 'https://www.clubdam.com/',
+    'DeepSWE': 'https://deepswe.datacurve.ai/',
     'Discord': 'https://discord.com/channels/@me',
     'Doc': 'https://docs.google.com/document/u/0/',
     'Drive': 'https://drive.google.com/drive/u/0/home',

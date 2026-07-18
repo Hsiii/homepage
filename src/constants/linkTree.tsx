@@ -119,6 +119,7 @@ const defaultCategoryData = [
             'Search Console',
             'LeetCode',
             'Artificial Analysis',
+            'DeepSWE',
         ],
     },
     {
