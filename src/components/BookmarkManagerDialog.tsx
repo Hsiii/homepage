@@ -1028,47 +1028,6 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                 </button>
                             )}
                         </div>
-                        <div className='bookmark-workspace-tree-heading'>
-                            {rootCategoryIndex === -1 ? (
-                                <span>{t.bookmarks}</span>
-                            ) : (
-                                <button
-                                    className='bookmark-workspace-tree-root-button'
-                                    type='button'
-                                    data-drop-target={
-                                        dropTargetKey ===
-                                        getLocationKey(rootCategoryIndex, [])
-                                            ? 'true'
-                                            : undefined
-                                    }
-                                    aria-current={
-                                        location.categoryIndex ===
-                                            rootCategoryIndex &&
-                                        location.folderPath.length === 0
-                                            ? 'page'
-                                            : undefined
-                                    }
-                                    onClick={() => {
-                                        navigateToCategory(rootCategoryIndex);
-                                    }}
-                                    onDragOver={(event) => {
-                                        dragOverLocation(event, {
-                                            categoryIndex: rootCategoryIndex,
-                                            folderPath: [],
-                                        });
-                                    }}
-                                    onDragLeave={leaveDropTarget}
-                                    onDrop={(event) => {
-                                        dropAtLocation(event, {
-                                            categoryIndex: rootCategoryIndex,
-                                            folderPath: [],
-                                        });
-                                    }}
-                                >
-                                    {t.bookmarks}
-                                </button>
-                            )}
-                        </div>
                         <nav
                             className='bookmark-workspace-tree'
                             aria-label={t.folders}
