@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PanelLeft, PanelLeftClose } from 'lucide-react';
 
-import { decorateBookmarkTree } from '@/constants/linkTree';
 import type { BookmarkControls } from '@/hooks/useBookmarks';
 import { useLinkNavigation } from '@/hooks/useLinkNavigation';
 import { useLocale } from '@/hooks/useLocale';
 import type { InitialAppPreferences } from '@/types/preferences';
+import { decorateBookmarkTree } from '@/utils/bookmarkPresentation';
 import { isBrowser } from '@/utils/browserEnv';
 import type { WallpaperAsset } from '../../shared/wallpaper';
 import { BookmarkEmptyState } from './BookmarkEmptyState';

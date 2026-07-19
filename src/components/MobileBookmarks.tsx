@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bookmark, ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { createBookmarkIcon } from '@/constants/linkTree';
-import type { CategoryData } from '@/constants/linkTree';
 import type { BookmarkNodeData } from '@/types/bookmarks';
+import type { CategoryData } from '@/utils/bookmarkPresentation';
+import { createBookmarkIcon } from '@/utils/bookmarkPresentation';
 import { isBookmarkFolder } from '@/utils/bookmarks';
 
 interface MobileBookmarksProps {

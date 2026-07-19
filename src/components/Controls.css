@@ -3245,7 +3245,7 @@
     }
 }
 
-/* Keep workspace layout authoritative over the legacy manager rules above. */
+/* Keep workspace layout authoritative over shared manager dialog sizing. */
 .bookmark-workspace.bookmark-manager-dialog {
     width: min(82rem, calc(100vw - 2rem));
     height: min(56rem, calc(100svh - 2rem));

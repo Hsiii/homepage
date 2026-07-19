@@ -17,11 +17,6 @@ export type CategoryData = {
     links: BookmarkLinkData[];
 };
 
-type CategoryIconDefault = {
-    category: string;
-    iconName: string;
-};
-
 export interface CategoryIconOption {
     Icon: LucideIcon;
     iconName: string;
@@ -70,52 +65,6 @@ export const isCategoryIconName = (
 ): iconName is string =>
     iconName !== undefined && categoryIconNames.has(iconName);
 
-const categoryIconDefaults = [
-    {
-        category: 'Study',
-        iconName: 'BookOpenText',
-    },
-    {
-        category: 'SNS',
-        iconName: 'MessagesSquare',
-    },
-    {
-        category: 'Media',
-        iconName: 'MonitorPlay',
-    },
-    {
-        category: 'Game',
-        iconName: 'Gamepad2',
-    },
-    {
-        category: 'Dev',
-        iconName: 'CodeXml',
-    },
-    {
-        category: 'Design',
-        iconName: 'PenTool',
-    },
-    {
-        category: 'Art',
-        iconName: 'Brush',
-    },
-    {
-        category: 'Tools',
-        iconName: 'ToolCase',
-    },
-    {
-        category: 'GSuite',
-        iconName: 'LayoutGrid',
-    },
-] as const satisfies readonly CategoryIconDefault[];
-
-const categoryIconNameByName = new Map<string, string>(
-    categoryIconDefaults.map((categoryData) => [
-        categoryData.category,
-        categoryData.iconName,
-    ])
-);
-
 const fallbackCategoryIconName = 'Folder';
 
 export const resolveBookmarkIconName = (
@@ -136,24 +85,11 @@ export const createBookmarkIcon = (
     return <Icon className={className} />;
 };
 
-const resolveCategoryIconName = (
-    categoryData: BookmarkCategoryData
-): string => {
-    if (isCategoryIconName(categoryData.icon)) {
-        return categoryData.icon;
-    }
-
-    return (
-        categoryIconNameByName.get(categoryData.category) ??
-        fallbackCategoryIconName
-    );
-};
-
 export const decorateBookmarkTree = (
     bookmarkTree: readonly BookmarkCategoryData[]
 ): CategoryData[] =>
     bookmarkTree.map((categoryData) => {
-        const iconName = resolveCategoryIconName(categoryData);
+        const iconName = resolveBookmarkIconName(categoryData.icon);
 
         return {
             category: categoryData.category,

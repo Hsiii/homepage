@@ -1,5 +1,4 @@
 import { completeConfigBase } from 'eslint-config-complete';
-import sortKeys from 'eslint-plugin-sort-keys';
 import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
@@ -40,23 +39,6 @@ export default defineConfig(
         files: ['src/proxy.ts'],
         rules: {
             'unicorn/prefer-string-raw': 'off',
-        },
-    },
-
-    {
-        files: ['src/constants/links.ts'],
-        plugins: {
-            'sort-keys': sortKeys,
-        },
-        rules: {
-            'sort-keys/sort-keys-fix': [
-                'error',
-                'asc',
-                {
-                    caseSensitive: false,
-                    natural: true,
-                },
-            ],
         },
     },
 

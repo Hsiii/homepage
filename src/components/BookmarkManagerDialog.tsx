@@ -24,13 +24,6 @@ import {
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
-import {
-    categoryIconOptions,
-    createBookmarkIcon,
-    decorateBookmarkTree,
-    normalizeCategoryIconSearch,
-    resolveFolderIconName,
-} from '@/constants/linkTree';
 import type { BookmarkControls } from '@/hooks/useBookmarks';
 import { useLocale } from '@/hooks/useLocale';
 import type {
@@ -39,6 +32,13 @@ import type {
     BookmarkLinkData,
     BookmarkNodeData,
 } from '@/types/bookmarks';
+import {
+    categoryIconOptions,
+    createBookmarkIcon,
+    decorateBookmarkTree,
+    normalizeCategoryIconSearch,
+    resolveFolderIconName,
+} from '@/utils/bookmarkPresentation';
 import { isBookmarkFolder, isBookmarkLink } from '@/utils/bookmarks';
 
 interface BookmarkManagerDialogProps {
