@@ -36,6 +36,7 @@ export const BookmarkEmptyState: React.FC<BookmarkEmptyStateProps> = ({
                 className='bookmark-import-input'
                 type='file'
                 accept={browserBookmarkFileAccept}
+                disabled={!bookmarkControls.canEdit}
                 ref={fileInputRef}
                 onChange={(event) => {
                     const file = event.currentTarget.files?.[0];
@@ -59,6 +60,7 @@ export const BookmarkEmptyState: React.FC<BookmarkEmptyStateProps> = ({
             <button
                 className='bookmark-empty-action'
                 type='button'
+                disabled={!bookmarkControls.canEdit}
                 onClick={() => {
                     fileInputRef.current?.click();
                 }}

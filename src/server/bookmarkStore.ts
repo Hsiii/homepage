@@ -136,12 +136,3 @@ export const saveUserBookmarks = async (
 
     return mapBookmarkRow(row);
 };
-
-export const clearUserBookmarks = async (userId: string): Promise<void> => {
-    await ensureSchema();
-
-    await getDatabase()`
-        delete from user_bookmarks
-        where user_id = ${userId}
-    `;
-};

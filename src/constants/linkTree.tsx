@@ -2,8 +2,6 @@ import type { ReactElement } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Folder, icons } from 'lucide-react';
 
-import type { LinkName } from '@/constants/links';
-import { links } from '@/constants/links';
 import type {
     BookmarkCategoryData,
     BookmarkFolderData,
@@ -19,10 +17,9 @@ export type CategoryData = {
     links: BookmarkLinkData[];
 };
 
-type DefaultCategoryData = {
+type CategoryIconDefault = {
     category: string;
     iconName: string;
-    links: LinkName[];
 };
 
 export interface CategoryIconOption {
@@ -73,146 +70,47 @@ export const isCategoryIconName = (
 ): iconName is string =>
     iconName !== undefined && categoryIconNames.has(iconName);
 
-const defaultCategoryData = [
+const categoryIconDefaults = [
     {
         category: 'Study',
         iconName: 'BookOpenText',
-        links: ['eeclass', 'ccxp', 'Past Exam', 'NotebookLM'],
     },
     {
         category: 'SNS',
         iconName: 'MessagesSquare',
-        links: [
-            'Instagram',
-            'Threads',
-            'Messenger',
-            'Twitter',
-            'Facebook',
-            'LinkedIn',
-        ],
     },
     {
         category: 'Media',
         iconName: 'MonitorPlay',
-        links: [
-            'YouTube',
-            'Anigamer',
-            'Crunchyroll',
-            'Spotify',
-            'Utaten',
-            'Dam',
-        ],
     },
     {
         category: 'Game',
         iconName: 'Gamepad2',
-        links: ['majsoul', 'Supercell Store', 'Tetr.io', 'maimai', 'maimaiJP'],
     },
     {
         category: 'Dev',
         iconName: 'CodeXml',
-        links: [
-            'GitHub',
-            'ASC',
-            'Vercel',
-            'Clerk',
-            'Cloudflare',
-            'Oracle',
-            'Supabase',
-            'Neon',
-            'Crx',
-            'TDX',
-            'Moz Add-on',
-            'Search Console',
-            'LeetCode',
-            'Artificial Analysis',
-            'DeepSWE',
-        ],
     },
     {
         category: 'Design',
         iconName: 'PenTool',
-        links: [
-            'Awwwards',
-            'Figma',
-            'Font',
-            'Coliss',
-            'wordmark',
-            'Lucide',
-            'Svgl',
-            'Coolor',
-            'WebGradients',
-            'Haikei',
-            'React Bits',
-            'Motion',
-            'SSTM',
-        ],
     },
     {
         category: 'Art',
         iconName: 'Brush',
-        links: [
-            'Pinterest',
-            'Pixiv',
-            'Head Ref',
-            'Pose Ref',
-            'Line of Action',
-            'Quickposes',
-            'Resource Boy',
-            'Texturelabs',
-            'Hololive Ref',
-        ],
     },
     {
         category: 'Tools',
         iconName: 'ToolCase',
-        links: [
-            'HackMD',
-            'Squoosh',
-            'AkuMa',
-            'OnTrack',
-            'Skyscanner',
-            'Morning',
-            'Badgical',
-        ],
     },
     {
         category: 'GSuite',
         iconName: 'LayoutGrid',
-        links: [
-            'Gemini',
-            'Maps',
-            'Drive',
-            'Doc',
-            'Sheet',
-            'Slide',
-            'Gmail',
-            'Calendar',
-        ],
     },
-] as const satisfies readonly DefaultCategoryData[];
-
-export const defaultBookmarkTree: BookmarkCategoryData[] =
-    defaultCategoryData.map((categoryData) => {
-        const bookmarkLinks: BookmarkLinkData[] = categoryData.links.map(
-            (link) => ({
-                id: link,
-                title: link,
-                type: 'link',
-                url: links[link],
-            })
-        );
-
-        return {
-            category: categoryData.category,
-            children: bookmarkLinks,
-            id: `default-category-${categoryData.category.toLowerCase()}`,
-            links: bookmarkLinks,
-        };
-    });
+] as const satisfies readonly CategoryIconDefault[];
 
 const categoryIconNameByName = new Map<string, string>(
-    defaultCategoryData.map((categoryData) => [
+    categoryIconDefaults.map((categoryData) => [
         categoryData.category,
         categoryData.iconName,
     ])

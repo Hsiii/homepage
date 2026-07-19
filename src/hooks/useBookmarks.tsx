@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { defaultBookmarkTree } from '@/constants/linkTree';
 import type {
     BookmarkCategoryData,
     BookmarkFolderData,
@@ -15,16 +14,13 @@ import {
 import { isBrowser } from '@/utils/browserEnv';
 
 const bookmarkApiPath = '/api/bookmarks';
-const bookmarkStorageKey = 'homepage.bookmarks';
-const bookmarkUserStorageKeyPrefix = 'homepage.bookmarks.user';
+const guestBookmarkStorageKey = 'homepage.bookmarks';
 const bookmarkStorageVersion = 2;
 
 type BookmarkStatusMessageKey =
-    | 'bookmarksCleared'
     | 'bookmarksExported'
     | 'bookmarksImportEmpty'
     | 'bookmarksImportFailed'
-    | 'bookmarksReset'
     | 'bookmarksStorageFailed'
     | 'bookmarksSyncFailed';
 
@@ -76,7 +72,7 @@ export interface BookmarkControls {
     deleteFolder: (location: BookmarkLocationInput) => boolean;
     exportBookmarks: () => void;
     importBookmarks: (file: File) => Promise<void>;
-    isCustom: boolean;
+    canEdit: boolean;
     isLoading: boolean;
     moveBookmarkNode: (
         source: BookmarkLocationInput,
@@ -87,7 +83,6 @@ export interface BookmarkControls {
     replaceBookmarkTree: (
         bookmarkTree: readonly BookmarkCategoryData[]
     ) => boolean;
-    resetBookmarks: () => void;
     saveState: BookmarkSaveState;
     status?: BookmarkStatus;
     updateBookmark: (
@@ -129,67 +124,46 @@ interface UseBookmarksOptions {
     initialBookmarkTree?: BookmarkCategoryData[];
 }
 
-const getBookmarkStorageKey = (userId: string | undefined): string =>
-    userId === undefined
-        ? bookmarkStorageKey
-        : `${bookmarkUserStorageKeyPrefix}.${userId}`;
-
-const readStoredBookmarkTree = (
-    storageKey: string
-): BookmarkCategoryData[] | undefined => {
-    const storedValue = globalThis.localStorage.getItem(storageKey);
-    if (storedValue === null) {
-        return undefined;
-    }
-
-    const parsedValue: unknown = JSON.parse(storedValue);
-    if (
-        typeof parsedValue === 'object' &&
-        parsedValue !== null &&
-        'categories' in parsedValue
-    ) {
-        return coerceBookmarkTree(
-            (parsedValue as { categories: unknown }).categories
-        );
-    }
-
-    return coerceBookmarkTree(parsedValue);
-};
-
-const getStoredBookmarkTree = (
-    userId?: string
-): BookmarkCategoryData[] | undefined => {
+const readGuestBookmarkTree = (): BookmarkCategoryData[] | undefined => {
     if (!isBrowser()) {
         return undefined;
     }
 
     try {
-        return (
-            (userId === undefined
-                ? undefined
-                : readStoredBookmarkTree(getBookmarkStorageKey(userId))) ??
-            readStoredBookmarkTree(bookmarkStorageKey)
+        const storedValue = globalThis.localStorage.getItem(
+            guestBookmarkStorageKey
         );
+        if (storedValue === null) {
+            return undefined;
+        }
+
+        const parsedValue: unknown = JSON.parse(storedValue);
+        if (
+            typeof parsedValue === 'object' &&
+            parsedValue !== null &&
+            'categories' in parsedValue
+        ) {
+            return coerceBookmarkTree(
+                (parsedValue as { categories: unknown }).categories
+            );
+        }
+
+        return coerceBookmarkTree(parsedValue);
     } catch {
         return undefined;
     }
 };
 
-const storeBookmarkTree = (
-    bookmarkTree: readonly BookmarkCategoryData[],
-    userId?: string
-) => {
+const storeGuestBookmarkTree = (
+    bookmarkTree: readonly BookmarkCategoryData[]
+): void => {
     globalThis.localStorage.setItem(
-        getBookmarkStorageKey(userId),
+        guestBookmarkStorageKey,
         JSON.stringify({
             categories: bookmarkTree,
             version: bookmarkStorageVersion,
         })
     );
-};
-
-const removeStoredBookmarkTree = (userId?: string): void => {
-    globalThis.localStorage.removeItem(getBookmarkStorageKey(userId));
 };
 
 const normalizeInputText = (value: string): string =>
@@ -398,41 +372,6 @@ const deleteFolderAtPath = (
     });
 };
 
-const areBookmarkTreesEqual = (
-    firstBookmarkTree: readonly BookmarkCategoryData[],
-    secondBookmarkTree: readonly BookmarkCategoryData[]
-): boolean => {
-    if (firstBookmarkTree.length !== secondBookmarkTree.length) {
-        return false;
-    }
-
-    return firstBookmarkTree.every((categoryData, categoryIndex) => {
-        const otherCategoryData = secondBookmarkTree[categoryIndex];
-
-        if (
-            categoryData.category !== otherCategoryData.category ||
-            categoryData.icon !== otherCategoryData.icon ||
-            categoryData.links.length !== otherCategoryData.links.length
-        ) {
-            return false;
-        }
-
-        return categoryData.links.every((bookmark, bookmarkIndex) => {
-            const otherBookmark = otherCategoryData.links[bookmarkIndex];
-
-            return (
-                bookmark.id === otherBookmark.id &&
-                bookmark.title === otherBookmark.title &&
-                bookmark.url === otherBookmark.url
-            );
-        });
-    });
-};
-
-const isDefaultBookmarkTree = (
-    bookmarkTree: readonly BookmarkCategoryData[]
-): boolean => areBookmarkTreesEqual(bookmarkTree, defaultBookmarkTree);
-
 const readBookmarkResponse = async (
     response: Response
 ): Promise<BookmarkApiResponse> => {
@@ -474,12 +413,7 @@ export const useBookmarks = (
             ? options.auth.userId
             : undefined;
     const [bookmarkTree, setBookmarkTree] = useState<BookmarkCategoryData[]>(
-        initialBookmarkTree ??
-            (hasAuth ? emptyBookmarkTree : defaultBookmarkTree)
-    );
-    const [isCustom, setIsCustom] = useState(
-        initialBookmarkTree !== undefined &&
-            !isDefaultBookmarkTree(initialBookmarkTree)
+        initialBookmarkTree ?? emptyBookmarkTree
     );
     const [status, setStatus] = useState<BookmarkStatus>();
     const [isLoading, setIsLoading] = useState(
@@ -490,20 +424,7 @@ export const useBookmarks = (
     );
     const mutationVersionRef = useRef(0);
     const saveOperationRef = useRef(0);
-
-    useEffect(() => {
-        if (initialBookmarkTree !== undefined || hasAuth) {
-            return;
-        }
-
-        const storedBookmarkTree = getStoredBookmarkTree();
-        if (storedBookmarkTree === undefined) {
-            return;
-        }
-
-        setBookmarkTree(storedBookmarkTree);
-        setIsCustom(!isDefaultBookmarkTree(storedBookmarkTree));
-    }, [hasAuth, initialBookmarkTree]);
+    const remoteSaveQueueRef = useRef<Promise<void>>(Promise.resolve());
 
     const getAuthHeaders = useCallback(async (): Promise<
         Record<'Authorization', string> | undefined
@@ -543,16 +464,7 @@ export const useBookmarks = (
                     },
                     method: 'POST',
                 });
-                const payload = await readBookmarkResponse(response);
-
-                try {
-                    storeBookmarkTree(
-                        payload.categories ?? nextBookmarkTree,
-                        remoteUserId
-                    );
-                } catch {
-                    // Local cache failures should not invalidate a remote save.
-                }
+                await readBookmarkResponse(response);
 
                 if (saveOperation === saveOperationRef.current) {
                     setSaveState('saved');
@@ -576,85 +488,58 @@ export const useBookmarks = (
         [getAuthHeaders, remoteUserId]
     );
 
-    const clearRemoteBookmarks = useCallback(async (): Promise<boolean> => {
-        try {
-            const headers = await getAuthHeaders();
-            if (headers === undefined) {
+    const commitBookmarkTree = useCallback(
+        (nextBookmarkTree: readonly BookmarkCategoryData[]) => {
+            if (hasAuth && !isAuthLoaded) {
                 return false;
             }
 
-            const response = await fetch(bookmarkApiPath, {
-                headers,
-                method: 'DELETE',
-            });
-
-            if (!response.ok) {
-                await readBookmarkResponse(response);
-            }
-
-            return true;
-        } catch {
-            setStatus({
-                messageKey: 'bookmarksSyncFailed',
-                type: 'error',
-            });
-            return false;
-        }
-    }, [getAuthHeaders]);
-
-    const commitBookmarkTree = useCallback(
-        (nextBookmarkTree: readonly BookmarkCategoryData[]) => {
             const normalizedBookmarkTree =
                 coerceBookmarkTree(nextBookmarkTree) ?? [];
 
-            try {
-                storeBookmarkTree(normalizedBookmarkTree, remoteUserId);
-            } catch {
-                setSaveState('error');
-                setStatus({
-                    messageKey: 'bookmarksStorageFailed',
-                    type: 'error',
-                });
-                return false;
-            }
-
             mutationVersionRef.current++;
             setBookmarkTree([...normalizedBookmarkTree]);
-            setIsCustom(true);
             if (remoteUserId === undefined) {
+                try {
+                    storeGuestBookmarkTree(normalizedBookmarkTree);
+                } catch {
+                    setSaveState('error');
+                    setStatus({
+                        messageKey: 'bookmarksStorageFailed',
+                        type: 'error',
+                    });
+                    return false;
+                }
                 setSaveState('saved');
             } else {
                 saveOperationRef.current++;
                 const saveOperation = saveOperationRef.current;
                 setSaveState('saving');
-                saveRemoteBookmarkTree(
-                    normalizedBookmarkTree,
-                    true,
-                    saveOperation
-                ).catch(() => undefined);
+                remoteSaveQueueRef.current = remoteSaveQueueRef.current.then(
+                    async () => {
+                        await saveRemoteBookmarkTree(
+                            normalizedBookmarkTree,
+                            true,
+                            saveOperation
+                        );
+                    }
+                );
             }
             return true;
         },
-        [remoteUserId, saveRemoteBookmarkTree]
+        [hasAuth, isAuthLoaded, remoteUserId, saveRemoteBookmarkTree]
     );
 
     useEffect(() => {
-        if (getToken === undefined || !isAuthLoaded) {
-            setIsLoading(hasAuth && !isAuthLoaded);
+        if (hasAuth && !isAuthLoaded) {
+            setIsLoading(true);
             return undefined;
         }
 
         if (remoteUserId === undefined) {
-            const storedBookmarkTree = getStoredBookmarkTree();
+            const storedBookmarkTree = readGuestBookmarkTree();
 
             setBookmarkTree(storedBookmarkTree ?? emptyBookmarkTree);
-            setIsCustom(
-                storedBookmarkTree !== undefined &&
-                    !areBookmarkTreesEqual(
-                        storedBookmarkTree,
-                        emptyBookmarkTree
-                    )
-            );
             setIsLoading(false);
             setSaveState('saved');
             return undefined;
@@ -662,26 +547,12 @@ export const useBookmarks = (
 
         if (initialBookmarkTree !== undefined) {
             setBookmarkTree(initialBookmarkTree);
-            setIsCustom(!isDefaultBookmarkTree(initialBookmarkTree));
-
-            try {
-                storeBookmarkTree(initialBookmarkTree, remoteUserId);
-            } catch {
-                // Keep the server copy as the source of truth.
-            }
             setIsLoading(false);
             setSaveState('saved');
             return undefined;
         }
 
-        const cachedBookmarkTree = getStoredBookmarkTree(remoteUserId);
-        if (cachedBookmarkTree === undefined) {
-            setBookmarkTree(defaultBookmarkTree);
-            setIsCustom(false);
-        } else {
-            setBookmarkTree(cachedBookmarkTree);
-            setIsCustom(!isDefaultBookmarkTree(cachedBookmarkTree));
-        }
+        setBookmarkTree(emptyBookmarkTree);
 
         let isCurrent = true;
         const loadMutationVersion = mutationVersionRef.current;
@@ -706,21 +577,8 @@ export const useBookmarks = (
 
                 if (payload.categories !== undefined) {
                     setBookmarkTree(payload.categories);
-                    setIsCustom(!isDefaultBookmarkTree(payload.categories));
-
-                    try {
-                        storeBookmarkTree(payload.categories, remoteUserId);
-                    } catch {
-                        // Keep the remote copy as the source of truth.
-                    }
-                    return;
-                }
-
-                if (cachedBookmarkTree !== undefined) {
-                    await saveRemoteBookmarkTree(cachedBookmarkTree, false);
                 }
             } catch {
-                // Keep the cached or anonymous localStorage bookmarks as fallback.
                 if (isCurrent) {
                     setSaveState('error');
                     setStatus({
@@ -747,7 +605,6 @@ export const useBookmarks = (
         initialBookmarkTree,
         isAuthLoaded,
         remoteUserId,
-        saveRemoteBookmarkTree,
     ]);
 
     const exportBookmarks = useCallback(() => {
@@ -795,46 +652,6 @@ export const useBookmarks = (
         },
         [commitBookmarkTree]
     );
-
-    const resetBookmarks = useCallback(() => {
-        try {
-            removeStoredBookmarkTree(remoteUserId);
-            if (remoteUserId !== undefined) {
-                removeStoredBookmarkTree();
-            }
-        } catch {
-            setStatus({ messageKey: 'bookmarksStorageFailed', type: 'error' });
-            return;
-        }
-
-        mutationVersionRef.current++;
-        if (remoteUserId !== undefined || !hasAuth) {
-            setBookmarkTree(defaultBookmarkTree);
-            setStatus({ messageKey: 'bookmarksReset', type: 'success' });
-        } else {
-            setBookmarkTree(emptyBookmarkTree);
-            setStatus({ messageKey: 'bookmarksCleared', type: 'success' });
-        }
-        setIsCustom(false);
-        if (remoteUserId === undefined) {
-            setSaveState('saved');
-        } else {
-            saveOperationRef.current++;
-            const saveOperation = saveOperationRef.current;
-            setSaveState('saving');
-            clearRemoteBookmarks()
-                .then((didClear) => {
-                    if (saveOperation === saveOperationRef.current) {
-                        setSaveState(didClear ? 'saved' : 'error');
-                    }
-                })
-                .catch(() => {
-                    if (saveOperation === saveOperationRef.current) {
-                        setSaveState('error');
-                    }
-                });
-        }
-    }, [clearRemoteBookmarks, hasAuth, remoteUserId]);
 
     const addCategory = useCallback(
         (categoryInput: BookmarkCategoryInput) => {
@@ -1444,16 +1261,15 @@ export const useBookmarks = (
         addCategory,
         addFolder,
         bookmarkTree,
+        canEdit: !hasAuth || isAuthLoaded,
         deleteBookmark,
         deleteCategory,
         deleteFolder,
         exportBookmarks,
         importBookmarks,
-        isCustom,
         isLoading,
         moveBookmarkNode,
         replaceBookmarkTree,
-        resetBookmarks,
         saveState,
         status,
         updateBookmark,

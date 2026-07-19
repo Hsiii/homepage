@@ -1,11 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 
 import { ApiError, createApiErrorResponse } from '@/server/apiError';
-import {
-    clearUserBookmarks,
-    getUserBookmarks,
-    saveUserBookmarks,
-} from '@/server/bookmarkStore';
+import { getUserBookmarks, saveUserBookmarks } from '@/server/bookmarkStore';
 
 const clerkPublishableKey =
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ??
@@ -60,17 +56,6 @@ export const POST = async (request: Request): Promise<Response> => {
         return Response.json({
             categories: await saveUserBookmarks(userId, categories),
         });
-    } catch (error) {
-        return createApiErrorResponse(error);
-    }
-};
-
-export const DELETE = async (): Promise<Response> => {
-    try {
-        const userId = await requireUserId();
-        await clearUserBookmarks(userId);
-
-        return Response.json({ categories: undefined });
     } catch (error) {
         return createApiErrorResponse(error);
     }

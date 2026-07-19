@@ -861,6 +861,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                                     className='settings-icon-choice'
                                     type='button'
                                     aria-label={t.manageBookmarks}
+                                    disabled={!bookmarkControls.canEdit}
                                     title={t.manageBookmarks}
                                     onClick={() => {
                                         setIsBookmarkManagerOpen(true);

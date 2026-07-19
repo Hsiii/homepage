@@ -39,8 +39,33 @@ const recentLinkTreeAdditions: BookmarkAddition[] = [
     },
 ];
 
+const personalLegacyBookmarkMarkers = [
+    { category: 'Study', url: links.eeclass },
+    { category: 'Dev', url: links.ASC },
+    { category: 'Art', url: links.Pixiv },
+] as const;
+
 const normalizeUrl = (value: string): string =>
     value.trim().replace(/\/$/, '').toLowerCase();
+
+const isPersonalLegacyBookmarkTree = (
+    bookmarkTree: readonly BookmarkCategoryData[]
+): boolean =>
+    personalLegacyBookmarkMarkers.every((marker) => {
+        const category = bookmarkTree.find(
+            (candidate) =>
+                candidate.category.toLowerCase() ===
+                marker.category.toLowerCase()
+        );
+
+        return (
+            category !== undefined &&
+            getBookmarkLinks(category.children).some(
+                (bookmark) =>
+                    normalizeUrl(bookmark.url) === normalizeUrl(marker.url)
+            )
+        );
+    });
 
 const addMissingBookmarks = (
     bookmarkTree: readonly BookmarkCategoryData[],
@@ -119,5 +144,7 @@ export const applyBookmarkAccountMigrations = (
         return [...bookmarkTree];
     }
 
-    return addMissingBookmarks(bookmarkTree, recentLinkTreeAdditions);
+    return isPersonalLegacyBookmarkTree(bookmarkTree)
+        ? addMissingBookmarks(bookmarkTree, recentLinkTreeAdditions)
+        : [...bookmarkTree];
 };

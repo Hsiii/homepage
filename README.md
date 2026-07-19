@@ -16,8 +16,9 @@ A personal browser homepage for fast bookmark access across browsers with instan
 
 Core features work without an account. Location is requested only after clicking the
 location control. The selected Taiwan location is stored in a same-site cookie for
-SSR and mirrored in browser storage with weather/AQI caches. Wallpaper sync requires
-sign-in and uses Clerk, Neon, and Vercel Blob.
+SSR and mirrored in browser storage with weather/AQI caches. Guest bookmarks stay in
+browser local storage; signed-in bookmarks sync to Neon under the Clerk account.
+Wallpaper sync requires sign-in and uses Clerk, Neon, and Vercel Blob.
 
 ## Development
 
@@ -38,7 +39,7 @@ bun dev
   Node.js standalone server in production.
 - **SSR:** Hydrates location, weather, AQI, Clerk state, and signed-in wallpaper.
 - **Auth:** Clerk auth
-- **Storage:** Neon wallpaper metadata, Vercel Blob image storage.
+- **Storage:** Neon bookmarks and wallpaper metadata, Vercel Blob image storage.
 - **External data:** OpenWeatherMap or Open-Meteo for weather; Taiwan MOENV for AQI.
 
 ### Oracle Deployment
