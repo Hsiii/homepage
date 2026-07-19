@@ -81,7 +81,8 @@ export interface BookmarkControls {
     moveBookmarkNode: (
         source: BookmarkLocationInput,
         nodeId: string,
-        destination: BookmarkLocationInput
+        destination: BookmarkLocationInput,
+        destinationIndex?: number
     ) => boolean;
     replaceBookmarkTree: (
         bookmarkTree: readonly BookmarkCategoryData[]
@@ -1046,14 +1047,16 @@ export const useBookmarks = (
         (
             source: BookmarkLocationInput,
             nodeId: string,
-            destination: BookmarkLocationInput
+            destination: BookmarkLocationInput,
+            destinationIndex?: number
         ) => {
             const sourceFolderPath = normalizeFolderPath(source);
             const destinationFolderPath = normalizeFolderPath(destination);
-            if (
+            const isSameLocation =
                 source.categoryIndex === destination.categoryIndex &&
-                sourceFolderPath.join('\n') === destinationFolderPath.join('\n')
-            ) {
+                sourceFolderPath.join('\n') ===
+                    destinationFolderPath.join('\n');
+            if (isSameLocation && destinationIndex === undefined) {
                 return false;
             }
 
@@ -1078,6 +1081,45 @@ export const useBookmarks = (
                     destinationFolderPath.includes(movedNode.id))
             ) {
                 return false;
+            }
+
+            if (isSameLocation) {
+                const sourceNodes = getNodesAtFolderPath(
+                    sourceCategory.children,
+                    sourceFolderPath
+                );
+                const sourceIndex = sourceNodes?.findIndex(
+                    (node) => node.id === nodeId
+                );
+                if (
+                    sourceNodes === undefined ||
+                    sourceIndex === undefined ||
+                    sourceIndex < 0
+                ) {
+                    return false;
+                }
+
+                let insertionIndex = Math.max(
+                    0,
+                    Math.min(
+                        destinationIndex ?? sourceNodes.length,
+                        sourceNodes.length
+                    )
+                );
+                if (sourceIndex < insertionIndex) {
+                    insertionIndex--;
+                }
+                if (insertionIndex === sourceIndex) {
+                    return false;
+                }
+
+                return updateBookmarkLocation(source, (nodes) => {
+                    const nextNodes = nodes.filter(
+                        (node) => node.id !== nodeId
+                    );
+                    nextNodes.splice(insertionIndex, 0, movedNode);
+                    return nextNodes;
+                });
             }
 
             const sourceChildren = updateNodesAtFolderPath(
@@ -1105,7 +1147,18 @@ export const useBookmarks = (
             const destinationChildren = updateNodesAtFolderPath(
                 nextDestinationCategory.children,
                 destinationFolderPath,
-                (nodes) => [...nodes, movedNode]
+                (nodes) => {
+                    const nextNodes = [...nodes];
+                    const insertionIndex = Math.max(
+                        0,
+                        Math.min(
+                            destinationIndex ?? nextNodes.length,
+                            nextNodes.length
+                        )
+                    );
+                    nextNodes.splice(insertionIndex, 0, movedNode);
+                    return nextNodes;
+                }
             );
             if (destinationChildren === undefined) {
                 return false;
@@ -1119,7 +1172,7 @@ export const useBookmarks = (
                 )
             );
         },
-        [bookmarkTree, commitBookmarkTree]
+        [bookmarkTree, commitBookmarkTree, updateBookmarkLocation]
     );
 
     const addBookmarkToLocation = useCallback(

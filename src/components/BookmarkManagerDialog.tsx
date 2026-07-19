@@ -11,6 +11,7 @@ import {
     ExternalLink,
     FolderOpen,
     FolderPlus,
+    GripVertical,
     Link as LinkIcon,
     LoaderCircle,
     Pencil,
@@ -70,6 +71,12 @@ interface DraggedNode {
     id: string;
     isFolder: boolean;
     source: BookmarkLocation;
+}
+
+interface RowDropTarget {
+    destination: BookmarkLocation;
+    destinationIndex?: number;
+    key: string;
 }
 
 interface DestinationOption {
@@ -844,7 +851,10 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         });
     };
 
-    const canDropAt = (destination: BookmarkLocation): boolean => {
+    const canDropAt = (
+        destination: BookmarkLocation,
+        allowSameLocation = false
+    ): boolean => {
         if (draggedNode === undefined) {
             return false;
         }
@@ -859,7 +869,93 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
             draggedNode.isFolder &&
             destination.folderPath.includes(draggedNode.id);
 
-        return !isSameLocation && !isOwnDescendant;
+        return (allowSameLocation || !isSameLocation) && !isOwnDescendant;
+    };
+
+    const getRowDropTarget = (
+        event: React.DragEvent<HTMLDivElement>,
+        node: BookmarkNodeData,
+        nodeIndex: number,
+        rowKey: string
+    ): RowDropTarget | undefined => {
+        if (draggedNode === undefined || draggedNode.id === node.id) {
+            return undefined;
+        }
+
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const pointerRatio = (event.clientY - bounds.top) / bounds.height;
+        const isFolderCenter =
+            isBookmarkFolder(node) &&
+            pointerRatio >= 0.25 &&
+            pointerRatio <= 0.75;
+
+        if (isFolderCenter) {
+            const destination = {
+                categoryIndex: location.categoryIndex,
+                folderPath: [...location.folderPath, node.id],
+            };
+
+            return canDropAt(destination)
+                ? {
+                      destination,
+                      key: `${rowKey}:inside`,
+                  }
+                : undefined;
+        }
+
+        if (normalizedQuery !== '' || !canDropAt(location, true)) {
+            return undefined;
+        }
+
+        const position = pointerRatio < 0.5 ? 'before' : 'after';
+        return {
+            destination: location,
+            destinationIndex: nodeIndex + (position === 'after' ? 1 : 0),
+            key: `${rowKey}:${position}`,
+        };
+    };
+
+    const dragOverRow = (
+        event: React.DragEvent<HTMLDivElement>,
+        node: BookmarkNodeData,
+        nodeIndex: number,
+        rowKey: string
+    ) => {
+        const target = getRowDropTarget(event, node, nodeIndex, rowKey);
+        if (target === undefined) {
+            return;
+        }
+
+        event.preventDefault();
+        const { dataTransfer } = event;
+        dataTransfer.dropEffect = 'move';
+        setDropTargetKey(target.key);
+    };
+
+    const dropOnRow = (
+        event: React.DragEvent<HTMLDivElement>,
+        node: BookmarkNodeData,
+        nodeIndex: number,
+        rowKey: string
+    ) => {
+        event.preventDefault();
+        const target = getRowDropTarget(event, node, nodeIndex, rowKey);
+        if (
+            draggedNode !== undefined &&
+            target !== undefined &&
+            bookmarkControls.moveBookmarkNode(
+                draggedNode.source,
+                draggedNode.id,
+                target.destination,
+                target.destinationIndex
+            )
+        ) {
+            setLocation(target.destination);
+            setEditorDraft(undefined);
+        }
+
+        setDraggedNode(undefined);
+        setDropTargetKey(undefined);
     };
 
     const dragOverLocation = (
@@ -1492,7 +1588,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                     </span>
                                 </div>
                             ) : (
-                                visibleNodes.map((node) => {
+                                visibleNodes.map((node, nodeIndex) => {
                                     const isFolder = isBookmarkFolder(node);
                                     const rowKey = isFolder
                                         ? `folder-${getLocationKey(
@@ -1507,11 +1603,16 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                             node.id,
                                         ],
                                     };
+                                    const dropPosition =
+                                        dropTargetKey?.startsWith(`${rowKey}:`)
+                                            ? dropTargetKey.slice(
+                                                  rowKey.length + 1
+                                              )
+                                            : undefined;
 
                                     return (
                                         <div
                                             className='bookmark-workspace-list-row'
-                                            draggable
                                             data-dragging={
                                                 draggedNode?.id === node.id
                                                     ? 'true'
@@ -1520,26 +1621,73 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                             data-selected={
                                                 selectedKey === rowKey
                                             }
+                                            data-drop-position={dropPosition}
                                             key={node.id}
-                                            onDragStart={(event) => {
-                                                const { dataTransfer } = event;
-                                                dataTransfer.effectAllowed =
-                                                    'move';
-                                                dataTransfer.setData(
-                                                    'text/plain',
-                                                    node.id
+                                            onDragOver={(event) => {
+                                                dragOverRow(
+                                                    event,
+                                                    node,
+                                                    nodeIndex,
+                                                    rowKey
                                                 );
-                                                setDraggedNode({
-                                                    id: node.id,
-                                                    isFolder,
-                                                    source: location,
-                                                });
                                             }}
-                                            onDragEnd={() => {
-                                                setDraggedNode(undefined);
-                                                setDropTargetKey(undefined);
+                                            onDragLeave={leaveDropTarget}
+                                            onDrop={(event) => {
+                                                dropOnRow(
+                                                    event,
+                                                    node,
+                                                    nodeIndex,
+                                                    rowKey
+                                                );
                                             }}
                                         >
+                                            <button
+                                                className='bookmark-workspace-drag-handle'
+                                                type='button'
+                                                draggable
+                                                aria-label={t.dragBookmark}
+                                                onKeyDown={(event) => {
+                                                    if (
+                                                        event.key !==
+                                                            'ArrowUp' &&
+                                                        event.key !==
+                                                            'ArrowDown'
+                                                    ) {
+                                                        return;
+                                                    }
+
+                                                    event.preventDefault();
+                                                    bookmarkControls.moveBookmarkNode(
+                                                        location,
+                                                        node.id,
+                                                        location,
+                                                        event.key === 'ArrowUp'
+                                                            ? nodeIndex - 1
+                                                            : nodeIndex + 2
+                                                    );
+                                                }}
+                                                onDragStart={(event) => {
+                                                    const { dataTransfer } =
+                                                        event;
+                                                    dataTransfer.effectAllowed =
+                                                        'move';
+                                                    dataTransfer.setData(
+                                                        'text/plain',
+                                                        node.id
+                                                    );
+                                                    setDraggedNode({
+                                                        id: node.id,
+                                                        isFolder,
+                                                        source: location,
+                                                    });
+                                                }}
+                                                onDragEnd={() => {
+                                                    setDraggedNode(undefined);
+                                                    setDropTargetKey(undefined);
+                                                }}
+                                            >
+                                                <GripVertical aria-hidden='true' />
+                                            </button>
                                             {isFolder ? (
                                                 <button
                                                     className='bookmark-workspace-list-item'
