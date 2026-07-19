@@ -939,6 +939,14 @@
     gap: 0.5rem;
 }
 
+.bookmark-workspace-icon-search input {
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+}
+
+.bookmark-workspace-icon-search:has(button) input {
+    padding-right: 2.75rem;
+}
+
 .bookmark-workspace-icon-empty {
     min-height: 5rem;
     padding: 1rem;

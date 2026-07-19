@@ -1594,12 +1594,13 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                         {isIconPickerOpen ? (
                                             <div className='bookmark-workspace-icon-picker'>
                                                 <div
-                                                    className='bookmark-workspace-search quiet'
+                                                    className='bookmark-workspace-search bookmark-workspace-icon-search quiet'
                                                     role='search'
                                                 >
                                                     <Search aria-hidden='true' />
                                                     <input
-                                                        type='search'
+                                                        type='text'
+                                                        inputMode='search'
                                                         aria-label={
                                                             t.categoryIconSearch
                                                         }
