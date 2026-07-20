@@ -52,7 +52,7 @@ Deploy from a clean local checkout. The command builds the app, pushes the curre
 commit to GitHub, and deploys it to Oracle:
 
 ```bash
-bun deploy
+bun run deploy
 ```
 
 The container listens on `0.0.0.0:3102` and exposes `/api/health` for health
