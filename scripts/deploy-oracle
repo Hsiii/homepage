@@ -29,7 +29,7 @@ COPYFILE_DISABLE=1 tar --no-xattrs -C "$tmp_dir" -czf - . | ssh "$host" "
     set -euo pipefail
     mkdir -p \"$(dirname "$remote_artifact_dir")\"
     next_dir=\"\$(mktemp -d \"${remote_artifact_dir}.XXXXXX\")\"
-    tar -xzf - -C \"\$next_dir\"
+    tar --warning=no-unknown-keyword -xzf - -C \"\$next_dir\"
     rm -rf \"${remote_artifact_dir}.previous\"
     if [ -d \"$remote_artifact_dir\" ]; then
         mv \"$remote_artifact_dir\" \"${remote_artifact_dir}.previous\"
