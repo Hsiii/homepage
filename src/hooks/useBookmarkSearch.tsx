@@ -143,7 +143,8 @@ const findBookmarkByTitle = (
 };
 
 export const useBookmarkSearch = (
-    bookmarkTree: readonly BookmarkCategoryData[]
+    bookmarkTree: readonly BookmarkCategoryData[],
+    bookmarksLoading = false
 ): {
     blockedFeedsLinks: FeedsLink[];
     clearSearch: () => void;
@@ -193,6 +194,9 @@ export const useBookmarkSearch = (
     const searchSuggestionsPositionRef = useRef<
         SearchSuggestionsPosition | undefined
     >(undefined);
+    const pendingSearchRef = useRef<
+        { keySequence: string; value: string } | undefined
+    >(undefined);
     const flattenedSearchItems = useMemo<LinkItem[]>(
         () => getSearchItems(bookmarkTree),
         [bookmarkTree]
@@ -201,7 +205,9 @@ export const useBookmarkSearch = (
     const trimmedSearchValue = searchValue.trim();
     const hasSearchQuery = trimmedSearchValue !== '';
     const isSlashCommandQuery = isSlashCommandSearch(trimmedSearchValue);
-    const slashCommandResults = getSlashCommandResults(searchValue);
+    const slashCommandResults = bookmarksLoading
+        ? []
+        : getSlashCommandResults(searchValue);
     const searchResults = useMemo(
         () =>
             hasSearchQuery && !isSlashCommandQuery
@@ -219,7 +225,8 @@ export const useBookmarkSearch = (
             trimmedSearchValue,
         ]
     );
-    const hasGoogleSearchResult = hasSearchQuery && !isSlashCommandQuery;
+    const hasGoogleSearchResult =
+        hasSearchQuery && !isSlashCommandQuery && !bookmarksLoading;
     const hasSearchSuggestions =
         hasGoogleSearchResult || slashCommandResults.length > 0;
     const searchResultIndexOffset = slashCommandResults.length;
@@ -424,6 +431,40 @@ export const useBookmarkSearch = (
         searchGoogle(searchValue);
     }, [searchGoogle, searchValue]);
 
+    useEffect(() => {
+        if (bookmarksLoading || pendingSearchRef.current === undefined) {
+            return;
+        }
+
+        const pendingSearch = pendingSearchRef.current;
+        pendingSearchRef.current = undefined;
+        const slashCommand = getSlashCommandResults(pendingSearch.value).at(0);
+
+        if (slashCommand !== undefined) {
+            executeSlashCommand(slashCommand);
+            return;
+        }
+
+        const result = getSearchResults(
+            flattenedSearchItems,
+            pendingSearch.value,
+            pendingSearch.keySequence
+        ).at(0);
+
+        if (result !== undefined) {
+            navigateToSearchResult(result);
+            return;
+        }
+
+        searchGoogle(pendingSearch.value);
+    }, [
+        bookmarksLoading,
+        executeSlashCommand,
+        flattenedSearchItems,
+        navigateToSearchResult,
+        searchGoogle,
+    ]);
+
     const handleSearchKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'ArrowDown' && searchNavigationItemCount > 0) {
@@ -455,6 +496,7 @@ export const useBookmarkSearch = (
 
             if (e.key === 'Escape') {
                 e.preventDefault();
+                pendingSearchRef.current = undefined;
                 setSearchValue('');
                 setSearchKeySequence('');
                 setRequestedSearchResultIndex(undefined);
@@ -477,6 +519,15 @@ export const useBookmarkSearch = (
                 if (sequenceInput !== undefined) {
                     setSearchKeySequence((value) => value + sequenceInput);
                 }
+                return;
+            }
+
+            if (bookmarksLoading) {
+                e.preventDefault();
+                pendingSearchRef.current = {
+                    keySequence: searchKeySequence,
+                    value: searchValue,
+                };
                 return;
             }
 
@@ -507,6 +558,7 @@ export const useBookmarkSearch = (
             }
         },
         [
+            bookmarksLoading,
             googleSearchResultIndex,
             hasGoogleSearchResult,
             highlightedSearchResultIndex,
@@ -514,6 +566,7 @@ export const useBookmarkSearch = (
             navigateToSearchResult,
             searchGoogle,
             searchNavigationItemCount,
+            searchKeySequence,
             searchValue,
             selectedSearchResult,
             selectedSlashCommand,
@@ -556,6 +609,14 @@ export const useBookmarkSearch = (
     const handleSubmit = useCallback(
         (e: React.FormEvent) => {
             e.preventDefault();
+            if (bookmarksLoading) {
+                pendingSearchRef.current = {
+                    keySequence: searchKeySequence,
+                    value: searchValue,
+                };
+                return;
+            }
+
             if (selectedSlashCommand) {
                 executeSlashCommand(selectedSlashCommand);
                 return;
@@ -567,10 +628,12 @@ export const useBookmarkSearch = (
             }
         },
         [
+            bookmarksLoading,
             navigateToSearchResult,
             executeSlashCommand,
             hasGoogleSearchResult,
             searchGoogle,
+            searchKeySequence,
             searchValue,
             selectedSearchResult,
             selectedSlashCommand,
@@ -582,6 +645,7 @@ export const useBookmarkSearch = (
     }, []);
 
     const handleSearchBlur = useCallback(() => {
+        pendingSearchRef.current = undefined;
         setInputFocused(false);
         setSearchValue('');
         setSearchKeySequence('');
@@ -590,6 +654,7 @@ export const useBookmarkSearch = (
 
     const handleSearchChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
+            pendingSearchRef.current = undefined;
             setSearchValue(e.target.value);
             if (e.target.value === '') {
                 setSearchKeySequence('');

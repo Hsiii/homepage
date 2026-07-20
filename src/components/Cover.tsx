@@ -85,7 +85,10 @@ const CoverContent: React.FC<CoverContentProps> = ({
         selectedSearchResult,
         slashCommandResults,
         trimmedSearchValue,
-    } = useBookmarkSearch(bookmarkControls.bookmarkTree);
+    } = useBookmarkSearch(
+        bookmarkControls.bookmarkTree,
+        bookmarkControls.isLoading
+    );
 
     return (
         <section className='cover'>

@@ -443,7 +443,7 @@ export const useBookmarks = (
     );
     const [status, setStatus] = useState<BookmarkStatus>();
     const [isLoading, setIsLoading] = useState(
-        hasAuth && initialBookmarkTree === undefined
+        initialBookmarkTree === undefined
     );
     const [saveState, setSaveState] = useState<BookmarkSaveState>(
         hasAuth ? 'idle' : 'saved'
@@ -595,10 +595,10 @@ export const useBookmarks = (
         const cachedBookmarkTree = readUserBookmarkTree(remoteUserId);
 
         setBookmarkTree(cachedBookmarkTree ?? emptyBookmarkTree);
+        setIsLoading(cachedBookmarkTree === undefined);
 
         let isCurrent = true;
         const loadMutationVersion = mutationVersionRef.current;
-        setIsLoading(true);
 
         const loadRemoteBookmarkTree = async () => {
             try {
