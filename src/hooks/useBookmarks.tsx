@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import type {
     BookmarkCategoryData,
@@ -439,11 +439,14 @@ export const useBookmarks = (
             ? options.auth.userId
             : undefined;
     const [bookmarkTree, setBookmarkTree] = useState<BookmarkCategoryData[]>(
-        initialBookmarkTree ?? emptyBookmarkTree
+        () =>
+            initialBookmarkTree ??
+            (hasAuth ? undefined : readGuestBookmarkTree()) ??
+            emptyBookmarkTree
     );
     const [status, setStatus] = useState<BookmarkStatus>();
     const [isLoading, setIsLoading] = useState(
-        initialBookmarkTree === undefined
+        initialBookmarkTree === undefined && hasAuth
     );
     const [saveState, setSaveState] = useState<BookmarkSaveState>(
         hasAuth ? 'idle' : 'saved'
@@ -570,13 +573,17 @@ export const useBookmarks = (
         [hasAuth, isAuthLoaded, remoteUserId, saveRemoteBookmarkTree]
     );
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (hasAuth && !isAuthLoaded) {
             setIsLoading(true);
             return undefined;
         }
 
         if (remoteUserId === undefined) {
+            if (!hasAuth) {
+                return undefined;
+            }
+
             const storedBookmarkTree = readGuestBookmarkTree();
 
             setBookmarkTree(storedBookmarkTree ?? emptyBookmarkTree);
