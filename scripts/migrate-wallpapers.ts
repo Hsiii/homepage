@@ -4,7 +4,6 @@ import {
     PutObjectCommand,
     S3Client,
 } from '@aws-sdk/client-s3';
-import { head } from '@vercel/blob';
 import postgres from 'postgres';
 
 /* eslint-disable no-await-in-loop, unicorn/template-indent */
@@ -50,21 +49,6 @@ const databaseUrl = readRequiredSetting('DATABASE_URL');
 const sql = postgres(databaseUrl, { max: 1, prepare: false });
 let r2: S3Client | undefined;
 
-const getBlobToken = (): string => {
-    const token = [
-        process.env.WALLPAPER_READ_WRITE_TOKEN?.trim(),
-        process.env.BLOB_READ_WRITE_TOKEN?.trim(),
-    ].find((value) => value !== undefined && value !== '');
-
-    if (token === undefined) {
-        throw new Error(
-            'WALLPAPER_READ_WRITE_TOKEN or BLOB_READ_WRITE_TOKEN is not configured.'
-        );
-    }
-
-    return token;
-};
-
 const getR2 = (): S3Client => {
     r2 ??= new S3Client({
         credentials: {
@@ -84,8 +68,16 @@ const hash = (body: Uint8Array): string =>
     createHash('sha256').update(body).digest('hex');
 
 const readLegacyObject = async (row: WallpaperRow): Promise<Uint8Array> => {
-    const metadata = await head(row.object_key, { token: getBlobToken() });
-    const response = await fetch(metadata.downloadUrl);
+    const url = new URL(row.download_url || row.url);
+
+    if (
+        url.protocol !== 'https:' ||
+        !url.hostname.endsWith('.blob.vercel-storage.com')
+    ) {
+        throw new Error('Legacy object URL is not a Vercel Blob URL.');
+    }
+
+    const response = await fetch(url);
 
     if (!response.ok) {
         throw new Error(`Legacy object fetch failed with ${response.status}.`);
