@@ -28,7 +28,6 @@ bucket. Set these secret environment variables on the trusted migration host:
 ```text
 SOURCE_DATABASE_URL
 TARGET_DATABASE_URL
-WALLPAPER_READ_WRITE_TOKEN (or BLOB_READ_WRITE_TOKEN)
 R2_ENDPOINT
 R2_BUCKET
 R2_ACCESS_KEY_ID
@@ -37,6 +36,12 @@ R2_SECRET_ACCESS_KEY
 
 Use the account-specific S3 endpoint in `R2_ENDPOINT`, including `https://`.
 Provider resource IDs and secret values remain outside the repository.
+Keep the existing Blob token in the runtime environment throughout the rollback
+window even though the migration command reads the existing public Blob URLs.
+
+The production image includes all three scripts under `/app/scripts`, so a
+trusted operator can run them from a one-shot container attached to the private
+data network without exposing PostgreSQL publicly.
 
 ## 2. Prepare and copy PostgreSQL
 
