@@ -61,10 +61,9 @@ interface EditorDraft extends BookmarkLocation {
     url: string;
 }
 
-interface DeleteRequest extends BookmarkLocation {
+interface DeleteTarget extends BookmarkLocation {
     bookmarkId?: string;
     kind: EditorDraft['kind'];
-    label: string;
 }
 
 interface DraggedNode {
@@ -420,12 +419,14 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
     const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
     const [iconQuery, setIconQuery] = useState('');
-    const [deleteRequest, setDeleteRequest] = useState<DeleteRequest>();
+    const [isTrashOpen, setIsTrashOpen] = useState(false);
+    const [isEmptyTrashConfirmOpen, setIsEmptyTrashConfirmOpen] =
+        useState(false);
     const [discardTarget, setDiscardTarget] = useState<'dialog' | 'editor'>();
     const [undoSnapshot, setUndoSnapshot] = useState<{
-        label: string;
-        tree: readonly BookmarkCategoryData[];
+        id: string;
     }>();
+    const undoToastRef = useRef<HTMLDivElement>(null);
     const [draggedNode, setDraggedNode] = useState<DraggedNode>();
     const [dropTargetKey, setDropTargetKey] = useState<string>();
     const [quickAddValue, setQuickAddValue] = useState('');
@@ -755,46 +756,37 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         }
     };
 
-    const confirmDelete = () => {
-        if (deleteRequest === undefined) {
-            return;
-        }
-
-        const previousTree = bookmarkTree;
-        const didDelete = (() => {
-            if (deleteRequest.kind === 'category') {
+    const deleteItem = (deleteTarget: DeleteTarget) => {
+        const trashItemId = (() => {
+            if (deleteTarget.kind === 'category') {
                 return bookmarkControls.deleteCategory(
-                    deleteRequest.categoryIndex
+                    deleteTarget.categoryIndex
                 );
             }
-            if (deleteRequest.kind === 'folder') {
-                return bookmarkControls.deleteFolder(deleteRequest);
+            if (deleteTarget.kind === 'folder') {
+                return bookmarkControls.deleteFolder(deleteTarget);
             }
             return bookmarkControls.deleteBookmark(
-                deleteRequest.categoryIndex,
-                deleteRequest.bookmarkId ?? ''
+                deleteTarget.categoryIndex,
+                deleteTarget.bookmarkId ?? ''
             );
         })();
 
-        if (didDelete) {
-            setUndoSnapshot({
-                label: deleteRequest.label,
-                tree: previousTree,
-            });
+        if (trashItemId !== false) {
+            setUndoSnapshot({ id: trashItemId });
             setEditorDraft(undefined);
             setDraftBaseline('');
             setLocation({
                 categoryIndex:
-                    deleteRequest.kind === 'category'
+                    deleteTarget.kind === 'category'
                         ? Math.min(
-                              deleteRequest.categoryIndex,
+                              deleteTarget.categoryIndex,
                               bookmarkTree.length - 2
                           )
-                        : deleteRequest.categoryIndex,
+                        : deleteTarget.categoryIndex,
                 folderPath: [],
             });
         }
-        setDeleteRequest(undefined);
     };
 
     const undoDelete = () => {
@@ -802,7 +794,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
             return;
         }
 
-        bookmarkControls.replaceBookmarkTree(undoSnapshot.tree);
+        bookmarkControls.restoreTrashItem(undoSnapshot.id);
         setUndoSnapshot(undefined);
     };
 
@@ -815,11 +807,21 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
             return undefined;
         }
 
-        const timeout = globalThis.window.setTimeout(
-            (_timeoutArgument: undefined) => {
-                setUndoSnapshot(undefined);
-            },
-            6000,
+        let timeout: number;
+        const dismissWhenIdle = (_timeoutArgument: undefined) => {
+            if (undoToastRef.current?.matches(':hover') === true) {
+                timeout = globalThis.window.setTimeout(
+                    dismissWhenIdle,
+                    100,
+                    undefined
+                );
+                return;
+            }
+            setUndoSnapshot(undefined);
+        };
+        timeout = globalThis.window.setTimeout(
+            dismissWhenIdle,
+            1000,
             undefined
         );
 
@@ -1192,8 +1194,10 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                     }
 
                     event.preventDefault();
-                    if (deleteRequest !== undefined) {
-                        setDeleteRequest(undefined);
+                    if (isEmptyTrashConfirmOpen) {
+                        setIsEmptyTrashConfirmOpen(false);
+                    } else if (isTrashOpen) {
+                        setIsTrashOpen(false);
                     } else if (discardTarget !== undefined) {
                         setDiscardTarget(undefined);
                     } else if (isLocationPickerOpen) {
@@ -1257,6 +1261,23 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                         >
                             <Download aria-hidden='true' />
                             <span>{t.export}</span>
+                        </button>
+                        <button
+                            className='bookmark-workspace-header-button'
+                            type='button'
+                            aria-label={t.trash}
+                            onClick={() => {
+                                setIsTrashOpen(true);
+                            }}
+                        >
+                            <Trash2 aria-hidden='true' />
+                            <span>{t.trash}</span>
+                            {bookmarkControls.bookmarkTrash.length ===
+                            0 ? undefined : (
+                                <small>
+                                    {bookmarkControls.bookmarkTrash.length}
+                                </small>
+                            )}
                         </button>
                         <button
                             className='bookmark-workspace-icon-button'
@@ -2080,9 +2101,8 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                             className='bookmark-workspace-danger-button'
                                             type='button'
                                             onClick={() => {
-                                                setDeleteRequest({
+                                                deleteItem({
                                                     ...editorDraft,
-                                                    label: editorDraft.title,
                                                 });
                                             }}
                                         >
@@ -2124,7 +2144,109 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                     </div>
                 )}
 
-                {deleteRequest === undefined ? undefined : (
+                {isTrashOpen ? (
+                    <div className='bookmark-workspace-editor-backdrop'>
+                        <section
+                            className='bookmark-workspace-trash-dialog'
+                            role='dialog'
+                            aria-label={t.trash}
+                            aria-modal='true'
+                        >
+                            <header>
+                                <div>
+                                    <Trash2 aria-hidden='true' />
+                                    <div>
+                                        <h3>{t.trash}</h3>
+                                        <p>{t.trashEmptyDescription}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    className='bookmark-workspace-icon-button'
+                                    type='button'
+                                    aria-label={t.cancel}
+                                    onClick={() => {
+                                        setIsTrashOpen(false);
+                                    }}
+                                >
+                                    <X aria-hidden='true' />
+                                </button>
+                            </header>
+                            {bookmarkControls.bookmarkTrash.length === 0 ? (
+                                <div className='bookmark-workspace-empty'>
+                                    <Trash2 aria-hidden='true' />
+                                    <strong>{t.trashEmpty}</strong>
+                                    <span>{t.trashEmptyDescription}</span>
+                                </div>
+                            ) : (
+                                <div className='bookmark-workspace-trash-list'>
+                                    {bookmarkControls.bookmarkTrash.map(
+                                        (trashItem) => (
+                                            <div key={trashItem.id}>
+                                                <span className='bookmark-workspace-item-icon'>
+                                                    {trashItem.kind ===
+                                                    'bookmark' ? (
+                                                        <Bookmark aria-hidden='true' />
+                                                    ) : (
+                                                        <FolderOpen aria-hidden='true' />
+                                                    )}
+                                                </span>
+                                                <span>
+                                                    <strong>
+                                                        {trashItem.label}
+                                                    </strong>
+                                                    <small>
+                                                        {t[trashItem.kind]} ·{' '}
+                                                        {new Intl.DateTimeFormat(
+                                                            locale,
+                                                            {
+                                                                dateStyle:
+                                                                    'medium',
+                                                            }
+                                                        ).format(
+                                                            new Date(
+                                                                trashItem.deletedAt
+                                                            )
+                                                        )}
+                                                    </small>
+                                                </span>
+                                                <button
+                                                    className='bookmark-workspace-secondary-button'
+                                                    type='button'
+                                                    onClick={() => {
+                                                        bookmarkControls.restoreTrashItem(
+                                                            trashItem.id
+                                                        );
+                                                    }}
+                                                >
+                                                    <Undo2 aria-hidden='true' />
+                                                    {t.restore}
+                                                </button>
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            )}
+                            <footer>
+                                <button
+                                    className='bookmark-workspace-danger-button'
+                                    type='button'
+                                    disabled={
+                                        bookmarkControls.bookmarkTrash
+                                            .length === 0
+                                    }
+                                    onClick={() => {
+                                        setIsEmptyTrashConfirmOpen(true);
+                                    }}
+                                >
+                                    <Trash2 aria-hidden='true' />
+                                    {t.emptyTrash}
+                                </button>
+                            </footer>
+                        </section>
+                    </div>
+                ) : undefined}
+
+                {isEmptyTrashConfirmOpen ? (
                     <div className='bookmark-workspace-confirm-backdrop'>
                         <div
                             className='bookmark-workspace-confirm'
@@ -2135,14 +2257,14 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                 <Trash2 aria-hidden='true' />
                             </span>
                             <div>
-                                <h3>{t.deleteItemConfirm}</h3>
-                                <p>{deleteRequest.label}</p>
+                                <h3>{t.emptyTrash}?</h3>
+                                <p>{t.emptyTrashConfirm}</p>
                             </div>
                             <div>
                                 <button
                                     type='button'
                                     onClick={() => {
-                                        setDeleteRequest(undefined);
+                                        setIsEmptyTrashConfirmOpen(false);
                                     }}
                                 >
                                     {t.cancel}
@@ -2150,15 +2272,18 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                 <button
                                     className='danger'
                                     type='button'
-                                    onClick={confirmDelete}
+                                    onClick={() => {
+                                        bookmarkControls.emptyTrash();
+                                        setIsEmptyTrashConfirmOpen(false);
+                                    }}
                                 >
                                     <Trash2 aria-hidden='true' />
-                                    {t.deleteBookmark}
+                                    {t.emptyTrash}
                                 </button>
                             </div>
                         </div>
                     </div>
-                )}
+                ) : undefined}
 
                 {discardTarget === undefined ? undefined : (
                     <div className='bookmark-workspace-confirm-backdrop'>
@@ -2192,10 +2317,13 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                 )}
 
                 {undoSnapshot === undefined ? undefined : (
-                    <div className='bookmark-workspace-toast' role='status'>
-                        <span>{undoSnapshot.label}</span>
+                    <div
+                        ref={undoToastRef}
+                        className='bookmark-workspace-toast'
+                        role='status'
+                    >
+                        <span>{t.deleted}</span>
                         <button type='button' onClick={undoDelete}>
-                            <Undo2 aria-hidden='true' />
                             {t.undo}
                         </button>
                     </div>

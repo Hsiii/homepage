@@ -5,8 +5,10 @@ import type {
     BookmarkFolderData,
     BookmarkLinkData,
     BookmarkNodeData,
+    BookmarkTrashItemData,
 } from '@/types/bookmarks';
 import {
+    coerceBookmarkTrash,
     coerceBookmarkTree,
     parseBrowserBookmarks,
     serializeBrowserBookmarks,
@@ -16,7 +18,7 @@ import { isBrowser } from '@/utils/browserEnv';
 const bookmarkApiPath = '/api/bookmarks';
 const guestBookmarkStorageKey = 'homepage.bookmarks';
 const userBookmarkStorageKeyPrefix = 'homepage.bookmarks.user';
-const bookmarkStorageVersion = 2;
+const bookmarkStorageVersion = 3;
 
 type BookmarkStatusMessageKey =
     | 'bookmarksExported'
@@ -68,9 +70,14 @@ export interface BookmarkControls {
         folder: BookmarkFolderInput
     ) => boolean;
     bookmarkTree: BookmarkCategoryData[];
-    deleteBookmark: (categoryIndex: number, bookmarkId: string) => boolean;
-    deleteCategory: (categoryIndex: number) => boolean;
-    deleteFolder: (location: BookmarkLocationInput) => boolean;
+    bookmarkTrash: BookmarkTrashItemData[];
+    deleteBookmark: (
+        categoryIndex: number,
+        bookmarkId: string
+    ) => false | string;
+    deleteCategory: (categoryIndex: number) => false | string;
+    deleteFolder: (location: BookmarkLocationInput) => false | string;
+    emptyTrash: () => boolean;
     exportBookmarks: () => void;
     importBookmarks: (file: File) => Promise<void>;
     canEdit: boolean;
@@ -84,6 +91,7 @@ export interface BookmarkControls {
     replaceBookmarkTree: (
         bookmarkTree: readonly BookmarkCategoryData[]
     ) => boolean;
+    restoreTrashItem: (trashItemId: string) => boolean;
     saveState: BookmarkSaveState;
     status?: BookmarkStatus;
     updateBookmark: (
@@ -111,6 +119,12 @@ export interface BookmarkControls {
 
 interface BookmarkApiResponse {
     categories?: BookmarkCategoryData[];
+    trash?: BookmarkTrashItemData[];
+}
+
+interface StoredBookmarkData {
+    categories?: BookmarkCategoryData[];
+    trash: BookmarkTrashItemData[];
 }
 
 interface BookmarkAuthState {
@@ -125,17 +139,15 @@ interface UseBookmarksOptions {
     initialBookmarkTree?: BookmarkCategoryData[];
 }
 
-const readStoredBookmarkTree = (
-    storageKey: string
-): BookmarkCategoryData[] | undefined => {
+const readStoredBookmarkData = (storageKey: string): StoredBookmarkData => {
     if (!isBrowser()) {
-        return undefined;
+        return { trash: [] };
     }
 
     try {
         const storedValue = globalThis.localStorage.getItem(storageKey);
         if (storedValue === null) {
-            return undefined;
+            return { trash: [] };
         }
 
         const parsedValue: unknown = JSON.parse(storedValue);
@@ -144,25 +156,32 @@ const readStoredBookmarkTree = (
             parsedValue !== null &&
             'categories' in parsedValue
         ) {
-            return coerceBookmarkTree(
-                (parsedValue as { categories: unknown }).categories
-            );
+            const storedData = parsedValue as {
+                categories: unknown;
+                trash?: unknown;
+            };
+            return {
+                categories: coerceBookmarkTree(storedData.categories),
+                trash: coerceBookmarkTrash(storedData.trash ?? []) ?? [],
+            };
         }
 
-        return coerceBookmarkTree(parsedValue);
+        return { categories: coerceBookmarkTree(parsedValue), trash: [] };
     } catch {
-        return undefined;
+        return { trash: [] };
     }
 };
 
 const storeBookmarkTree = (
     storageKey: string,
-    bookmarkTree: readonly BookmarkCategoryData[]
+    bookmarkTree: readonly BookmarkCategoryData[],
+    bookmarkTrash: readonly BookmarkTrashItemData[]
 ): void => {
     globalThis.localStorage.setItem(
         storageKey,
         JSON.stringify({
             categories: bookmarkTree,
+            trash: bookmarkTrash,
             version: bookmarkStorageVersion,
         })
     );
@@ -171,25 +190,29 @@ const storeBookmarkTree = (
 const getUserBookmarkStorageKey = (userId: string): string =>
     `${userBookmarkStorageKeyPrefix}.${userId}`;
 
-const readGuestBookmarkTree = (): BookmarkCategoryData[] | undefined =>
-    readStoredBookmarkTree(guestBookmarkStorageKey);
+const readGuestBookmarkData = (): StoredBookmarkData =>
+    readStoredBookmarkData(guestBookmarkStorageKey);
 
-const readUserBookmarkTree = (
-    userId: string
-): BookmarkCategoryData[] | undefined =>
-    readStoredBookmarkTree(getUserBookmarkStorageKey(userId));
+const readUserBookmarkData = (userId: string): StoredBookmarkData =>
+    readStoredBookmarkData(getUserBookmarkStorageKey(userId));
 
 const storeGuestBookmarkTree = (
-    bookmarkTree: readonly BookmarkCategoryData[]
+    bookmarkTree: readonly BookmarkCategoryData[],
+    bookmarkTrash: readonly BookmarkTrashItemData[]
 ): void => {
-    storeBookmarkTree(guestBookmarkStorageKey, bookmarkTree);
+    storeBookmarkTree(guestBookmarkStorageKey, bookmarkTree, bookmarkTrash);
 };
 
 const storeUserBookmarkTree = (
     userId: string,
-    bookmarkTree: readonly BookmarkCategoryData[]
+    bookmarkTree: readonly BookmarkCategoryData[],
+    bookmarkTrash: readonly BookmarkTrashItemData[]
 ): void => {
-    storeBookmarkTree(getUserBookmarkStorageKey(userId), bookmarkTree);
+    storeBookmarkTree(
+        getUserBookmarkStorageKey(userId),
+        bookmarkTree,
+        bookmarkTrash
+    );
 };
 
 const normalizeInputText = (value: string): string =>
@@ -207,23 +230,29 @@ const createBookmarkId = (): string => createEntityId('bookmark');
 
 const createFolderId = (): string => createEntityId('folder');
 
-const fallbackCategory: BookmarkCategoryData = {
-    category: 'Bookmarks',
-    children: [],
-    id: 'fallback-category-bookmarks',
-    links: [],
-};
 const emptyBookmarkTree: BookmarkCategoryData[] = [];
 
-const hasBookmarkNode = (
+const findBookmarkNode = (
     nodes: readonly BookmarkNodeData[],
-    bookmarkId: string
-): boolean =>
-    nodes.some((node) =>
-        node.type === 'link'
-            ? node.id === bookmarkId
-            : hasBookmarkNode(node.children, bookmarkId)
-    );
+    bookmarkId: string,
+    folderPath: readonly string[] = []
+): { bookmark: BookmarkLinkData; folderPath: string[] } | undefined => {
+    for (const node of nodes) {
+        if (node.type === 'link' && node.id === bookmarkId) {
+            return { bookmark: node, folderPath: [...folderPath] };
+        }
+        if (node.type === 'folder') {
+            const match = findBookmarkNode(node.children, bookmarkId, [
+                ...folderPath,
+                node.id,
+            ]);
+            if (match !== undefined) {
+                return match;
+            }
+        }
+    }
+    return undefined;
+};
 
 const updateBookmarkNodes = (
     nodes: readonly BookmarkNodeData[],
@@ -277,6 +306,23 @@ const getNodesAtFolderPath = (
     return folder === undefined
         ? undefined
         : getNodesAtFolderPath(folder.children, folderPath.slice(1));
+};
+
+const getFolderAtPath = (
+    nodes: readonly BookmarkNodeData[],
+    folderPath: readonly string[]
+): BookmarkFolderData | undefined => {
+    if (folderPath.length === 0) {
+        return undefined;
+    }
+    const folderId = folderPath[0];
+    const folder = nodes.find(
+        (node): node is BookmarkFolderData =>
+            node.type === 'folder' && node.id === folderId
+    );
+    return folderPath.length === 1 || folder === undefined
+        ? folder
+        : getFolderAtPath(folder.children, folderPath.slice(1));
 };
 
 const updateNodesAtFolderPath = (
@@ -418,11 +464,12 @@ const readBookmarkResponse = async (
     }
 
     const categories = coerceBookmarkTree(payload.categories);
-    if (categories === undefined) {
+    const trash = coerceBookmarkTrash(payload.trash ?? []);
+    if (categories === undefined || trash === undefined) {
         throw new Error('Bookmark data is invalid.');
     }
 
-    return { categories };
+    return { categories, trash };
 };
 
 export const useBookmarks = (
@@ -438,11 +485,15 @@ export const useBookmarks = (
         typeof options.auth.userId === 'string'
             ? options.auth.userId
             : undefined;
+    const initialGuestData = hasAuth ? { trash: [] } : readGuestBookmarkData();
     const [bookmarkTree, setBookmarkTree] = useState<BookmarkCategoryData[]>(
         () =>
             initialBookmarkTree ??
-            (hasAuth ? undefined : readGuestBookmarkTree()) ??
+            initialGuestData.categories ??
             emptyBookmarkTree
+    );
+    const [bookmarkTrash, setBookmarkTrash] = useState<BookmarkTrashItemData[]>(
+        () => initialGuestData.trash
     );
     const [status, setStatus] = useState<BookmarkStatus>();
     const [isLoading, setIsLoading] = useState(
@@ -476,6 +527,7 @@ export const useBookmarks = (
     const saveRemoteBookmarkTree = useCallback(
         async (
             nextBookmarkTree: readonly BookmarkCategoryData[],
+            nextBookmarkTrash: readonly BookmarkTrashItemData[],
             shouldReportError = true,
             saveOperation?: number
         ): Promise<boolean> => {
@@ -486,7 +538,10 @@ export const useBookmarks = (
                 }
 
                 const response = await fetch(bookmarkApiPath, {
-                    body: JSON.stringify({ categories: nextBookmarkTree }),
+                    body: JSON.stringify({
+                        categories: nextBookmarkTree,
+                        trash: nextBookmarkTrash,
+                    }),
                     headers: {
                         ...headers,
                         'Content-Type': 'application/json',
@@ -498,7 +553,8 @@ export const useBookmarks = (
                 try {
                     storeUserBookmarkTree(
                         remoteUserId,
-                        payload.categories ?? nextBookmarkTree
+                        payload.categories ?? nextBookmarkTree,
+                        payload.trash ?? nextBookmarkTrash
                     );
                 } catch {
                     // The remote copy remains authoritative if the cache fails.
@@ -527,19 +583,28 @@ export const useBookmarks = (
     );
 
     const commitBookmarkTree = useCallback(
-        (nextBookmarkTree: readonly BookmarkCategoryData[]) => {
+        (
+            nextBookmarkTree: readonly BookmarkCategoryData[],
+            nextBookmarkTrash: readonly BookmarkTrashItemData[] = bookmarkTrash
+        ) => {
             if (hasAuth && !isAuthLoaded) {
                 return false;
             }
 
             const normalizedBookmarkTree =
                 coerceBookmarkTree(nextBookmarkTree) ?? [];
+            const normalizedBookmarkTrash =
+                coerceBookmarkTrash(nextBookmarkTrash) ?? [];
 
             mutationVersionRef.current++;
             setBookmarkTree([...normalizedBookmarkTree]);
+            setBookmarkTrash([...normalizedBookmarkTrash]);
             if (remoteUserId === undefined) {
                 try {
-                    storeGuestBookmarkTree(normalizedBookmarkTree);
+                    storeGuestBookmarkTree(
+                        normalizedBookmarkTree,
+                        normalizedBookmarkTrash
+                    );
                 } catch {
                     setSaveState('error');
                     setStatus({
@@ -551,7 +616,11 @@ export const useBookmarks = (
                 setSaveState('saved');
             } else {
                 try {
-                    storeUserBookmarkTree(remoteUserId, normalizedBookmarkTree);
+                    storeUserBookmarkTree(
+                        remoteUserId,
+                        normalizedBookmarkTree,
+                        normalizedBookmarkTrash
+                    );
                 } catch {
                     // Saving remotely should not depend on the local cache.
                 }
@@ -562,6 +631,7 @@ export const useBookmarks = (
                     async () => {
                         await saveRemoteBookmarkTree(
                             normalizedBookmarkTree,
+                            normalizedBookmarkTrash,
                             true,
                             saveOperation
                         );
@@ -570,7 +640,13 @@ export const useBookmarks = (
             }
             return true;
         },
-        [hasAuth, isAuthLoaded, remoteUserId, saveRemoteBookmarkTree]
+        [
+            bookmarkTrash,
+            hasAuth,
+            isAuthLoaded,
+            remoteUserId,
+            saveRemoteBookmarkTree,
+        ]
     );
 
     useLayoutEffect(() => {
@@ -584,9 +660,10 @@ export const useBookmarks = (
                 return undefined;
             }
 
-            const storedBookmarkTree = readGuestBookmarkTree();
+            const storedBookmarkData = readGuestBookmarkData();
 
-            setBookmarkTree(storedBookmarkTree ?? emptyBookmarkTree);
+            setBookmarkTree(storedBookmarkData.categories ?? emptyBookmarkTree);
+            setBookmarkTrash(storedBookmarkData.trash);
             setIsLoading(false);
             setSaveState('saved');
             return undefined;
@@ -594,15 +671,17 @@ export const useBookmarks = (
 
         if (initialBookmarkTree !== undefined) {
             setBookmarkTree(initialBookmarkTree);
+            setBookmarkTrash([]);
             setIsLoading(false);
             setSaveState('saved');
             return undefined;
         }
 
-        const cachedBookmarkTree = readUserBookmarkTree(remoteUserId);
+        const cachedBookmarkData = readUserBookmarkData(remoteUserId);
 
-        setBookmarkTree(cachedBookmarkTree ?? emptyBookmarkTree);
-        setIsLoading(cachedBookmarkTree === undefined);
+        setBookmarkTree(cachedBookmarkData.categories ?? emptyBookmarkTree);
+        setBookmarkTrash(cachedBookmarkData.trash);
+        setIsLoading(cachedBookmarkData.categories === undefined);
 
         let isCurrent = true;
         const loadMutationVersion = mutationVersionRef.current;
@@ -626,9 +705,14 @@ export const useBookmarks = (
 
                 if (payload.categories !== undefined) {
                     setBookmarkTree(payload.categories);
+                    setBookmarkTrash(payload.trash ?? []);
 
                     try {
-                        storeUserBookmarkTree(remoteUserId, payload.categories);
+                        storeUserBookmarkTree(
+                            remoteUserId,
+                            payload.categories,
+                            payload.trash ?? []
+                        );
                     } catch {
                         // The fresh remote data can still be used without caching.
                     }
@@ -761,21 +845,32 @@ export const useBookmarks = (
 
     const deleteCategory = useCallback(
         (categoryIndex: number) => {
-            if (categoryIndex < 0 || categoryIndex >= bookmarkTree.length) {
+            const category = bookmarkTree.at(categoryIndex);
+            if (category === undefined) {
                 return false;
             }
+
+            const trashItemId = createEntityId('trash');
+            const trashItem: BookmarkTrashItemData = {
+                deletedAt: new Date().toISOString(),
+                folderPath: [],
+                id: trashItemId,
+                item: category,
+                kind: 'category',
+                label: category.category,
+            };
 
             const nextBookmarkTree = bookmarkTree.filter(
                 (_categoryData, currentIndex) => currentIndex !== categoryIndex
             );
 
-            return commitBookmarkTree(
-                nextBookmarkTree.length === 0
-                    ? [fallbackCategory]
-                    : nextBookmarkTree
-            );
+            const didCommit = commitBookmarkTree(nextBookmarkTree, [
+                trashItem,
+                ...bookmarkTrash,
+            ]);
+            return didCommit ? trashItemId : false;
         },
-        [bookmarkTree, commitBookmarkTree]
+        [bookmarkTrash, bookmarkTree, commitBookmarkTree]
     );
 
     const updateBookmarkLocation = useCallback(
@@ -888,7 +983,11 @@ export const useBookmarks = (
             }
 
             const categoryData = bookmarkTree.at(location.categoryIndex);
-            if (categoryData === undefined) {
+            const folder =
+                categoryData === undefined
+                    ? undefined
+                    : getFolderAtPath(categoryData.children, folderPath);
+            if (categoryData === undefined || folder === undefined) {
                 return false;
             }
 
@@ -901,7 +1000,17 @@ export const useBookmarks = (
                 return false;
             }
 
-            return commitBookmarkTree(
+            const trashItemId = createEntityId('trash');
+            const trashItem: BookmarkTrashItemData = {
+                categoryId: categoryData.id,
+                deletedAt: new Date().toISOString(),
+                folderPath: folderPath.slice(0, -1),
+                id: trashItemId,
+                item: folder,
+                kind: 'folder',
+                label: folder.title,
+            };
+            const didCommit = commitBookmarkTree(
                 bookmarkTree.map((currentCategoryData, currentIndex) =>
                     currentIndex === location.categoryIndex
                         ? {
@@ -909,10 +1018,12 @@ export const useBookmarks = (
                               children: nextChildren,
                           }
                         : currentCategoryData
-                )
+                ),
+                [trashItem, ...bookmarkTrash]
             );
+            return didCommit ? trashItemId : false;
         },
-        [bookmarkTree, commitBookmarkTree]
+        [bookmarkTrash, bookmarkTree, commitBookmarkTree]
     );
 
     const moveBookmarkNode = useCallback(
@@ -1256,15 +1367,26 @@ export const useBookmarks = (
     const deleteBookmark = useCallback(
         (categoryIndex: number, bookmarkId: string) => {
             const categoryData = bookmarkTree.at(categoryIndex);
+            const match =
+                categoryData === undefined
+                    ? undefined
+                    : findBookmarkNode(categoryData.children, bookmarkId);
 
-            if (
-                categoryData === undefined ||
-                !hasBookmarkNode(categoryData.children, bookmarkId)
-            ) {
+            if (categoryData === undefined || match === undefined) {
                 return false;
             }
 
-            return commitBookmarkTree(
+            const trashItemId = createEntityId('trash');
+            const trashItem: BookmarkTrashItemData = {
+                categoryId: categoryData.id,
+                deletedAt: new Date().toISOString(),
+                folderPath: match.folderPath,
+                id: trashItemId,
+                item: match.bookmark,
+                kind: 'bookmark',
+                label: match.bookmark.title,
+            };
+            const didCommit = commitBookmarkTree(
                 bookmarkTree.map((currentCategoryData, currentIndex) =>
                     currentIndex === categoryIndex
                         ? {
@@ -1275,10 +1397,12 @@ export const useBookmarks = (
                               ),
                           }
                         : currentCategoryData
-                )
+                ),
+                [trashItem, ...bookmarkTrash]
             );
+            return didCommit ? trashItemId : false;
         },
-        [bookmarkTree, commitBookmarkTree]
+        [bookmarkTrash, bookmarkTree, commitBookmarkTree]
     );
 
     const updateCategoryIcon = useCallback(
@@ -1309,6 +1433,65 @@ export const useBookmarks = (
         [commitBookmarkTree]
     );
 
+    const restoreTrashItem = useCallback(
+        (trashItemId: string) => {
+            const trashItem = bookmarkTrash.find(
+                (item) => item.id === trashItemId
+            );
+            if (trashItem === undefined) {
+                return false;
+            }
+
+            let nextBookmarkTree: BookmarkCategoryData[];
+            if (trashItem.kind === 'category') {
+                nextBookmarkTree = [
+                    ...bookmarkTree,
+                    trashItem.item as BookmarkCategoryData,
+                ];
+            } else {
+                const categoryIndex = Math.max(
+                    bookmarkTree.findIndex(
+                        (category) => category.id === trashItem.categoryId
+                    ),
+                    0
+                );
+                const category = bookmarkTree.at(categoryIndex);
+                if (category === undefined) {
+                    return false;
+                }
+                const node = trashItem.item as BookmarkNodeData;
+                const restoredChildren = updateNodesAtFolderPath(
+                    category.children,
+                    trashItem.folderPath,
+                    (nodes) => [...nodes, node]
+                );
+                nextBookmarkTree = bookmarkTree.map(
+                    (currentCategory, currentIndex) =>
+                        currentIndex === categoryIndex
+                            ? {
+                                  ...currentCategory,
+                                  children: restoredChildren ?? [
+                                      ...currentCategory.children,
+                                      node,
+                                  ],
+                              }
+                            : currentCategory
+                );
+            }
+
+            return commitBookmarkTree(
+                nextBookmarkTree,
+                bookmarkTrash.filter((item) => item.id !== trashItemId)
+            );
+        },
+        [bookmarkTrash, bookmarkTree, commitBookmarkTree]
+    );
+
+    const emptyTrash = useCallback(
+        () => bookmarkTrash.length > 0 && commitBookmarkTree(bookmarkTree, []),
+        [bookmarkTrash.length, bookmarkTree, commitBookmarkTree]
+    );
+
     return {
         addBookmark,
         addBookmarksToLocation,
@@ -1316,15 +1499,18 @@ export const useBookmarks = (
         addCategory,
         addFolder,
         bookmarkTree,
+        bookmarkTrash,
         canEdit: !hasAuth || isAuthLoaded,
         deleteBookmark,
         deleteCategory,
         deleteFolder,
+        emptyTrash,
         exportBookmarks,
         importBookmarks,
         isLoading,
         moveBookmarkNode,
         replaceBookmarkTree,
+        restoreTrashItem,
         saveState,
         status,
         updateBookmark,
