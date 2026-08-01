@@ -3,6 +3,7 @@ import type {
     BookmarkFolderData,
     BookmarkLinkData,
     BookmarkNodeData,
+    BookmarkTrashItemData,
 } from '@/types/bookmarks';
 
 const defaultCategoryName = 'Bookmarks';
@@ -287,6 +288,74 @@ export const coerceBookmarkTree = (
     return normalizedBookmarkTree.length > 0
         ? normalizedBookmarkTree
         : undefined;
+};
+
+export const coerceBookmarkTrash = (
+    value: unknown
+): BookmarkTrashItemData[] | undefined => {
+    if (!Array.isArray(value)) {
+        return undefined;
+    }
+
+    return value.flatMap((itemValue): BookmarkTrashItemData[] => {
+        if (
+            !isRecord(itemValue) ||
+            typeof itemValue.id !== 'string' ||
+            typeof itemValue.deletedAt !== 'string' ||
+            typeof itemValue.label !== 'string' ||
+            !Array.isArray(itemValue.folderPath) ||
+            !itemValue.folderPath.every((part) => typeof part === 'string') ||
+            !['bookmark', 'category', 'folder'].includes(String(itemValue.kind))
+        ) {
+            return [];
+        }
+
+        const kind = itemValue.kind as BookmarkTrashItemData['kind'];
+        const normalizedItem =
+            kind === 'category'
+                ? coerceBookmarkTree([itemValue.item])?.[0]
+                : coerceBookmarkTree([
+                      {
+                          category: 'Trash',
+                          children: [itemValue.item],
+                          id: 'trash-wrapper',
+                          links: [],
+                      },
+                  ])?.[0]?.children[0];
+
+        if (normalizedItem === undefined) {
+            return [];
+        }
+        if (kind === 'category') {
+            if (!('category' in normalizedItem)) {
+                return [];
+            }
+        } else {
+            if ('category' in normalizedItem) {
+                return [];
+            }
+            if (
+                (kind === 'folder' && normalizedItem.type !== 'folder') ||
+                (kind === 'bookmark' && normalizedItem.type !== 'link')
+            ) {
+                return [];
+            }
+        }
+
+        return [
+            {
+                ...(typeof itemValue.categoryId === 'string'
+                    ? { categoryId: itemValue.categoryId }
+                    : {}),
+                deletedAt: itemValue.deletedAt,
+                folderPath: [...itemValue.folderPath],
+                id: itemValue.id,
+                item: normalizedItem,
+                kind,
+                label: itemValue.label,
+            },
+        ];
+    });
 };
 
 export interface BookmarkLinkLocation {

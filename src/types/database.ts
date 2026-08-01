@@ -18,6 +18,7 @@ export interface Database {
                     created_at?: string;
                     updated_at?: string;
                     user_id: string;
+                    trash?: Json;
                     version?: number;
                 };
                 Relationships: [];
@@ -26,6 +27,7 @@ export interface Database {
                     created_at: string;
                     updated_at: string;
                     user_id: string;
+                    trash: Json;
                     version: number;
                 };
                 Update: {
@@ -33,6 +35,7 @@ export interface Database {
                     created_at?: string;
                     updated_at?: string;
                     user_id?: string;
+                    trash?: Json;
                     version?: number;
                 };
             };

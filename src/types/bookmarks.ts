@@ -22,3 +22,13 @@ export interface BookmarkCategoryData {
     icon?: string;
     links: BookmarkLinkData[];
 }
+
+export interface BookmarkTrashItemData {
+    categoryId?: string;
+    deletedAt: string;
+    folderPath: string[];
+    id: string;
+    item: BookmarkCategoryData | BookmarkNodeData;
+    kind: 'bookmark' | 'category' | 'folder';
+    label: string;
+}
