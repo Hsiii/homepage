@@ -136,7 +136,9 @@ interface BookmarkAuthState {
 
 interface UseBookmarksOptions {
     auth?: BookmarkAuthState;
+    initialBookmarkTrash?: BookmarkTrashItemData[];
     initialBookmarkTree?: BookmarkCategoryData[];
+    initialBookmarkUserId?: string;
 }
 
 const readStoredBookmarkData = (storageKey: string): StoredBookmarkData => {
@@ -475,7 +477,8 @@ const readBookmarkResponse = async (
 export const useBookmarks = (
     options: UseBookmarksOptions = {}
 ): BookmarkControls => {
-    const { initialBookmarkTree } = options;
+    const { initialBookmarkTrash, initialBookmarkTree, initialBookmarkUserId } =
+        options;
     const hasAuth = options.auth !== undefined;
     const getToken = options.auth?.getToken;
     const isAuthLoaded = options.auth?.isLoaded === true;
@@ -493,14 +496,14 @@ export const useBookmarks = (
             emptyBookmarkTree
     );
     const [bookmarkTrash, setBookmarkTrash] = useState<BookmarkTrashItemData[]>(
-        () => initialGuestData.trash
+        () => initialBookmarkTrash ?? initialGuestData.trash
     );
     const [status, setStatus] = useState<BookmarkStatus>();
     const [isLoading, setIsLoading] = useState(
         initialBookmarkTree === undefined && hasAuth
     );
     const [saveState, setSaveState] = useState<BookmarkSaveState>(
-        hasAuth ? 'idle' : 'saved'
+        hasAuth && initialBookmarkTree === undefined ? 'idle' : 'saved'
     );
     const mutationVersionRef = useRef(0);
     const saveOperationRef = useRef(0);
@@ -650,6 +653,19 @@ export const useBookmarks = (
     );
 
     useLayoutEffect(() => {
+        const canUseInitialBookmarks =
+            initialBookmarkTree !== undefined &&
+            typeof initialBookmarkUserId === 'string' &&
+            (!isAuthLoaded || remoteUserId === initialBookmarkUserId);
+
+        if (canUseInitialBookmarks) {
+            setBookmarkTree(initialBookmarkTree);
+            setBookmarkTrash(initialBookmarkTrash ?? []);
+            setIsLoading(false);
+            setSaveState('saved');
+            return undefined;
+        }
+
         if (hasAuth && !isAuthLoaded) {
             setIsLoading(true);
             return undefined;
@@ -664,14 +680,6 @@ export const useBookmarks = (
 
             setBookmarkTree(storedBookmarkData.categories ?? emptyBookmarkTree);
             setBookmarkTrash(storedBookmarkData.trash);
-            setIsLoading(false);
-            setSaveState('saved');
-            return undefined;
-        }
-
-        if (initialBookmarkTree !== undefined) {
-            setBookmarkTree(initialBookmarkTree);
-            setBookmarkTrash([]);
             setIsLoading(false);
             setSaveState('saved');
             return undefined;
@@ -741,7 +749,9 @@ export const useBookmarks = (
         getAuthHeaders,
         getToken,
         hasAuth,
+        initialBookmarkTrash,
         initialBookmarkTree,
+        initialBookmarkUserId,
         isAuthLoaded,
         remoteUserId,
     ]);
