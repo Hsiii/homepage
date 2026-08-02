@@ -44,7 +44,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-    themeColor: 'hsl(316, 42%, 82%)',
+    themeColor: [
+        {
+            color: 'hsl(316, 42%, 82%)',
+            media: '(prefers-color-scheme: light)',
+        },
+        {
+            color: 'hsl(220, 54%, 18%)',
+            media: '(prefers-color-scheme: dark)',
+        },
+    ],
 };
 
 const themeInitScript = `
@@ -214,12 +223,13 @@ export default function RootLayout({
             lang={defaultInitialAppPreferences.locale}
             className={quicksand.variable}
             data-animation-mode={defaultInitialAppPreferences.animationMode}
-            data-theme={defaultInitialAppPreferences.resolvedTheme}
-            data-theme-mode={defaultInitialAppPreferences.themeMode}
             suppressHydrationWarning
         >
-            <body>
+            <head>
+                <meta name='color-scheme' content='light dark' />
                 <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+            </head>
+            <body>
                 {content}
                 {process.env.NODE_ENV === 'production' ? (
                     <script

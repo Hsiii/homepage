@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
 import {
     Check,
     ChevronDown,
@@ -91,6 +97,18 @@ const getInitialThemeMode = (initialThemeMode: ThemeMode): ThemeMode => {
         globalThis.localStorage.getItem(themeStorageKey);
 
     return isThemeMode(savedThemeMode) ? savedThemeMode : initialThemeMode;
+};
+
+const getInitialThemeColor = (initialThemeColor: ThemeColor): ThemeColor => {
+    if (!isBrowser()) {
+        return initialThemeColor;
+    }
+
+    const savedThemeColor =
+        globalThis.document.documentElement.dataset.themeColor ??
+        globalThis.localStorage.getItem(themeColorStorageKey);
+
+    return isThemeColor(savedThemeColor) ? savedThemeColor : initialThemeColor;
 };
 
 const getSystemTheme = (): Exclude<ThemeMode, 'system'> =>
@@ -328,27 +346,17 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isControlled = controlledIsOpen !== undefined;
     const isOpen = controlledIsOpen ?? internalIsOpen;
-    const [themeMode, setThemeMode] = useState<ThemeMode>(() =>
-        getInitialThemeMode(initialPreferences.themeMode)
+    const [themeMode, setThemeMode] = useState<ThemeMode>(
+        initialPreferences.themeMode
     );
+    const [hasHydratedThemePreferences, setHasHydratedThemePreferences] =
+        useState(false);
     const [animationMode, setAnimationMode] = useState<AnimationMode>(() =>
         getInitialAnimationMode(initialPreferences.animationMode)
     );
     const [isBookmarkManagerOpen, setIsBookmarkManagerOpen] = useState(false);
     const [selectedThemeColor, setSelectedThemeColor] = useState<ThemeColor>(
-        () => {
-            if (!isBrowser()) {
-                return defaultThemeColor;
-            }
-
-            const savedThemeColor =
-                globalThis.document.documentElement.dataset.themeColor ??
-                globalThis.localStorage.getItem(themeColorStorageKey);
-
-            return isThemeColor(savedThemeColor)
-                ? savedThemeColor
-                : initialPreferences.themeColor;
-        }
+        initialPreferences.themeColor
     );
     const [openDropdownId, setOpenDropdownId] = useState<string>();
     const menuRef = useRef<HTMLDivElement>(null);
@@ -364,6 +372,24 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
         },
         [isControlled, onOpenChange]
     );
+
+    useLayoutEffect(() => {
+        const initialThemeMode = getInitialThemeMode(
+            initialPreferences.themeMode
+        );
+        const initialThemeColor = getInitialThemeColor(
+            initialPreferences.themeColor
+        );
+
+        applyResolvedTheme(
+            resolveThemeMode(initialThemeMode),
+            initialThemeMode
+        );
+        applyThemeColor(initialThemeColor);
+        setThemeMode(initialThemeMode);
+        setSelectedThemeColor(initialThemeColor);
+        setHasHydratedThemePreferences(true);
+    }, [initialPreferences.themeColor, initialPreferences.themeMode]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -398,7 +424,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
     }, [closeSignal, setMenuOpen]);
 
     useEffect(() => {
-        if (themeMode !== 'system') {
+        if (!hasHydratedThemePreferences || themeMode !== 'system') {
             return undefined;
         }
 
@@ -413,7 +439,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
         return () => {
             mediaQuery.removeEventListener('change', updateSystemTheme);
         };
-    }, [themeMode]);
+    }, [hasHydratedThemePreferences, themeMode]);
 
     const updateThemeMode = useCallback(
         (nextThemeMode: ThemeMode, button?: HTMLButtonElement) => {
