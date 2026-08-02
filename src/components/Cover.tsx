@@ -27,6 +27,23 @@ const Weather = lazy(
         }))
 );
 
+const timeBootstrapScript = `
+(function () {
+    try {
+        var clock = document.currentScript.previousElementSibling;
+
+        if (clock) {
+            clock.textContent = new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                hour12: false,
+                minute: '2-digit',
+                timeZone: 'Asia/Taipei',
+            });
+        }
+    } catch {}
+})();
+`;
+
 interface CoverProps {
     initialAqi: AqiData | undefined;
     initialPreferences: InitialAppPreferences;
@@ -102,7 +119,14 @@ const CoverContent: React.FC<CoverContentProps> = ({
                             />
                         </Suspense>
                     </div>
-                    <span className='title'>{time}</span>
+                    <span className='title' suppressHydrationWarning>
+                        {time}
+                    </span>
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: timeBootstrapScript,
+                        }}
+                    />
                 </div>
                 <div
                     className={[
