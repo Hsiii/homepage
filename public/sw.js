@@ -1,7 +1,15 @@
-const CACHE_NAME = 'homepage-shell-v5';
+const CACHE_PREFIX = 'homepage-shell-';
+const CACHE_NAME = `${CACHE_PREFIX}v5`;
 const SHELL_PATH = '/';
+const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
+const IS_LOCALHOST = LOCAL_HOSTNAMES.has(self.location.hostname);
 
 self.addEventListener('install', (event) => {
+    if (IS_LOCALHOST) {
+        event.waitUntil(self.skipWaiting());
+        return;
+    }
+
     event.waitUntil(
         caches
             .open(CACHE_NAME)
@@ -13,13 +21,33 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
+    if (IS_LOCALHOST) {
+        event.waitUntil(
+            caches
+                .keys()
+                .then((names) =>
+                    Promise.all(
+                        names
+                            .filter((name) => name.startsWith(CACHE_PREFIX))
+                            .map((name) => caches.delete(name))
+                    )
+                )
+                .then(() => self.registration.unregister())
+        );
+        return;
+    }
+
     event.waitUntil(
         caches
             .keys()
             .then((names) =>
                 Promise.all(
                     names
-                        .filter((name) => name !== CACHE_NAME)
+                        .filter(
+                            (name) =>
+                                name.startsWith(CACHE_PREFIX) &&
+                                name !== CACHE_NAME
+                        )
                         .map((name) => caches.delete(name))
                 )
             )
@@ -36,6 +64,10 @@ const cacheResponse = async (cache, request, response) => {
 };
 
 self.addEventListener('fetch', (event) => {
+    if (IS_LOCALHOST) {
+        return;
+    }
+
     const { request } = event;
     const url = new URL(request.url);
 

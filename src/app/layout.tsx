@@ -250,6 +250,32 @@ if ('serviceWorker' in navigator) {
 }
 `;
 
+const serviceWorkerCleanupScript = `
+addEventListener('load', function () {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+            registrations.forEach(function (registration) {
+                registration.unregister();
+            });
+        }).catch(function () {});
+    }
+
+    if ('caches' in globalThis) {
+        caches.keys().then(function (names) {
+            return Promise.all(
+                names
+                    .filter(function (name) {
+                        return name.startsWith('homepage-shell-');
+                    })
+                    .map(function (name) {
+                        return caches.delete(name);
+                    })
+            );
+        }).catch(function () {});
+    }
+});
+`;
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -274,13 +300,14 @@ export default function RootLayout({
             </head>
             <body>
                 {content}
-                {process.env.NODE_ENV === 'production' ? (
-                    <script
-                        dangerouslySetInnerHTML={{
-                            __html: serviceWorkerInitScript,
-                        }}
-                    />
-                ) : undefined}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html:
+                            process.env.NODE_ENV === 'production'
+                                ? serviceWorkerInitScript
+                                : serviceWorkerCleanupScript,
+                    }}
+                />
             </body>
         </html>
     );
