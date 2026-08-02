@@ -203,7 +203,10 @@ const themeInitScript = `
             removeStorage(themeColorStorageKey);
             clearCookie(themeColorStorageKey);
         }
-    } catch {}
+    } catch {
+    } finally {
+        document.documentElement.style.removeProperty('background-color');
+    }
 })();
 `;
 
@@ -214,6 +217,7 @@ export default async function RootLayout({
 }>): Promise<ReactNode> {
     const initialPreferences = await readInitialAppPreferences();
     const htmlStyle = {
+        backgroundColor: getViewportThemeColor(initialPreferences),
         colorScheme: initialPreferences.resolvedTheme,
     } satisfies CSSProperties;
     const documentMarkup = (
