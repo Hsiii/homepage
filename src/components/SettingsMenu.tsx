@@ -61,6 +61,10 @@ interface SettingsDropdownOption {
     readonly value: string;
 }
 
+interface ThemeHydrationRoot extends HTMLElement {
+    __homepageThemeHydrationObserver?: MutationObserver;
+}
+
 interface SettingsDropdownProps {
     id: string;
     isOpen: boolean;
@@ -164,6 +168,13 @@ const applyThemeColor = (themeColor: ThemeColor) => {
     root.dataset.themeColor = themeColor;
     globalThis.localStorage.setItem(themeColorStorageKey, themeColor);
     writePreferenceCookie(themeColorStorageKey, themeColor);
+};
+
+const releaseThemeHydrationGuard = () => {
+    const root = globalThis.document.documentElement as ThemeHydrationRoot;
+
+    root.__homepageThemeHydrationObserver?.disconnect();
+    delete root.__homepageThemeHydrationObserver;
 };
 
 const SettingsDropdown: React.FC<SettingsDropdownProps> = ({
@@ -381,6 +392,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
             initialPreferences.themeColor
         );
 
+        releaseThemeHydrationGuard();
         applyResolvedTheme(
             resolveThemeMode(initialThemeMode),
             initialThemeMode

@@ -173,11 +173,56 @@ const themeInitScript = `
                 ? 'dark'
                 : 'light';
 
-        root.dataset.animationMode = animationMode;
-        root.dataset.theme = resolvedTheme;
-        root.dataset.themeMode = themeMode;
-        root.lang = locale;
-        root.style.colorScheme = resolvedTheme;
+        var applyResolvedPreferences = function () {
+            root.dataset.animationMode = animationMode;
+            root.dataset.theme = resolvedTheme;
+            root.dataset.themeMode = themeMode;
+            root.lang = locale;
+            root.style.colorScheme = resolvedTheme;
+
+            if (themeColor === 'azure') {
+                root.dataset.themeColor = 'azure';
+            } else {
+                delete root.dataset.themeColor;
+            }
+        };
+
+        applyResolvedPreferences();
+
+        var hydrationObserver = new MutationObserver(function () {
+            var hasExpectedThemeColor =
+                themeColor === 'azure'
+                    ? root.dataset.themeColor === 'azure'
+                    : root.dataset.themeColor === undefined;
+
+            if (
+                root.dataset.theme !== resolvedTheme ||
+                root.dataset.themeMode !== themeMode ||
+                root.style.colorScheme !== resolvedTheme ||
+                !hasExpectedThemeColor
+            ) {
+                applyResolvedPreferences();
+            }
+        });
+
+        hydrationObserver.observe(root, {
+            attributeFilter: [
+                'data-theme',
+                'data-theme-color',
+                'data-theme-mode',
+                'style',
+            ],
+            attributes: true,
+        });
+        root.__homepageThemeHydrationObserver = hydrationObserver;
+
+        setTimeout(function () {
+            if (root.__homepageThemeHydrationObserver === hydrationObserver) {
+                hydrationObserver.disconnect();
+                delete root.__homepageThemeHydrationObserver;
+            }
+        }, 5000);
+
         writeStorage(animationStorageKey, animationMode);
         writeStorage(localeStorageKey, locale);
         writeStorage(themeStorageKey, themeMode);
@@ -187,11 +232,9 @@ const themeInitScript = `
         writeCookie(themeResolvedStorageKey, resolvedTheme);
 
         if (themeColor === 'azure') {
-            root.dataset.themeColor = 'azure';
             writeStorage(themeColorStorageKey, themeColor);
             writeCookie(themeColorStorageKey, themeColor);
         } else {
-            delete root.dataset.themeColor;
             removeStorage(themeColorStorageKey);
             clearCookie(themeColorStorageKey);
         }
