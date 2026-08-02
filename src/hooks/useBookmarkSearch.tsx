@@ -556,7 +556,13 @@ export const useBookmarkSearch = (
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (inputFocused) {
+            const { target } = e;
+            const isEditableTarget =
+                target instanceof HTMLElement &&
+                (target.isContentEditable ||
+                    ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName));
+
+            if (inputFocused || isEditableTarget) {
                 return;
             }
 
