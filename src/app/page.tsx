@@ -1,25 +1,16 @@
 import type { ReactNode } from 'react';
 
+import { defaultInitialAppPreferences } from '@/constants/defaultPreferences';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
-import { readInitialBookmarkData } from '@/server/initialBookmarks';
-import { readInitialAppPreferences } from '@/server/preferences';
 import { HomePageClient } from './HomePageClient';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
-export default async function Page(): Promise<ReactNode> {
-    const [initialBookmarkData, initialPreferences] = await Promise.all([
-        readInitialBookmarkData(),
-        readInitialAppPreferences(),
-    ]);
-
+export default function Page(): ReactNode {
     return (
         <HomePageClient
             initialAqi={undefined}
-            initialBookmarkTrash={initialBookmarkData?.trash}
-            initialBookmarkTree={initialBookmarkData?.categories}
-            initialBookmarkUserId={initialBookmarkData?.userId}
-            initialPreferences={initialPreferences}
+            initialPreferences={defaultInitialAppPreferences}
             initialWallpaper={undefined}
             initialWeather={undefined}
             isSupabaseEnabled={isSupabaseConfigured()}

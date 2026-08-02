@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Quicksand as loadQuicksand } from 'next/font/google';
 
@@ -11,6 +11,7 @@ import '@/components/Mountains.css';
 import '@/components/Weather.css';
 
 import { AuthProvider } from '@/auth/AuthProvider';
+import { defaultInitialAppPreferences } from '@/constants/defaultPreferences';
 import {
     defaultLocale,
     localeCookieName,
@@ -25,7 +26,6 @@ import {
     themeStorageKey,
 } from '@/constants/theme';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
-import { readInitialAppPreferences } from '@/server/preferences';
 
 const quicksand = loadQuicksand({
     display: 'swap',
@@ -43,25 +43,8 @@ export const metadata: Metadata = {
     title: 'Homepage',
 };
 
-const getViewportThemeColor = ({
-    resolvedTheme,
-    themeColor,
-}: Awaited<ReturnType<typeof readInitialAppPreferences>>): string => {
-    if (resolvedTheme === 'dark') {
-        return themeColor === 'azure'
-            ? 'hsl(212, 54%, 18%)'
-            : 'hsl(220, 54%, 18%)';
-    }
-
-    return themeColor === 'azure' ? 'hsl(212, 42%, 82%)' : 'hsl(316, 42%, 82%)';
-};
-
-export const generateViewport = async (): Promise<Viewport> => {
-    const initialPreferences = await readInitialAppPreferences();
-
-    return {
-        themeColor: getViewportThemeColor(initialPreferences),
-    };
+export const viewport: Viewport = {
+    themeColor: 'hsl(316, 42%, 82%)',
 };
 
 const themeInitScript = `
@@ -203,48 +186,49 @@ const themeInitScript = `
             removeStorage(themeColorStorageKey);
             clearCookie(themeColorStorageKey);
         }
-    } catch {
-    } finally {
-        document.documentElement.style.removeProperty('background-color');
-    }
+    } catch {}
 })();
 `;
 
-export default async function RootLayout({
+const serviceWorkerInitScript = `
+if ('serviceWorker' in navigator) {
+    addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+}
+`;
+
+export default function RootLayout({
     children,
 }: Readonly<{
     children: ReactNode;
-}>): Promise<ReactNode> {
-    const initialPreferences = await readInitialAppPreferences();
-    const htmlStyle = {
-        backgroundColor: getViewportThemeColor(initialPreferences),
-        colorScheme: initialPreferences.resolvedTheme,
-    } satisfies CSSProperties;
-    const documentMarkup = (
+}>): ReactNode {
+    const content = isSupabaseConfigured() ? (
+        <AuthProvider>{children}</AuthProvider>
+    ) : (
+        children
+    );
+
+    return (
         <html
-            lang={initialPreferences.locale}
+            lang={defaultInitialAppPreferences.locale}
             className={quicksand.variable}
-            data-animation-mode={initialPreferences.animationMode}
-            data-theme={initialPreferences.resolvedTheme}
-            data-theme-color={
-                initialPreferences.themeColor === defaultThemeColor
-                    ? undefined
-                    : initialPreferences.themeColor
-            }
-            data-theme-mode={initialPreferences.themeMode}
-            style={htmlStyle}
+            data-animation-mode={defaultInitialAppPreferences.animationMode}
+            data-theme={defaultInitialAppPreferences.resolvedTheme}
+            data-theme-mode={defaultInitialAppPreferences.themeMode}
             suppressHydrationWarning
         >
             <body>
                 <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-                {children}
+                {content}
+                {process.env.NODE_ENV === 'production' ? (
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: serviceWorkerInitScript,
+                        }}
+                    />
+                ) : undefined}
             </body>
         </html>
-    );
-
-    return isSupabaseConfigured() ? (
-        <AuthProvider>{documentMarkup}</AuthProvider>
-    ) : (
-        documentMarkup
     );
 }

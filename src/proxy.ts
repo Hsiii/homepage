@@ -10,8 +10,5 @@ export const proxy = async (request: NextRequest): Promise<NextResponse> =>
         : NextResponse.next({ request });
 
 export const config = {
-    matcher: [
-        '/((?!api/health$|_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-        '/(api(?!/health$)|trpc)(.*)',
-    ],
+    matcher: ['/(api(?!/health$)|trpc)(.*)'],
 };
