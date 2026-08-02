@@ -4,7 +4,7 @@ set -euo pipefail
 repository="Hsiii/Homepage"
 workflow="image.yml"
 host="${PLATFORM_HOST:-platform}"
-remote_deploy_script="${PLATFORM_HOMEPAGE_DEPLOY_SCRIPT:-/srv/platform/operations/scripts/deploy-homepage}"
+remote_deploy_script="${PLATFORM_HOMEPAGE_DEPLOY_SCRIPT:-/srv/sago-cloud/operations/scripts/deploy-homepage}"
 
 branch="$(git branch --show-current)"
 
