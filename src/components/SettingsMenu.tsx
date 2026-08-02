@@ -8,6 +8,7 @@ import React, {
 import {
     Check,
     ChevronDown,
+    ChevronRight,
     Image,
     Monitor,
     Moon,
@@ -18,7 +19,7 @@ import {
     Upload,
     X,
 } from 'lucide-react';
-import { flushSync } from 'react-dom';
+import { createPortal, flushSync } from 'react-dom';
 
 import { isAppLocale, localeOptions } from '@/constants/i18n';
 import { getLocationLabel, taiwanLocations } from '@/constants/taiwanLocations';
@@ -336,7 +337,6 @@ interface SettingsMenuProps {
 
 export const SettingsMenu: React.FC<SettingsMenuProps> = ({
     bookmarkControls,
-    closeSignal,
     isOpen: controlledIsOpen,
     isTriggerHidden = false,
     initialPreferences,
@@ -370,7 +370,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
         initialPreferences.themeColor
     );
     const [openDropdownId, setOpenDropdownId] = useState<string>();
-    const menuRef = useRef<HTMLDivElement>(null);
+    const closeButtonRef = useRef<HTMLButtonElement>(null);
     const wallpaperInputRef = useRef<HTMLInputElement>(null);
 
     const setMenuOpen = useCallback(
@@ -408,15 +408,29 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
             return undefined;
         }
 
-        const onClickOutside = (e: MouseEvent) => {
-            if (menuRef.current?.contains(e.target as Node) === false) {
+        const previousOverflow = globalThis.document.body.style.overflow;
+        const previouslyFocused = globalThis.document.activeElement;
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
                 setMenuOpen(false);
             }
         };
 
-        globalThis.document.addEventListener('click', onClickOutside);
+        globalThis.document.body.style.overflow = 'hidden';
+        globalThis.document.addEventListener('keydown', onKeyDown);
+        closeButtonRef.current?.focus();
+
         return () => {
-            globalThis.document.removeEventListener('click', onClickOutside);
+            globalThis.document.body.style.overflow = previousOverflow;
+            globalThis.document.removeEventListener('keydown', onKeyDown);
+
+            if (
+                previouslyFocused instanceof HTMLElement &&
+                previouslyFocused.isConnected
+            ) {
+                previouslyFocused.focus();
+            }
         };
     }, [isOpen, setMenuOpen]);
 
@@ -425,15 +439,6 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
             setOpenDropdownId(undefined);
         }
     }, [isOpen]);
-
-    useEffect(() => {
-        if (closeSignal === undefined) {
-            return;
-        }
-
-        setMenuOpen(false);
-        setOpenDropdownId(undefined);
-    }, [closeSignal, setMenuOpen]);
 
     useEffect(() => {
         if (!hasHydratedThemePreferences || themeMode !== 'system') {
@@ -553,10 +558,528 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
             ? undefined
             : Math.round(wallpaperControls.progress);
 
-    const isMobilePanel = placement === 'mobile';
+    const settingsPage =
+        isOpen && isBrowser()
+            ? createPortal(
+                  <div className='settings-page-backdrop'>
+                      <section
+                          className='settings-page'
+                          role='dialog'
+                          aria-modal='true'
+                          aria-labelledby='settings-page-title'
+                          style={settingsMenuStyle}
+                          onClickCapture={(event) => {
+                              const { target } = event;
+
+                              if (
+                                  target instanceof Element &&
+                                  !target.closest('.settings-select-control')
+                              ) {
+                                  setOpenDropdownId(undefined);
+                              }
+                          }}
+                      >
+                          <header className='settings-page-header'>
+                              <div className='settings-page-heading'>
+                                  <h1 id='settings-page-title'>{t.settings}</h1>
+                                  <p>{t.settingsDescription}</p>
+                              </div>
+                              <button
+                                  className='settings-page-close'
+                                  type='button'
+                                  aria-label={t.cancel}
+                                  ref={closeButtonRef}
+                                  onClick={() => {
+                                      setMenuOpen(false);
+                                  }}
+                              >
+                                  <X className='icon' size={20} />
+                              </button>
+                          </header>
+
+                          <div className='settings-page-content'>
+                              <section className='settings-page-section'>
+                                  <div className='settings-section-heading'>
+                                      <h2>{t.appearance}</h2>
+                                      <p>{t.appearanceDescription}</p>
+                                  </div>
+                                  <div className='settings-card'>
+                                      <div className='settings-row settings-stacked-row'>
+                                          <div className='settings-row-copy'>
+                                              <span className='settings-row-label'>
+                                                  {t.theme}
+                                              </span>
+                                              <span className='settings-row-description'>
+                                                  {t.themeDescription}
+                                              </span>
+                                          </div>
+                                          <div
+                                              className='settings-choice-group settings-theme-group'
+                                              role='radiogroup'
+                                              aria-label={t.theme}
+                                          >
+                                              {themeModeOptions.map(
+                                                  (option) => {
+                                                      const isSelected =
+                                                          option.value ===
+                                                          themeMode;
+
+                                                      return (
+                                                          <button
+                                                              className={[
+                                                                  'settings-theme-choice',
+                                                                  isSelected &&
+                                                                      'selected',
+                                                              ]
+                                                                  .filter(
+                                                                      Boolean
+                                                                  )
+                                                                  .join(' ')}
+                                                              key={option.value}
+                                                              type='button'
+                                                              role='radio'
+                                                              aria-checked={
+                                                                  isSelected
+                                                              }
+                                                              onClick={(
+                                                                  event
+                                                              ) => {
+                                                                  if (
+                                                                      isThemeMode(
+                                                                          option.value
+                                                                      )
+                                                                  ) {
+                                                                      updateThemeMode(
+                                                                          option.value,
+                                                                          event.currentTarget
+                                                                      );
+                                                                  }
+                                                              }}
+                                                          >
+                                                              {getThemeModeIcon(
+                                                                  option.value as ThemeMode
+                                                              )}
+                                                              <span>
+                                                                  {option.label}
+                                                              </span>
+                                                          </button>
+                                                      );
+                                                  }
+                                              )}
+                                          </div>
+                                      </div>
+
+                                      <div className='settings-row settings-stacked-row'>
+                                          <div className='settings-row-copy'>
+                                              <span className='settings-row-label'>
+                                                  {t.accent}
+                                              </span>
+                                              <span className='settings-row-description'>
+                                                  {t.accentDescription}
+                                              </span>
+                                          </div>
+                                          <div
+                                              className='settings-choice-group settings-accent-group'
+                                              role='radiogroup'
+                                              aria-label={t.accent}
+                                          >
+                                              {themeColorOptions.map(
+                                                  (option) => {
+                                                      const isSelected =
+                                                          option.value ===
+                                                          selectedThemeColor;
+
+                                                      return (
+                                                          <button
+                                                              className={[
+                                                                  'settings-accent-choice',
+                                                                  `settings-swatch-${option.value}`,
+                                                                  isSelected &&
+                                                                      'selected',
+                                                              ]
+                                                                  .filter(
+                                                                      Boolean
+                                                                  )
+                                                                  .join(' ')}
+                                                              key={option.value}
+                                                              type='button'
+                                                              role='radio'
+                                                              aria-checked={
+                                                                  isSelected
+                                                              }
+                                                              onClick={() => {
+                                                                  selectThemeColor(
+                                                                      option.value
+                                                                  );
+                                                              }}
+                                                          >
+                                                              <span
+                                                                  className='settings-accent-swatch'
+                                                                  aria-hidden
+                                                              />
+                                                              <span>
+                                                                  {
+                                                                      t[
+                                                                          option
+                                                                              .labelKey
+                                                                      ]
+                                                                  }
+                                                              </span>
+                                                              {isSelected ? (
+                                                                  <Check
+                                                                      className='icon'
+                                                                      size={16}
+                                                                      aria-hidden
+                                                                  />
+                                                              ) : undefined}
+                                                          </button>
+                                                      );
+                                                  }
+                                              )}
+                                          </div>
+                                      </div>
+
+                                      {wallpaperControls ===
+                                      undefined ? undefined : (
+                                          <div className='settings-row settings-wallpaper-row'>
+                                              <div className='settings-row-copy'>
+                                                  <span className='settings-row-label'>
+                                                      {t.wallpaper}
+                                                  </span>
+                                                  <span className='settings-row-description'>
+                                                      {wallpaperControls.isAvailable
+                                                          ? t.wallpaperDescription
+                                                          : t.wallpaperUnavailable}
+                                                  </span>
+                                              </div>
+                                              <div className='settings-wallpaper-actions'>
+                                                  <input
+                                                      className='settings-wallpaper-input'
+                                                      type='file'
+                                                      accept={wallpaperAcceptedContentTypes.join(
+                                                          ','
+                                                      )}
+                                                      ref={wallpaperInputRef}
+                                                      onChange={(event) => {
+                                                          const file =
+                                                              event
+                                                                  .currentTarget
+                                                                  .files?.[0];
+                                                          if (
+                                                              wallpaperInputRef.current !==
+                                                              null
+                                                          ) {
+                                                              wallpaperInputRef.current.value =
+                                                                  '';
+                                                          }
+
+                                                          if (
+                                                              file !== undefined
+                                                          ) {
+                                                              wallpaperControls
+                                                                  .uploadWallpaper(
+                                                                      file
+                                                                  )
+                                                                  .catch(
+                                                                      () =>
+                                                                          undefined
+                                                                  );
+                                                          }
+                                                      }}
+                                                  />
+                                                  <button
+                                                      className={[
+                                                          'settings-wallpaper-preview',
+                                                          wallpaperControls.wallpaper !==
+                                                              undefined &&
+                                                              'has-wallpaper',
+                                                      ]
+                                                          .filter(Boolean)
+                                                          .join(' ')}
+                                                      type='button'
+                                                      aria-label={
+                                                          t.uploadWallpaper
+                                                      }
+                                                      style={
+                                                          wallpaperControls.wallpaper ===
+                                                          undefined
+                                                              ? undefined
+                                                              : ({
+                                                                    '--settings-wallpaper-preview':
+                                                                        getCssUrlValue(
+                                                                            wallpaperControls
+                                                                                .wallpaper
+                                                                                .url
+                                                                        ),
+                                                                } as React.CSSProperties &
+                                                                    Record<
+                                                                        '--settings-wallpaper-preview',
+                                                                        string
+                                                                    >)
+                                                      }
+                                                      disabled={
+                                                          !wallpaperControls.isAvailable ||
+                                                          wallpaperControls.isBusy
+                                                      }
+                                                      onClick={() => {
+                                                          wallpaperInputRef.current?.click();
+                                                      }}
+                                                  >
+                                                      <Image
+                                                          className='icon'
+                                                          size={20}
+                                                      />
+                                                  </button>
+                                                  <button
+                                                      className='settings-action-button'
+                                                      type='button'
+                                                      disabled={
+                                                          !wallpaperControls.isAvailable ||
+                                                          wallpaperControls.isBusy
+                                                      }
+                                                      onClick={() => {
+                                                          wallpaperInputRef.current?.click();
+                                                      }}
+                                                  >
+                                                      <Upload
+                                                          className='icon'
+                                                          size={16}
+                                                      />
+                                                      <span>
+                                                          {t.uploadWallpaper}
+                                                      </span>
+                                                  </button>
+                                                  {wallpaperControls.wallpaper ===
+                                                  undefined ? undefined : (
+                                                      <button
+                                                          className='settings-icon-button settings-danger-button'
+                                                          type='button'
+                                                          aria-label={
+                                                              t.removeWallpaper
+                                                          }
+                                                          disabled={
+                                                              wallpaperControls.isBusy
+                                                          }
+                                                          onClick={() => {
+                                                              wallpaperControls
+                                                                  .clearWallpaper()
+                                                                  .catch(
+                                                                      () =>
+                                                                          undefined
+                                                                  );
+                                                          }}
+                                                      >
+                                                          <Trash2
+                                                              className='icon'
+                                                              size={16}
+                                                          />
+                                                      </button>
+                                                  )}
+                                              </div>
+                                              {wallpaperControls.isBusy ? (
+                                                  <div
+                                                      className='settings-wallpaper-meter'
+                                                      role='progressbar'
+                                                      aria-label={
+                                                          t.wallpaperUploading
+                                                      }
+                                                      aria-valuemin={0}
+                                                      aria-valuemax={100}
+                                                      aria-valuenow={
+                                                          wallpaperProgress ?? 0
+                                                      }
+                                                      style={
+                                                          {
+                                                              '--settings-wallpaper-progress': `${wallpaperProgress ?? 0}%`,
+                                                          } as React.CSSProperties &
+                                                              Record<
+                                                                  '--settings-wallpaper-progress',
+                                                                  string
+                                                              >
+                                                      }
+                                                  />
+                                              ) : undefined}
+                                              {wallpaperControls.error ===
+                                              undefined ? undefined : (
+                                                  <div
+                                                      className='settings-wallpaper-status'
+                                                      role='status'
+                                                  >
+                                                      {wallpaperControls.error}
+                                                  </div>
+                                              )}
+                                          </div>
+                                      )}
+                                  </div>
+                              </section>
+
+                              <section className='settings-page-section'>
+                                  <div className='settings-section-heading'>
+                                      <h2>{t.preferences}</h2>
+                                      <p>{t.preferencesDescription}</p>
+                                  </div>
+                                  <div className='settings-card'>
+                                      <div className='settings-row'>
+                                          <div className='settings-row-copy'>
+                                              <span className='settings-row-label'>
+                                                  {t.animations}
+                                              </span>
+                                              <span className='settings-row-description'>
+                                                  {animationMode ===
+                                                  normalAnimationMode
+                                                      ? t.useNormalAnimations
+                                                      : t.skipRiseAnimations}
+                                              </span>
+                                          </div>
+                                          <button
+                                              className='settings-animation-switch'
+                                              type='button'
+                                              role='switch'
+                                              aria-checked={
+                                                  animationMode ===
+                                                  normalAnimationMode
+                                              }
+                                              aria-label={t.animations}
+                                              onClick={() => {
+                                                  updateAnimationMode(
+                                                      animationMode ===
+                                                          normalAnimationMode
+                                                          ? skipAnimationMode
+                                                          : normalAnimationMode
+                                                  );
+                                              }}
+                                          >
+                                              <span
+                                                  className='settings-switch-track'
+                                                  aria-hidden
+                                              >
+                                                  <span className='settings-switch-thumb' />
+                                              </span>
+                                          </button>
+                                      </div>
+
+                                      <div className='settings-row settings-select-row'>
+                                          <div className='settings-row-copy'>
+                                              <span
+                                                  className='settings-row-label'
+                                                  id='location-picker-label'
+                                              >
+                                                  {t.location}
+                                              </span>
+                                              <span className='settings-row-description'>
+                                                  {t.locationDescription}
+                                              </span>
+                                          </div>
+                                          <SettingsDropdown
+                                              id='location-picker'
+                                              labelledBy='location-picker-label'
+                                              value={selectedLocation.id}
+                                              options={locationOptions}
+                                              isOpen={
+                                                  openDropdownId ===
+                                                  'location-picker'
+                                              }
+                                              onOpenChange={getDropdownOpenHandler(
+                                                  'location-picker'
+                                              )}
+                                              onChange={(nextLocationId) => {
+                                                  if (
+                                                      nextLocationId ===
+                                                      myLocationOptionValue
+                                                  ) {
+                                                      syncCurrentLocation();
+                                                      return;
+                                                  }
+
+                                                  selectLocationId(
+                                                      nextLocationId
+                                                  );
+                                              }}
+                                          />
+                                      </div>
+
+                                      <div className='settings-row settings-select-row'>
+                                          <div className='settings-row-copy'>
+                                              <span
+                                                  className='settings-row-label'
+                                                  id='language-picker-label'
+                                              >
+                                                  {t.language}
+                                              </span>
+                                              <span className='settings-row-description'>
+                                                  {t.languageDescription}
+                                              </span>
+                                          </div>
+                                          <SettingsDropdown
+                                              id='language-picker'
+                                              labelledBy='language-picker-label'
+                                              value={locale}
+                                              options={languageOptions}
+                                              isOpen={
+                                                  openDropdownId ===
+                                                  'language-picker'
+                                              }
+                                              onOpenChange={getDropdownOpenHandler(
+                                                  'language-picker'
+                                              )}
+                                              onChange={(nextLocale) => {
+                                                  if (isAppLocale(nextLocale)) {
+                                                      setLocale(nextLocale);
+                                                  }
+                                              }}
+                                          />
+                                      </div>
+                                  </div>
+                              </section>
+
+                              <section className='settings-page-section'>
+                                  <div className='settings-section-heading'>
+                                      <h2>{t.content}</h2>
+                                      <p>{t.contentDescription}</p>
+                                  </div>
+                                  <div className='settings-card'>
+                                      <button
+                                          className='settings-row settings-navigation-row'
+                                          type='button'
+                                          disabled={!bookmarkControls.canEdit}
+                                          onClick={() => {
+                                              setIsBookmarkManagerOpen(true);
+                                              setMenuOpen(false);
+                                          }}
+                                      >
+                                          <div className='settings-row-copy'>
+                                              <span className='settings-row-label'>
+                                                  {t.bookmarks}
+                                              </span>
+                                              <span className='settings-row-description'>
+                                                  {t.bookmarksDescription}
+                                              </span>
+                                          </div>
+                                          <span className='settings-navigation-action'>
+                                              <Pencil
+                                                  className='icon'
+                                                  size={16}
+                                                  aria-hidden
+                                              />
+                                              <span>{t.manageBookmarks}</span>
+                                              <ChevronRight
+                                                  className='icon'
+                                                  size={16}
+                                                  aria-hidden
+                                              />
+                                          </span>
+                                      </button>
+                                  </div>
+                              </section>
+                          </div>
+                      </section>
+                  </div>,
+                  globalThis.document.body
+              )
+            : undefined;
 
     return (
-        <div className={`settings-control ${placement}`} ref={menuRef}>
+        <div className={`settings-control ${placement}`}>
             {isTriggerHidden ? undefined : (
                 <button
                     className='settings-trigger'
@@ -580,396 +1103,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                     </span>
                 </button>
             )}
-            {isOpen ? (
-                <div
-                    className='settings-menu'
-                    role='dialog'
-                    aria-label={t.settings}
-                    style={settingsMenuStyle}
-                    onClickCapture={(event) => {
-                        const { target } = event;
-
-                        if (
-                            target instanceof Element &&
-                            !target.closest('.settings-select-control')
-                        ) {
-                            setOpenDropdownId(undefined);
-                        }
-                    }}
-                >
-                    {isMobilePanel ? (
-                        <header className='settings-mobile-header'>
-                            <span>{t.settings}</span>
-                            <button
-                                className='settings-mobile-close'
-                                type='button'
-                                aria-label={t.cancel}
-                                onClick={() => {
-                                    setMenuOpen(false);
-                                }}
-                            >
-                                <X className='icon' size={20} />
-                            </button>
-                        </header>
-                    ) : undefined}
-
-                    <div className='settings-section'>
-                        <div className='settings-row settings-choice-row'>
-                            <span className='settings-row-label'>
-                                {t.theme}
-                            </span>
-                            <div
-                                className='settings-choice-group settings-theme-group'
-                                role='radiogroup'
-                                aria-label={t.theme}
-                                style={
-                                    {
-                                        '--settings-theme-index':
-                                            themeModeOptions.findIndex(
-                                                (option) =>
-                                                    option.value === themeMode
-                                            ),
-                                    } as React.CSSProperties &
-                                        Record<'--settings-theme-index', number>
-                                }
-                            >
-                                {themeModeOptions.map((option) => {
-                                    const isSelected =
-                                        option.value === themeMode;
-
-                                    return (
-                                        <button
-                                            className={[
-                                                'settings-icon-choice',
-                                                isSelected && 'selected',
-                                            ]
-                                                .filter(Boolean)
-                                                .join(' ')}
-                                            key={option.value}
-                                            type='button'
-                                            role='radio'
-                                            aria-checked={isSelected}
-                                            aria-label={option.label}
-                                            title={option.label}
-                                            onClick={(event) => {
-                                                if (isThemeMode(option.value)) {
-                                                    updateThemeMode(
-                                                        option.value,
-                                                        event.currentTarget
-                                                    );
-                                                }
-                                            }}
-                                        >
-                                            {getThemeModeIcon(
-                                                option.value as ThemeMode
-                                            )}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='settings-section'>
-                        <div className='settings-row settings-choice-row'>
-                            <span className='settings-row-label'>
-                                {t.accent}
-                            </span>
-                            <div
-                                className='settings-choice-group'
-                                role='radiogroup'
-                                aria-label={t.accent}
-                            >
-                                {themeColorOptions.map((option) => {
-                                    const isSelected =
-                                        option.value === selectedThemeColor;
-
-                                    return (
-                                        <button
-                                            className={[
-                                                'settings-color-choice',
-                                                `settings-swatch-${option.value}`,
-                                                isSelected && 'selected',
-                                            ]
-                                                .filter(Boolean)
-                                                .join(' ')}
-                                            key={option.value}
-                                            type='button'
-                                            role='radio'
-                                            aria-checked={isSelected}
-                                            aria-label={t[option.labelKey]}
-                                            title={t[option.labelKey]}
-                                            onClick={() => {
-                                                selectThemeColor(option.value);
-                                            }}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='settings-section'>
-                        <div className='settings-row settings-choice-row'>
-                            <span className='settings-row-label'>
-                                {t.animations}
-                            </span>
-                            <button
-                                className='settings-animation-switch'
-                                type='button'
-                                role='switch'
-                                aria-checked={
-                                    animationMode === normalAnimationMode
-                                }
-                                aria-label={t.animations}
-                                title={
-                                    animationMode === normalAnimationMode
-                                        ? t.normal
-                                        : t.skip
-                                }
-                                onClick={() => {
-                                    updateAnimationMode(
-                                        animationMode === normalAnimationMode
-                                            ? skipAnimationMode
-                                            : normalAnimationMode
-                                    );
-                                }}
-                            >
-                                <span
-                                    className='settings-switch-track'
-                                    aria-hidden
-                                >
-                                    <span className='settings-switch-thumb' />
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-
-                    {wallpaperControls === undefined ? undefined : (
-                        <div className='settings-section'>
-                            <div className='settings-row settings-wallpaper-row'>
-                                <span className='settings-row-label'>
-                                    {t.wallpaper}
-                                </span>
-                                <div className='settings-wallpaper-actions'>
-                                    <input
-                                        className='settings-wallpaper-input'
-                                        type='file'
-                                        accept={wallpaperAcceptedContentTypes.join(
-                                            ','
-                                        )}
-                                        ref={wallpaperInputRef}
-                                        onChange={(event) => {
-                                            const file =
-                                                event.currentTarget.files?.[0];
-                                            if (
-                                                wallpaperInputRef.current !==
-                                                null
-                                            ) {
-                                                wallpaperInputRef.current.value =
-                                                    '';
-                                            }
-
-                                            if (file !== undefined) {
-                                                wallpaperControls
-                                                    .uploadWallpaper(file)
-                                                    .catch(() => undefined);
-                                            }
-                                        }}
-                                    />
-                                    <button
-                                        className={[
-                                            'settings-wallpaper-preview',
-                                            'settings-icon-choice',
-                                            wallpaperControls.wallpaper !==
-                                                undefined && 'has-wallpaper',
-                                        ]
-                                            .filter(Boolean)
-                                            .join(' ')}
-                                        type='button'
-                                        aria-label={t.uploadWallpaper}
-                                        title={
-                                            wallpaperControls.isAvailable
-                                                ? t.uploadWallpaper
-                                                : t.wallpaperUnavailable
-                                        }
-                                        style={
-                                            wallpaperControls.wallpaper ===
-                                            undefined
-                                                ? undefined
-                                                : ({
-                                                      '--settings-wallpaper-preview':
-                                                          getCssUrlValue(
-                                                              wallpaperControls
-                                                                  .wallpaper.url
-                                                          ),
-                                                  } as React.CSSProperties &
-                                                      Record<
-                                                          '--settings-wallpaper-preview',
-                                                          string
-                                                      >)
-                                        }
-                                        disabled={
-                                            !wallpaperControls.isAvailable ||
-                                            wallpaperControls.isBusy
-                                        }
-                                        onClick={() => {
-                                            wallpaperInputRef.current?.click();
-                                        }}
-                                    >
-                                        <Image className='icon' size={18} />
-                                    </button>
-                                    <button
-                                        className='settings-icon-choice'
-                                        type='button'
-                                        aria-label={t.uploadWallpaper}
-                                        title={
-                                            wallpaperControls.isAvailable
-                                                ? t.uploadWallpaper
-                                                : t.wallpaperUnavailable
-                                        }
-                                        disabled={
-                                            !wallpaperControls.isAvailable ||
-                                            wallpaperControls.isBusy
-                                        }
-                                        onClick={() => {
-                                            wallpaperInputRef.current?.click();
-                                        }}
-                                    >
-                                        <Upload className='icon' size={18} />
-                                    </button>
-                                    <button
-                                        className='settings-icon-choice'
-                                        type='button'
-                                        aria-label={t.removeWallpaper}
-                                        title={t.removeWallpaper}
-                                        disabled={
-                                            wallpaperControls.wallpaper ===
-                                                undefined ||
-                                            wallpaperControls.isBusy
-                                        }
-                                        onClick={() => {
-                                            wallpaperControls
-                                                .clearWallpaper()
-                                                .catch(() => undefined);
-                                        }}
-                                    >
-                                        <Trash2 className='icon' size={18} />
-                                    </button>
-                                </div>
-                            </div>
-                            {wallpaperControls.isBusy ? (
-                                <div
-                                    className='settings-wallpaper-meter'
-                                    role='progressbar'
-                                    aria-label={t.wallpaperUploading}
-                                    aria-valuemin={0}
-                                    aria-valuemax={100}
-                                    aria-valuenow={wallpaperProgress ?? 0}
-                                    style={
-                                        {
-                                            '--settings-wallpaper-progress': `${wallpaperProgress ?? 0}%`,
-                                        } as React.CSSProperties &
-                                            Record<
-                                                '--settings-wallpaper-progress',
-                                                string
-                                            >
-                                    }
-                                />
-                            ) : undefined}
-                            {wallpaperControls.error ===
-                            undefined ? undefined : (
-                                <div
-                                    className='settings-wallpaper-status'
-                                    role='status'
-                                >
-                                    {wallpaperControls.error}
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className='settings-section'>
-                        <div className='settings-row settings-bookmark-row'>
-                            <span className='settings-row-label'>
-                                {t.bookmarks}
-                            </span>
-                            <div className='settings-bookmark-actions'>
-                                <button
-                                    className='settings-icon-choice'
-                                    type='button'
-                                    aria-label={t.manageBookmarks}
-                                    disabled={!bookmarkControls.canEdit}
-                                    title={t.manageBookmarks}
-                                    onClick={() => {
-                                        setIsBookmarkManagerOpen(true);
-                                        setMenuOpen(false);
-                                    }}
-                                >
-                                    <Pencil className='icon' size={18} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className='settings-section'>
-                        <div className='settings-row settings-select-row'>
-                            <span
-                                className='settings-row-label'
-                                id='location-picker-label'
-                            >
-                                {t.location}
-                            </span>
-                            <SettingsDropdown
-                                id='location-picker'
-                                labelledBy='location-picker-label'
-                                value={selectedLocation.id}
-                                options={locationOptions}
-                                isOpen={openDropdownId === 'location-picker'}
-                                onOpenChange={getDropdownOpenHandler(
-                                    'location-picker'
-                                )}
-                                onChange={(nextLocationId) => {
-                                    if (
-                                        nextLocationId === myLocationOptionValue
-                                    ) {
-                                        syncCurrentLocation();
-                                        return;
-                                    }
-
-                                    selectLocationId(nextLocationId);
-                                }}
-                            />
-                        </div>
-                    </div>
-
-                    <div className='settings-section'>
-                        <div className='settings-row settings-select-row'>
-                            <span
-                                className='settings-row-label'
-                                id='language-picker-label'
-                            >
-                                {t.language}
-                            </span>
-                            <SettingsDropdown
-                                id='language-picker'
-                                labelledBy='language-picker-label'
-                                value={locale}
-                                options={languageOptions}
-                                isOpen={openDropdownId === 'language-picker'}
-                                onOpenChange={getDropdownOpenHandler(
-                                    'language-picker'
-                                )}
-                                onChange={(nextLocale) => {
-                                    if (isAppLocale(nextLocale)) {
-                                        setLocale(nextLocale);
-                                    }
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            ) : undefined}
+            {settingsPage}
             {isBookmarkManagerOpen ? (
                 <BookmarkManagerDialog
                     bookmarkControls={bookmarkControls}
