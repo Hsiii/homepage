@@ -4,11 +4,14 @@ interface Time {
     time: string;
 }
 
+const defaultTimeZone = 'Asia/Taipei';
+
 const getCurrentTime = (): string =>
     new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         hour12: false,
         minute: '2-digit',
+        timeZone: defaultTimeZone,
     });
 
 export const useTime = (): Time => {
