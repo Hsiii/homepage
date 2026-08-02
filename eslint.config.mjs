@@ -5,7 +5,13 @@ export default defineConfig(
     ...completeConfigBase,
 
     {
-        ignores: ['.next/**', '.vercel/**', 'dist/**', 'next-env.d.ts'],
+        ignores: [
+            '.next/**',
+            '.vercel/**',
+            'dist/**',
+            'next-env.d.ts',
+            'public/sw.js',
+        ],
     },
 
     {

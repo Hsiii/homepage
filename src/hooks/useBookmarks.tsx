@@ -16,6 +16,7 @@ import {
 import { isBrowser } from '@/utils/browserEnv';
 
 const bookmarkApiPath = '/api/bookmarks';
+const activeBookmarkUserStorageKey = 'homepage.bookmarks.active-user';
 const guestBookmarkStorageKey = 'homepage.bookmarks';
 const userBookmarkStorageKeyPrefix = 'homepage.bookmarks.user';
 const bookmarkStorageVersion = 3;
@@ -136,7 +137,10 @@ interface BookmarkAuthState {
 
 interface UseBookmarksOptions {
     auth?: BookmarkAuthState;
-    initialBookmarkTree?: BookmarkCategoryData[];
+}
+
+interface ActiveUserBookmarkData extends StoredBookmarkData {
+    userId?: string;
 }
 
 const readStoredBookmarkData = (storageKey: string): StoredBookmarkData => {
@@ -196,6 +200,45 @@ const readGuestBookmarkData = (): StoredBookmarkData =>
 const readUserBookmarkData = (userId: string): StoredBookmarkData =>
     readStoredBookmarkData(getUserBookmarkStorageKey(userId));
 
+const readActiveUserBookmarkData = (): ActiveUserBookmarkData => {
+    if (!isBrowser()) {
+        return { trash: [] };
+    }
+
+    const activeUserId = globalThis.localStorage.getItem(
+        activeBookmarkUserStorageKey
+    );
+    const legacyCachedUserIds: string[] = [];
+
+    if (activeUserId === null) {
+        const userStorageKeyPrefix = `${userBookmarkStorageKeyPrefix}.`;
+
+        for (let index = 0; index < globalThis.localStorage.length; index++) {
+            const storageKey = globalThis.localStorage.key(index);
+
+            if (storageKey?.startsWith(userStorageKeyPrefix) === true) {
+                legacyCachedUserIds.push(
+                    storageKey.slice(userStorageKeyPrefix.length)
+                );
+            }
+        }
+    }
+
+    const userId =
+        activeUserId ??
+        (legacyCachedUserIds.length === 1 ? legacyCachedUserIds[0] : undefined);
+
+    return userId === undefined
+        ? { trash: [] }
+        : { ...readUserBookmarkData(userId), userId };
+};
+
+const clearActiveBookmarkUser = (): void => {
+    if (isBrowser()) {
+        globalThis.localStorage.removeItem(activeBookmarkUserStorageKey);
+    }
+};
+
 const storeGuestBookmarkTree = (
     bookmarkTree: readonly BookmarkCategoryData[],
     bookmarkTrash: readonly BookmarkTrashItemData[]
@@ -213,6 +256,7 @@ const storeUserBookmarkTree = (
         bookmarkTree,
         bookmarkTrash
     );
+    globalThis.localStorage.setItem(activeBookmarkUserStorageKey, userId);
 };
 
 const normalizeInputText = (value: string): string =>
@@ -475,7 +519,6 @@ const readBookmarkResponse = async (
 export const useBookmarks = (
     options: UseBookmarksOptions = {}
 ): BookmarkControls => {
-    const { initialBookmarkTree } = options;
     const hasAuth = options.auth !== undefined;
     const getToken = options.auth?.getToken;
     const isAuthLoaded = options.auth?.isLoaded === true;
@@ -485,22 +528,21 @@ export const useBookmarks = (
         typeof options.auth.userId === 'string'
             ? options.auth.userId
             : undefined;
-    const initialGuestData = hasAuth ? { trash: [] } : readGuestBookmarkData();
+    const [initialStoredData] = useState<ActiveUserBookmarkData>(() =>
+        hasAuth ? readActiveUserBookmarkData() : readGuestBookmarkData()
+    );
     const [bookmarkTree, setBookmarkTree] = useState<BookmarkCategoryData[]>(
-        () =>
-            initialBookmarkTree ??
-            initialGuestData.categories ??
-            emptyBookmarkTree
+        () => initialStoredData.categories ?? emptyBookmarkTree
     );
     const [bookmarkTrash, setBookmarkTrash] = useState<BookmarkTrashItemData[]>(
-        () => initialGuestData.trash
+        () => initialStoredData.trash
     );
     const [status, setStatus] = useState<BookmarkStatus>();
     const [isLoading, setIsLoading] = useState(
-        initialBookmarkTree === undefined && hasAuth
+        hasAuth && initialStoredData.categories === undefined
     );
     const [saveState, setSaveState] = useState<BookmarkSaveState>(
-        hasAuth ? 'idle' : 'saved'
+        hasAuth && initialStoredData.categories === undefined ? 'idle' : 'saved'
     );
     const mutationVersionRef = useRef(0);
     const saveOperationRef = useRef(0);
@@ -651,7 +693,7 @@ export const useBookmarks = (
 
     useLayoutEffect(() => {
         if (hasAuth && !isAuthLoaded) {
-            setIsLoading(true);
+            setIsLoading(initialStoredData.categories === undefined);
             return undefined;
         }
 
@@ -660,18 +702,11 @@ export const useBookmarks = (
                 return undefined;
             }
 
+            clearActiveBookmarkUser();
             const storedBookmarkData = readGuestBookmarkData();
 
             setBookmarkTree(storedBookmarkData.categories ?? emptyBookmarkTree);
             setBookmarkTrash(storedBookmarkData.trash);
-            setIsLoading(false);
-            setSaveState('saved');
-            return undefined;
-        }
-
-        if (initialBookmarkTree !== undefined) {
-            setBookmarkTree(initialBookmarkTree);
-            setBookmarkTrash([]);
             setIsLoading(false);
             setSaveState('saved');
             return undefined;
@@ -682,6 +717,9 @@ export const useBookmarks = (
         setBookmarkTree(cachedBookmarkData.categories ?? emptyBookmarkTree);
         setBookmarkTrash(cachedBookmarkData.trash);
         setIsLoading(cachedBookmarkData.categories === undefined);
+        setSaveState(
+            cachedBookmarkData.categories === undefined ? 'idle' : 'saved'
+        );
 
         let isCurrent = true;
         const loadMutationVersion = mutationVersionRef.current;
@@ -741,7 +779,7 @@ export const useBookmarks = (
         getAuthHeaders,
         getToken,
         hasAuth,
-        initialBookmarkTree,
+        initialStoredData.categories,
         isAuthLoaded,
         remoteUserId,
     ]);

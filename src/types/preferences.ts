@@ -15,6 +15,6 @@ export interface InitialClientPreferences {
 
 export interface InitialAppPreferences extends InitialClientPreferences {
     hasLocationCookie: boolean;
-    locationId: string;
+    locationId?: string;
     resolvedTheme: ResolvedTheme;
 }

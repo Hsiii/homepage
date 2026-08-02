@@ -7,7 +7,6 @@ import type { BookmarkControls } from '@/hooks/useBookmarks';
 import { useBookmarkSearch } from '@/hooks/useBookmarkSearch';
 import { useHideLinks } from '@/hooks/useHideLinks';
 import { useTime } from '@/hooks/useTime';
-import type { BookmarkCategoryData } from '@/types/bookmarks';
 import type { AqiData, WeatherData } from '@/types/environment';
 import type { InitialAppPreferences } from '@/types/preferences';
 import type { WallpaperAsset } from '../../shared/wallpaper';
@@ -30,7 +29,6 @@ const Weather = lazy(
 
 interface CoverProps {
     initialAqi: AqiData | undefined;
-    initialBookmarkTree: BookmarkCategoryData[] | undefined;
     initialPreferences: InitialAppPreferences;
     initialWallpaper: WallpaperAsset | undefined;
     initialWeather: WeatherData | undefined;
@@ -226,7 +224,6 @@ const CoverWithRemoteBookmarks: React.FC<CoverProps> = (props) => {
             isSignedIn,
             userId,
         },
-        initialBookmarkTree: props.initialBookmarkTree,
     });
 
     return <CoverContent {...props} bookmarkControls={bookmarkControls} />;
