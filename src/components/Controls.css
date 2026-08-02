@@ -138,15 +138,18 @@
     font: var(--fontBoldSm);
 }
 
-.bookmark-workspace-header-button small {
-    min-width: 1.25rem;
-    padding: 0.125rem 0.375rem;
+.bookmark-workspace-count-badge {
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    padding: 0 0.5rem;
     border-radius: 999px;
     background-color: var(--clr-text-alpha-2);
-    color: var(--clr-text);
+    color: var(--clr-text-alpha);
     text-align: center;
-    font: var(--fontBoldSm);
+    font: var(--fontSm);
     font-variant-numeric: tabular-nums;
+    display: inline-grid;
+    place-items: center;
 }
 
 .bookmark-workspace-icon-button,
@@ -242,7 +245,7 @@
 }
 
 .bookmark-workspace-tree-pane {
-    padding: var(--bookmark-workspace-pane-padding) 0.75rem;
+    padding: var(--bookmark-workspace-pane-padding) 0.5rem;
     border-right: 1px solid var(--bookmark-workspace-column-border);
     background-color: var(--clr-text-alpha-2);
     display: grid;
@@ -398,7 +401,7 @@
     --bookmark-tree-depth: 0;
 
     min-width: 0;
-    padding-left: calc(var(--bookmark-tree-depth) * 1rem);
+    padding-left: calc(var(--bookmark-tree-depth) * 0.75rem);
 }
 
 .bookmark-workspace-tree-item {
@@ -412,26 +415,13 @@
     cursor: pointer;
     text-align: left;
     display: grid;
-    grid-template-columns: 1rem 1.25rem minmax(0, 1fr) auto;
+    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.5rem;
     transition:
         background-color var(--motion-duration-fast) var(--motion-ease-out),
         color var(--motion-duration-fast) var(--motion-ease-out),
         scale var(--motion-duration-fast) var(--motion-ease-out);
-}
-
-.bookmark-workspace-tree-chevron {
-    width: 1rem;
-    height: 1rem;
-    color: var(--clr-text-alpha);
-    display: grid;
-    place-items: center;
-}
-
-.bookmark-workspace-tree-chevron svg {
-    width: 1rem;
-    height: 1rem;
 }
 
 .bookmark-workspace-tree-item:hover,
@@ -451,22 +441,12 @@
     height: 1.25rem;
 }
 
-.bookmark-workspace-tree-item > span:not(.bookmark-workspace-tree-chevron) {
+.bookmark-workspace-tree-item > span {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     font: var(--fontBoldSm);
-}
-
-.bookmark-workspace-tree-item small {
-    min-width: 1.5rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 999px;
-    background-color: var(--clr-text-alpha-2);
-    color: var(--clr-text-alpha);
-    text-align: center;
-    font-variant-numeric: tabular-nums;
 }
 
 .bookmark-workspace-list-pane {
@@ -538,9 +518,12 @@
     width: 1rem;
     height: 1rem;
     margin-left: 0.75rem;
+    pointer-events: none;
 }
 
 .bookmark-workspace-quick-add input {
+    position: relative;
+    z-index: 1;
     min-width: 0;
     min-height: 2.5rem;
     padding: 0.5rem;
@@ -548,6 +531,7 @@
     background-color: transparent;
     color: var(--clr-search-field-text);
     outline: none;
+    cursor: text;
 }
 
 .bookmark-workspace-quick-add input::placeholder {
@@ -567,6 +551,7 @@
     white-space: nowrap;
     color: var(--clr-search-field-text);
     font: var(--fontBoldSm);
+    pointer-events: none;
 }
 
 .bookmark-workspace-list-actions {
@@ -697,6 +682,7 @@
     position: relative;
     min-width: 0;
     min-height: 4rem;
+    padding-inline: var(--bookmark-manager-row-gap);
     border: 1px solid transparent;
     border-radius: var(--bookmark-workspace-control-radius);
     background-color: var(--clr-text-alpha-2);
@@ -711,6 +697,7 @@
 
 .bookmark-workspace-drag-handle {
     cursor: grab;
+    user-select: none;
 }
 
 .bookmark-workspace-drag-handle:active {
@@ -718,7 +705,9 @@
 }
 
 .bookmark-workspace-list-row[data-dragging='true'] {
-    opacity: 0.48;
+    z-index: 2;
+    opacity: 0.92;
+    box-shadow: var(--shadow-panel-hover);
 }
 
 .bookmark-workspace-list-row[data-drop-position='inside'] {
@@ -751,8 +740,12 @@
 .bookmark-workspace-list-row:hover,
 .bookmark-workspace-list-row:focus-within,
 .bookmark-workspace-list-row[data-selected='true'] {
-    border-color: var(--clr-primary-alpha);
-    background-color: var(--clr-primary-alpha);
+    border-color: var(--bookmark-workspace-column-border);
+    background-color: color-mix(
+        in srgb,
+        var(--clr-text-alpha-2),
+        var(--clr-on-dark) 24%
+    );
     box-shadow: var(--shadow-panel);
 }
 
@@ -811,32 +804,6 @@
 
 .bookmark-workspace-item-copy strong {
     font: var(--fontBoldSm);
-}
-
-.bookmark-workspace-inline-title {
-    width: 100%;
-    min-width: 0;
-    height: 1.5rem;
-    margin-left: -0.25rem;
-    padding: 0 0.25rem;
-    border: 0;
-    border-radius: 0.25rem;
-    background-color: transparent;
-    color: var(--clr-text);
-    outline: none;
-    font: var(--fontBoldSm);
-    transition:
-        background-color var(--motion-duration-fast) var(--motion-ease-out),
-        box-shadow var(--motion-duration-fast) var(--motion-ease-out);
-}
-
-.bookmark-workspace-inline-title:hover {
-    background-color: var(--clr-text-alpha-2);
-}
-
-.bookmark-workspace-inline-title:focus {
-    background-color: var(--clr-search-field-bg-active);
-    box-shadow: 0 0 0 2px var(--clr-primary-alpha);
 }
 
 .bookmark-workspace-row-actions {
@@ -1135,9 +1102,13 @@
 
 .bookmark-workspace-form-actions {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 0.5rem;
+}
+
+.bookmark-workspace-form-actions[data-editing='true'] {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
 }
 
 .bookmark-workspace-editor-backdrop {
@@ -1277,7 +1248,7 @@
     padding: 1rem;
     border: 1px solid var(--bookmark-workspace-column-border);
     border-radius: var(--bookmark-workspace-dialog-radius);
-    background-color: var(--clr-panel-bg);
+    background-color: var(--clr-neutral-light);
     box-shadow: var(--shadow-panel-hover);
     color: var(--clr-text);
     display: grid;
@@ -1335,7 +1306,18 @@
 }
 
 .bookmark-workspace-confirm button.danger {
-    color: var(--clr-aqi-unhealthy);
+    background-color: var(--clr-aqi-unhealthy);
+    color: var(--clr-on-dark);
+}
+
+.bookmark-workspace-confirm button.danger:hover,
+.bookmark-workspace-confirm button.danger:focus-visible {
+    background-color: color-mix(
+        in srgb,
+        var(--clr-aqi-unhealthy),
+        var(--clr-neutral-dark) 12%
+    );
+    color: var(--clr-on-dark);
 }
 
 .bookmark-workspace-confirm button svg {
@@ -1478,7 +1460,6 @@
         padding-left: 0;
     }
 
-    .bookmark-workspace-tree-chevron,
     .bookmark-workspace-tree-item small {
         display: none;
     }
@@ -1526,7 +1507,8 @@
         height: 1.75rem;
     }
 
-    .bookmark-workspace-form-actions {
+    .bookmark-workspace-form-actions,
+    .bookmark-workspace-form-actions[data-editing='true'] {
         grid-template-columns: 1fr 1fr;
     }
 
