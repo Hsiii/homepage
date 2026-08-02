@@ -1,4 +1,4 @@
-const CACHE_NAME = 'homepage-shell-v1';
+const CACHE_NAME = 'homepage-shell-v2';
 const SHELL_PATH = '/';
 
 self.addEventListener('install', (event) => {
