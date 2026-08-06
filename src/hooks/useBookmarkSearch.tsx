@@ -51,13 +51,12 @@ const getSearchKeySequenceInput = (
 
 const feedLinks = [
     'Instagram',
-    'Messenger',
     'Twitter',
     'Facebook',
     'GitHub',
-    'Crx',
     'YouTube',
     'Anigamer',
+    'Crunchyroll',
     'Supercell Store',
 ] as const;
 
