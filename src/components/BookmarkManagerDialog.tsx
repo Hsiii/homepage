@@ -18,6 +18,7 @@ import {
     LoaderCircle,
     MoreHorizontal,
     Plus,
+    Rss,
     Search,
     Trash2,
     Undo2,
@@ -42,6 +43,7 @@ import {
     resolveFolderIconName,
 } from '@/utils/bookmarkPresentation';
 import { isBookmarkFolder, isBookmarkLink } from '@/utils/bookmarks';
+import { hasCustomFeedSelection, isLegacyFeedTitle } from '@/utils/feeds';
 
 interface BookmarkManagerDialogProps {
     bookmarkControls: BookmarkControls;
@@ -56,6 +58,7 @@ interface BookmarkLocation {
 interface EditorDraft extends BookmarkLocation {
     bookmarkId?: string;
     destinationKey: string;
+    feed: boolean;
     icon: string;
     kind: 'bookmark' | 'category' | 'folder';
     mode: 'add' | 'edit';
@@ -316,6 +319,7 @@ const getDestinationOptions = (
 const serializeDraft = (draft: EditorDraft): string =>
     JSON.stringify({
         destinationKey: draft.destinationKey,
+        feed: draft.feed,
         icon: draft.icon,
         title: draft.title,
         url: draft.url,
@@ -464,6 +468,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
     const [quickAddMessage, setQuickAddMessage] = useState('');
 
     const { bookmarkTree } = bookmarkControls;
+    const hasCustomizedFeeds = hasCustomFeedSelection(bookmarkTree);
     const decoratedTree = useMemo(
         () => decorateBookmarkTree(bookmarkTree),
         [bookmarkTree]
@@ -573,6 +578,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         openDraft({
             categoryIndex,
             destinationKey: '',
+            feed: false,
             folderPath: [],
             icon: decoratedCategory.iconName,
             kind: 'category',
@@ -599,6 +605,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         openDraft({
             ...nextLocation,
             destinationKey: '',
+            feed: false,
             icon: resolveFolderIconName(folder),
             kind: 'folder',
             mode: 'edit',
@@ -619,6 +626,9 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                 nextLocation.categoryIndex,
                 nextLocation.folderPath
             ),
+            feed: hasCustomizedFeeds
+                ? bookmark.feed === true
+                : isLegacyFeedTitle(bookmark.title),
             icon: '',
             kind: 'bookmark',
             mode: 'edit',
@@ -631,6 +641,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         openDraft({
             categoryIndex: -1,
             destinationKey: '',
+            feed: false,
             folderPath: [],
             icon: defaultIconName,
             kind: 'category',
@@ -649,6 +660,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
         openDraft({
             ...location,
             destinationKey: '',
+            feed: false,
             icon: defaultIconName,
             kind: 'folder',
             mode: 'add',
@@ -669,6 +681,7 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                 location.categoryIndex,
                 location.folderPath
             ),
+            feed: false,
             icon: '',
             kind: 'bookmark',
             mode: 'add',
@@ -727,13 +740,18 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                 didSave =
                     editorDraft.mode === 'add'
                         ? bookmarkControls.addBookmarkToLocation(destination, {
+                              feed: editorDraft.feed,
                               title,
                               url: normalizedUrl,
                           })
                         : bookmarkControls.updateBookmarkInLocation(
                               editorDraft,
                               editorDraft.bookmarkId ?? '',
-                              { title, url: normalizedUrl },
+                              {
+                                  feed: editorDraft.feed,
+                                  title,
+                                  url: normalizedUrl,
+                              },
                               destination
                           );
             }
@@ -1783,6 +1801,32 @@ export const BookmarkManagerDialog: React.FC<BookmarkManagerDialogProps> = ({
                                                     {formErrors.url}
                                                 </small>
                                             )}
+                                        </label>
+                                        <label className='bookmark-workspace-feed-toggle'>
+                                            <span className='bookmark-workspace-feed-toggle-copy'>
+                                                <Rss aria-hidden='true' />
+                                                <span>
+                                                    <strong>
+                                                        {t.openWithFeeds}
+                                                    </strong>
+                                                    <small>
+                                                        {
+                                                            t.openWithFeedsDescription
+                                                        }
+                                                    </small>
+                                                </span>
+                                            </span>
+                                            <input
+                                                type='checkbox'
+                                                checked={editorDraft.feed}
+                                                onChange={(event) => {
+                                                    setEditorDraft({
+                                                        ...editorDraft,
+                                                        feed: event.target
+                                                            .checked,
+                                                    });
+                                                }}
+                                            />
                                         </label>
                                         <div className='bookmark-workspace-field'>
                                             <span>{t.location}</span>

@@ -163,8 +163,10 @@ const coerceBookmarkLink = (value: unknown): BookmarkLinkData | undefined => {
     const title = typeof value.title === 'string' ? value.title : '';
     const url = typeof value.url === 'string' ? value.url : '';
     const id = typeof value.id === 'string' ? value.id : '';
+    const feed = typeof value.feed === 'boolean' ? value.feed : undefined;
 
     return {
+        ...(feed === undefined ? {} : { feed }),
         id,
         title,
         type: 'link',

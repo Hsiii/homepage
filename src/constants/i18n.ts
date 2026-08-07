@@ -100,6 +100,9 @@ const messages = {
         noItems: 'Nothing here yet',
         noItemsDescription: 'Add a bookmark or folder to get started.',
         normal: 'Normal',
+        openWithFeeds: 'Open with /feeds',
+        openWithFeedsDescription:
+            'Include this bookmark when you run the feed command.',
         pasteLinks: 'Paste one or more links',
         preferences: 'Preferences',
         preferencesDescription: 'Tune motion, location, and language.',
@@ -214,6 +217,8 @@ const messages = {
         noItems: '這裡還沒有項目',
         noItemsDescription: '新增書籤或資料夾來開始使用。',
         normal: '一般',
+        openWithFeeds: '使用 /feeds 開啟',
+        openWithFeedsDescription: '執行動態指令時一併開啟這個書籤。',
         pasteLinks: '貼上一個或多個連結',
         preferences: '偏好設定',
         preferencesDescription: '調整動畫、位置與語言。',

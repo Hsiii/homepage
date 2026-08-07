@@ -14,6 +14,7 @@ import {
     serializeBrowserBookmarks,
 } from '@/utils/bookmarks';
 import { isBrowser } from '@/utils/browserEnv';
+import { hasCustomFeedSelection, initializeFeedSelection } from '@/utils/feeds';
 
 const bookmarkApiPath = '/api/bookmarks';
 const activeBookmarkUserStorageKey = 'homepage.bookmarks.active-user';
@@ -46,6 +47,7 @@ export interface BookmarkFolderInput {
 }
 
 export interface BookmarkInput {
+    feed?: boolean;
     title: string;
     url: string;
 }
@@ -1206,18 +1208,49 @@ export const useBookmarks = (
             }
 
             const bookmark: BookmarkLinkData = {
+                ...(bookmarkInput.feed === undefined
+                    ? {}
+                    : { feed: bookmarkInput.feed }),
                 id: createBookmarkId(),
                 title,
                 type: 'link',
                 url,
             };
 
-            return updateBookmarkLocation(location, (nodes) => [
-                ...nodes,
-                bookmark,
-            ]);
+            if (
+                bookmarkInput.feed === undefined ||
+                hasCustomFeedSelection(bookmarkTree)
+            ) {
+                return updateBookmarkLocation(location, (nodes) => [
+                    ...nodes,
+                    bookmark,
+                ]);
+            }
+
+            const initializedTree = initializeFeedSelection(bookmarkTree);
+            const category = initializedTree.at(location.categoryIndex);
+            if (category === undefined) {
+                return false;
+            }
+
+            const nextChildren = updateNodesAtFolderPath(
+                category.children,
+                normalizeFolderPath(location),
+                (nodes) => [...nodes, bookmark]
+            );
+
+            return (
+                nextChildren !== undefined &&
+                commitBookmarkTree(
+                    initializedTree.map((item, index) =>
+                        index === location.categoryIndex
+                            ? { ...item, children: nextChildren }
+                            : item
+                    )
+                )
+            );
         },
-        [updateBookmarkLocation]
+        [bookmarkTree, commitBookmarkTree, updateBookmarkLocation]
     );
 
     const addBookmarksToLocation = useCallback(
@@ -1284,8 +1317,13 @@ export const useBookmarks = (
         ) => {
             const title = normalizeInputText(bookmarkInput.title);
             const url = bookmarkInput.url.trim();
-            const sourceCategory = bookmarkTree.at(location.categoryIndex);
-            const targetCategory = bookmarkTree.at(nextLocation.categoryIndex);
+            const sourceTree =
+                bookmarkInput.feed === undefined ||
+                hasCustomFeedSelection(bookmarkTree)
+                    ? bookmarkTree
+                    : initializeFeedSelection(bookmarkTree);
+            const sourceCategory = sourceTree.at(location.categoryIndex);
+            const targetCategory = sourceTree.at(nextLocation.categoryIndex);
             const bookmark = sourceCategory?.links.find(
                 (linkData) => linkData.id === bookmarkId
             );
@@ -1304,6 +1342,9 @@ export const useBookmarks = (
             const targetFolderPath = normalizeFolderPath(nextLocation);
             const nextBookmark = {
                 ...bookmark,
+                ...(bookmarkInput.feed === undefined
+                    ? {}
+                    : { feed: bookmarkInput.feed }),
                 title,
                 url,
             };
@@ -1312,14 +1353,26 @@ export const useBookmarks = (
                 location.categoryIndex === nextLocation.categoryIndex &&
                 sourceFolderPath.join('\n') === targetFolderPath.join('\n')
             ) {
-                return updateBookmarkLocation(
-                    location,
+                const nextChildren = updateNodesAtFolderPath(
+                    sourceCategory.children,
+                    sourceFolderPath,
                     (nodes): BookmarkNodeData[] =>
                         updateBookmarkNodes(nodes, bookmarkId, nextBookmark)
                 );
+
+                return (
+                    nextChildren !== undefined &&
+                    commitBookmarkTree(
+                        sourceTree.map((category, index) =>
+                            index === location.categoryIndex
+                                ? { ...category, children: nextChildren }
+                                : category
+                        )
+                    )
+                );
             }
 
-            const nextBookmarkTree = bookmarkTree.map(
+            const nextBookmarkTree = sourceTree.map(
                 (categoryData, currentIndex) => {
                     if (
                         currentIndex !== location.categoryIndex &&
@@ -1379,7 +1432,7 @@ export const useBookmarks = (
 
             return commitBookmarkTree(nextBookmarkTree);
         },
-        [bookmarkTree, commitBookmarkTree, updateBookmarkLocation]
+        [bookmarkTree, commitBookmarkTree]
     );
 
     const updateBookmark = useCallback(

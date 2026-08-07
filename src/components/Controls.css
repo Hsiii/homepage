@@ -925,6 +925,56 @@
     color: var(--clr-aqi-unhealthy);
 }
 
+.bookmark-workspace-feed-toggle {
+    min-height: 4rem;
+    padding: 0.75rem;
+    border-radius: var(--bookmark-workspace-control-radius);
+    background-color: var(--clr-text-alpha-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.bookmark-workspace-feed-toggle-copy {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.bookmark-workspace-feed-toggle-copy > svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: 0 0 auto;
+    color: var(--clr-text-alpha);
+}
+
+.bookmark-workspace-feed-toggle-copy > span {
+    min-width: 0;
+    display: grid;
+    gap: 0.25rem;
+}
+
+.bookmark-workspace-feed-toggle-copy strong {
+    font: var(--fontBoldSm);
+}
+
+.bookmark-workspace-feed-toggle-copy small {
+    color: var(--clr-text-alpha);
+    font: var(--fontBaseSm);
+    text-wrap: pretty;
+}
+
+.bookmark-workspace-feed-toggle > input {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: 0 0 auto;
+    accent-color: var(--clr-primary);
+    cursor: pointer;
+}
+
 .bookmark-workspace-location-trigger {
     width: 100%;
     min-height: 2.75rem;
