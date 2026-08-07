@@ -2736,6 +2736,291 @@
     gap: 0.5rem;
 }
 
+.settings-feed-card {
+    overflow: hidden;
+}
+
+.settings-feed-selected,
+.settings-feed-search-area {
+    padding: 1rem;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.settings-feed-search-area {
+    border-top: 1px solid var(--clr-text-alpha-2);
+}
+
+.settings-feed-subheading {
+    min-height: 1.5rem;
+    color: var(--clr-neutral);
+    font: var(--fontBoldSm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.settings-feed-subheading > small {
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    background-color: var(--clr-text-alpha-2);
+    color: var(--clr-text-alpha);
+    font: var(--fontSm);
+    font-variant-numeric: tabular-nums;
+    display: grid;
+    place-items: center;
+}
+
+.settings-feed-list {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.settings-feed-bookmark {
+    min-width: 0;
+    min-height: 3.5rem;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    background-color: var(--clr-text-alpha-2);
+    display: grid;
+    grid-template-columns: 2.5rem 2rem minmax(0, 1fr) 2.5rem;
+    align-items: center;
+    gap: 0.5rem;
+    transition:
+        box-shadow var(--motion-duration-fast) var(--motion-ease-out),
+        opacity var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.settings-feed-bookmark[data-dragging='true'] {
+    z-index: 2;
+    opacity: 0.92;
+    box-shadow: var(--shadow-panel-hover);
+}
+
+.settings-feed-drag-handle {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    background-color: transparent;
+    color: var(--clr-text-alpha);
+    cursor: grab;
+    transition:
+        background-color var(--motion-duration-fast) var(--motion-ease-out),
+        color var(--motion-duration-fast) var(--motion-ease-out),
+        scale var(--motion-duration-fast) var(--motion-ease-out);
+    display: grid;
+    place-items: center;
+}
+
+.settings-feed-drag-handle:hover,
+.settings-feed-drag-handle:focus-visible {
+    background-color: var(--clr-text-alpha-2);
+    color: var(--clr-text);
+    outline: none;
+}
+
+.settings-feed-drag-handle:active {
+    cursor: grabbing;
+    scale: var(--motion-press-scale);
+}
+
+.settings-feed-drag-handle svg,
+.settings-feed-remove svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.settings-feed-bookmark-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background-color: var(--clr-panel-bg);
+    color: var(--clr-primary);
+    display: grid;
+    place-items: center;
+}
+
+.settings-feed-bookmark-icon svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.settings-feed-bookmark-copy,
+.settings-feed-results button > span,
+.settings-feed-empty > span {
+    min-width: 0;
+    display: grid;
+    gap: 0.25rem;
+}
+
+.settings-feed-bookmark-copy strong,
+.settings-feed-results strong,
+.settings-feed-empty strong {
+    overflow: hidden;
+    color: var(--clr-text);
+    font: var(--fontBoldSm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-feed-bookmark-copy small,
+.settings-feed-results small,
+.settings-feed-empty small {
+    overflow: hidden;
+    color: var(--clr-text-alpha);
+    font: var(--fontBaseSm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-feed-results strong,
+.settings-feed-results small {
+    line-height: 1rem;
+}
+
+.settings-feed-remove {
+    background-color: transparent;
+}
+
+.settings-feed-empty {
+    min-height: 4.5rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background-color: var(--clr-text-alpha-2);
+    color: var(--clr-text-alpha);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.settings-feed-empty > svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: 0 0 auto;
+}
+
+.settings-feed-search {
+    position: relative;
+}
+
+.settings-feed-search > svg {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+    color: var(--clr-text-alpha);
+    pointer-events: none;
+    translate: 0 -50%;
+}
+
+.settings-feed-search input {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+    border: 1px solid var(--clr-text-alpha-2);
+    border-radius: 0.75rem;
+    background-color: var(--clr-neutral-light);
+    box-shadow: var(--shadow-panel);
+    color: var(--clr-text);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition:
+        border-color var(--motion-duration-fast) var(--motion-ease-out),
+        box-shadow var(--motion-duration-fast) var(--motion-ease-out),
+        outline-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.settings-feed-search input:focus-visible {
+    border-color: transparent;
+    box-shadow: none;
+    outline-color: var(--clr-primary-alpha);
+}
+
+.settings-feed-results {
+    --settings-feed-result-height: 3.5rem;
+    --settings-feed-results-height: 17.75rem;
+
+    height: var(--settings-feed-results-height);
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+.settings-feed-results button {
+    width: 100%;
+    height: var(--settings-feed-result-height);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    background-color: transparent;
+    color: var(--clr-text-alpha);
+    cursor: pointer;
+    text-align: left;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+    transition:
+        background-color var(--motion-duration-fast) var(--motion-ease-out),
+        color var(--motion-duration-fast) var(--motion-ease-out),
+        outline-color var(--motion-duration-fast) var(--motion-ease-out),
+        scale var(--motion-duration-fast) var(--motion-ease-out);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1.25rem;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.settings-feed-results button > span {
+    align-self: stretch;
+    align-content: center;
+}
+
+.settings-feed-results button:hover,
+.settings-feed-results button:focus-visible {
+    background-color: var(--clr-text-alpha-2);
+    color: var(--clr-primary);
+}
+
+.settings-feed-results button:focus-visible {
+    outline-color: var(--clr-primary-alpha);
+}
+
+.settings-feed-results button:active {
+    scale: var(--motion-press-scale);
+}
+
+.settings-feed-results button > svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.settings-feed-search-empty {
+    height: 100%;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    background-color: var(--clr-text-alpha-2);
+    color: var(--clr-text-alpha);
+    font: var(--fontBaseSm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-align: center;
+    text-wrap: pretty;
+}
+
+.settings-feed-search-empty > svg {
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
+}
+
 @keyframes settings-page-enter {
     from {
         opacity: 0;

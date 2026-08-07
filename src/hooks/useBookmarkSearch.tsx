@@ -9,7 +9,8 @@ import {
 } from 'react';
 import type React from 'react';
 
-import type { BookmarkCategoryData, BookmarkLinkData } from '@/types/bookmarks';
+import type { BookmarkCategoryData } from '@/types/bookmarks';
+import { getFeedBookmarks } from '@/utils/feeds';
 import type {
     FeedsLink,
     LinkItem,
@@ -48,17 +49,6 @@ const getSearchKeySequenceInput = (
 
     return undefined;
 };
-
-const feedLinks = [
-    'Instagram',
-    'Twitter',
-    'Facebook',
-    'GitHub',
-    'YouTube',
-    'Anigamer',
-    'Crunchyroll',
-    'Supercell Store',
-] as const;
 
 const getFeedsWindowKey = (date = new Date()): string => {
     const shiftedTimestamp =
@@ -123,22 +113,6 @@ const getElementMotionDuration = (element: HTMLElement): number => {
         getMaxCssTime(style.transitionDelay) +
             getMaxCssTime(style.transitionDuration)
     );
-};
-
-const findBookmarkByTitle = (
-    bookmarkTree: readonly BookmarkCategoryData[],
-    title: string
-): BookmarkLinkData | undefined => {
-    for (const categoryData of bookmarkTree) {
-        const bookmark = categoryData.links.find(
-            (link) => link.title === title
-        );
-        if (bookmark !== undefined) {
-            return bookmark;
-        }
-    }
-
-    return undefined;
 };
 
 export const useBookmarkSearch = (
@@ -256,13 +230,9 @@ export const useBookmarkSearch = (
         const nextBlockedLinks: FeedsLink[] = [];
         const windowKey = getFeedsWindowKey();
 
-        for (const link of feedLinks) {
+        for (const bookmark of getFeedBookmarks(bookmarkTree)) {
+            const link = bookmark.title;
             if (!shouldOpenFeedLink(link, windowKey)) {
-                continue;
-            }
-
-            const bookmark = findBookmarkByTitle(bookmarkTree, link);
-            if (bookmark === undefined) {
                 continue;
             }
 

@@ -219,7 +219,8 @@ const getLinkItemSearchScore = (
 export const getSearchResults = (
     items: readonly LinkItem[],
     query: string,
-    keySequence = ''
+    keySequence = '',
+    maxResults = maxSearchResults
 ): LinkItem[] => {
     const trimmedQuery = query.trim();
     if (trimmedQuery === '') {
@@ -243,7 +244,7 @@ export const getSearchResults = (
             (a, b) =>
                 a.score - b.score || a.item.title.localeCompare(b.item.title)
         )
-        .slice(0, maxSearchResults)
+        .slice(0, maxResults)
         .map(({ item }) => item);
 };
 
