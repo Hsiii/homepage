@@ -81,6 +81,10 @@ const normalizeBookmarkLink = (
         createFallbackId('bookmark', bookmarkIndex);
 
     return {
+        ...(bookmark.feed === undefined ? {} : { feed: bookmark.feed }),
+        ...(bookmark.feedOrder === undefined
+            ? {}
+            : { feedOrder: bookmark.feedOrder }),
         id: getUniqueId(id),
         title,
         type: 'link',
@@ -164,9 +168,16 @@ const coerceBookmarkLink = (value: unknown): BookmarkLinkData | undefined => {
     const url = typeof value.url === 'string' ? value.url : '';
     const id = typeof value.id === 'string' ? value.id : '';
     const feed = typeof value.feed === 'boolean' ? value.feed : undefined;
+    const feedOrder =
+        typeof value.feedOrder === 'number' &&
+        Number.isSafeInteger(value.feedOrder) &&
+        value.feedOrder >= 0
+            ? value.feedOrder
+            : undefined;
 
     return {
         ...(feed === undefined ? {} : { feed }),
+        ...(feedOrder === undefined ? {} : { feedOrder }),
         id,
         title,
         type: 'link',

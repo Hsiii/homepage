@@ -1,5 +1,6 @@
 export interface BookmarkLinkData {
     feed?: boolean;
+    feedOrder?: number;
     id: string;
     title: string;
     type: 'link';

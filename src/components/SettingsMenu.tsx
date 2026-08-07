@@ -52,6 +52,7 @@ import { runThemeTransition } from '@/utils/themeTransition';
 import { getCssUrlValue } from '@/utils/wallpaperStyle';
 import { wallpaperAcceptedContentTypes } from '../../shared/wallpaper';
 import { BookmarkManagerDialog } from './BookmarkManagerDialog';
+import { FeedSettingsSection } from './FeedSettingsSection';
 
 const myLocationOptionValue = 'my-location';
 
@@ -561,7 +562,12 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
     const settingsPage =
         isOpen && isBrowser()
             ? createPortal(
-                  <div className='settings-page-backdrop'>
+                  <div
+                      className='settings-page-backdrop'
+                      onMouseDown={(event) => {
+                          event.stopPropagation();
+                      }}
+                  >
                       <section
                           className='settings-page'
                           role='dialog'
@@ -1031,6 +1037,10 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                                       </div>
                                   </div>
                               </section>
+
+                              <FeedSettingsSection
+                                  bookmarkControls={bookmarkControls}
+                              />
 
                               <section className='settings-page-section'>
                                   <div className='settings-section-heading'>

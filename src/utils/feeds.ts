@@ -33,7 +33,13 @@ export const getFeedBookmarks = (
     const bookmarks = bookmarkTree.flatMap((category) => category.links);
 
     if (hasCustomFeedSelection(bookmarkTree)) {
-        return bookmarks.filter((bookmark) => bookmark.feed === true);
+        return bookmarks
+            .filter((bookmark) => bookmark.feed === true)
+            .toSorted(
+                (left, right) =>
+                    (left.feedOrder ?? Number.MAX_SAFE_INTEGER) -
+                    (right.feedOrder ?? Number.MAX_SAFE_INTEGER)
+            );
     }
 
     return legacyFeedTitles.flatMap((title) => {
@@ -42,23 +48,46 @@ export const getFeedBookmarks = (
     });
 };
 
-const initializeFeedNodes = (
-    nodes: readonly BookmarkNodeData[]
+const updateFeedNodes = (
+    nodes: readonly BookmarkNodeData[],
+    feedOrderById: ReadonlyMap<string, number>
 ): BookmarkNodeData[] =>
-    nodes.map((node) =>
-        node.type === 'link'
-            ? { ...node, feed: isLegacyFeedTitle(node.title) }
-            : { ...node, children: initializeFeedNodes(node.children) }
+    nodes.map((node) => {
+        if (node.type === 'folder') {
+            return {
+                ...node,
+                children: updateFeedNodes(node.children, feedOrderById),
+            };
+        }
+
+        const feedOrder = feedOrderById.get(node.id);
+        return {
+            ...node,
+            feed: feedOrder !== undefined,
+            ...(feedOrder === undefined
+                ? { feedOrder: undefined }
+                : { feedOrder }),
+        };
+    });
+
+export const setFeedBookmarkIds = (
+    bookmarkTree: readonly BookmarkCategoryData[],
+    bookmarkIds: readonly string[]
+): BookmarkCategoryData[] => {
+    const feedOrderById = new Map(
+        bookmarkIds.map((bookmarkId, index) => [bookmarkId, index])
     );
+
+    return bookmarkTree.map((category) => ({
+        ...category,
+        children: updateFeedNodes(category.children, feedOrderById),
+    }));
+};
 
 export const initializeFeedSelection = (
     bookmarkTree: readonly BookmarkCategoryData[]
 ): BookmarkCategoryData[] =>
-    bookmarkTree.map((category) => ({
-        ...category,
-        children: initializeFeedNodes(category.children),
-        links: category.links.map((bookmark) => ({
-            ...bookmark,
-            feed: isLegacyFeedTitle(bookmark.title),
-        })),
-    }));
+    setFeedBookmarkIds(
+        bookmarkTree,
+        getFeedBookmarks(bookmarkTree).map((bookmark) => bookmark.id)
+    );
