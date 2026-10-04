@@ -7,8 +7,16 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { DragDropProvider, useDroppable } from '@dnd-kit/react';
-import type { DragEndEvent } from '@dnd-kit/react';
+import {
+    DragDropProvider,
+    useDragDropMonitor,
+    useDroppable,
+} from '@dnd-kit/react';
+import type {
+    DragEndEvent,
+    DragMoveEvent,
+    DragOverEvent,
+} from '@dnd-kit/react';
 import { useSortable } from '@dnd-kit/react/sortable';
 import {
     Bookmark,
@@ -115,6 +123,27 @@ interface DropLocationData {
     location: BookmarkLocation;
 }
 
+type NodeDropPosition = 'before' | 'inside' | 'after';
+
+const getNodeDropPosition = (
+    isFolder: boolean,
+    bounds: DOMRect | undefined,
+    pointerY: number
+): NodeDropPosition | undefined => {
+    if (bounds === undefined) {
+        return undefined;
+    }
+    // A folder's middle accepts children; its outer quarters reorder siblings.
+    if (
+        isFolder &&
+        pointerY > bounds.top + bounds.height * 0.25 &&
+        pointerY < bounds.bottom - bounds.height * 0.25
+    ) {
+        return 'inside';
+    }
+    return pointerY > bounds.top + bounds.height / 2 ? 'after' : 'before';
+};
+
 const getLocationKey = (
     categoryIndex: number,
     folderPath: readonly string[]
@@ -146,6 +175,7 @@ const SortableBookmarkRow: React.FC<SortableBookmarkRowProps> = ({
     nodeIndex,
     selected,
 }) => {
+    const [dropPosition, setDropPosition] = useState<NodeDropPosition>();
     const sortable = useSortable<DragNodeData>({
         accept: 'bookmark-node',
         data: { isFolder, kind: 'node', location, nodeIndex },
@@ -156,12 +186,44 @@ const SortableBookmarkRow: React.FC<SortableBookmarkRowProps> = ({
         type: 'bookmark-node',
     });
 
+    const updateDropPosition = (
+        event: DragMoveEvent | DragOverEvent,
+        pointerY = event.operation.position.current.y
+    ) => {
+        const { source, target } = event.operation;
+        setDropPosition(
+            target?.id === nodeId && source?.id !== nodeId
+                ? getNodeDropPosition(
+                      isFolder,
+                      target.element?.getBoundingClientRect(),
+                      pointerY
+                  )
+                : undefined
+        );
+    };
+
+    useDragDropMonitor({
+        onDragMove: (event) => {
+            updateDropPosition(
+                event,
+                event.to?.y ??
+                    event.operation.position.current.y + (event.by?.y ?? 0)
+            );
+        },
+        onDragOver: (event) => {
+            updateDropPosition(event);
+        },
+        onDragEnd: () => {
+            setDropPosition(undefined);
+        },
+    });
+
     return (
         <div
             ref={sortable.targetRef}
             className='bookmark-workspace-list-row'
             data-dragging={sortable.isDragSource ? 'true' : undefined}
-            data-drop-position={sortable.isDropTarget ? 'inside' : undefined}
+            data-drop-position={dropPosition}
             data-selected={selected}
         >
             {children(sortable.sourceRef)}
@@ -1053,15 +1115,15 @@ export const BookmarkManager: React.FC<BookmarkManagerProps> = ({
             if (String(source.id) === String(target.id)) {
                 return;
             }
-            const bounds = target.element?.getBoundingClientRect();
-            const pointerY = event.operation.position.current.y;
-            // Middle of a folder opens it as a destination; its edges reorder siblings.
-            const insideFolder =
-                targetData.isFolder &&
-                bounds !== undefined &&
-                pointerY > bounds.top + bounds.height * 0.25 &&
-                pointerY < bounds.bottom - bounds.height * 0.25;
-            if (insideFolder) {
+            const dropPosition = getNodeDropPosition(
+                targetData.isFolder,
+                target.element?.getBoundingClientRect(),
+                event.operation.position.current.y
+            );
+            if (dropPosition === undefined) {
+                return;
+            }
+            if (dropPosition === 'inside') {
                 destination =
                     targetData.location.categoryIndex === -1
                         ? {
@@ -1079,10 +1141,8 @@ export const BookmarkManager: React.FC<BookmarkManagerProps> = ({
                               ],
                           };
             } else {
-                const after =
-                    bounds !== undefined &&
-                    pointerY > bounds.top + bounds.height / 2;
-                destinationIndex = targetData.nodeIndex + (after ? 1 : 0);
+                destinationIndex =
+                    targetData.nodeIndex + (dropPosition === 'after' ? 1 : 0);
             }
         }
 
@@ -1385,7 +1445,13 @@ export const BookmarkManager: React.FC<BookmarkManagerProps> = ({
                         )}
                     </div>
                 </div>
-                <DragDropProvider onDragEnd={handleDragEnd}>
+                <DragDropProvider
+                    onDragOver={(event) => {
+                        // Keep rows in place while their indicators preview the drop.
+                        event.preventDefault();
+                    }}
+                    onDragEnd={handleDragEnd}
+                >
                     <div
                         className='bookmark-settings-browser bookmark-workspace-grid'
                         inert={editorDraft !== undefined}
