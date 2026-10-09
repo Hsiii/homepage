@@ -17,6 +17,21 @@ export type AppLocale = (typeof localeOptions)[number]['value'];
 
 const messages = {
     'en': {
+        keybinds: 'Keybinds',
+        keybindsDescription:
+            'Open a command or bookmark with a single English letter when you are not typing. Saved in this browser.',
+        keybindsEmpty: 'Add your first keybind to get started.',
+        keybindAction: 'Command or bookmark',
+        keybindSelectAction: 'Select a command or bookmark',
+        commands: 'Commands',
+        hotkey: 'Hotkey',
+        addKeybind: 'Add keybind',
+        removeKeybind: 'Remove keybind',
+        keybindLetterRequired: 'Enter a single English letter (A–Z).',
+        keybindDuplicate: 'That letter is already assigned to another keybind.',
+        keybindBookmarkUnavailable: 'Bookmark unavailable',
+        keybindSaveFailed: 'Keybinds could not be saved in this browser.',
+
         accent: 'Accent',
         accentDescription: 'Choose the color used for highlights and focus.',
         amethyst: 'Amethyst',
@@ -155,6 +170,21 @@ const messages = {
         wallpaperUploading: 'Uploading wallpaper',
     },
     'zh-TW': {
+        keybinds: '快捷鍵',
+        keybindsDescription:
+            '未輸入文字時，以單一英文字母開啟指令或書籤。設定儲存於此瀏覽器。',
+        keybindsEmpty: '新增第一個快捷鍵以開始使用。',
+        keybindAction: '指令或書籤',
+        keybindSelectAction: '選擇指令或書籤',
+        commands: '指令',
+        hotkey: '快捷鍵',
+        addKeybind: '新增快捷鍵',
+        removeKeybind: '移除快捷鍵',
+        keybindLetterRequired: '請輸入單一英文字母（A–Z）。',
+        keybindDuplicate: '此字母已用於其他快捷鍵。',
+        keybindBookmarkUnavailable: '書籤無法使用',
+        keybindSaveFailed: '無法在此瀏覽器儲存快捷鍵。',
+
         accent: '強調色',
         accentDescription: '選擇用於重點與焦點狀態的顏色。',
         amethyst: '紫晶',
