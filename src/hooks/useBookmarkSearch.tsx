@@ -9,8 +9,10 @@ import {
 } from 'react';
 import type React from 'react';
 
+import { useKeybinds } from '@/hooks/useKeybinds';
 import type { BookmarkCategoryData } from '@/types/bookmarks';
 import { getFeedBookmarks } from '@/utils/feeds';
+import { getHotkey } from '@/utils/keybinds';
 import type {
     FeedsLink,
     LinkItem,
@@ -147,6 +149,7 @@ export const useBookmarkSearch = (
     selectedSearchResult: LinkItem | undefined;
     trimmedSearchValue: string;
 } => {
+    const { keybinds } = useKeybinds();
     const inputRef = useRef<HTMLInputElement>(null);
     const searchFormRef = useRef<HTMLFormElement>(null);
     const searchRef = useRef<HTMLDivElement>(null);
@@ -260,6 +263,44 @@ export const useBookmarkSearch = (
         },
         [executeFeedsCommand]
     );
+
+    useEffect(() => {
+        const handleHotkey = (event: KeyboardEvent) => {
+            if (
+                bookmarksLoading ||
+                globalThis.document.querySelector(
+                    '[role="dialog"][aria-modal="true"], dialog[open]'
+                )
+            ) {
+                return;
+            }
+            const key = getHotkey(event);
+            if (key === undefined) {
+                return;
+            }
+            const binding = keybinds.find((item) => item.key === key);
+            if (!binding) {
+                return;
+            }
+            const command = getSlashCommandResults('/').find(
+                (item) => `command:${item.command}` === binding.target
+            );
+            const bookmark = flattenedSearchItems.find(
+                (item) => `bookmark:${item.id}` === binding.target
+            );
+            if (command) {
+                event.preventDefault();
+                executeSlashCommand(command);
+            } else if (bookmark) {
+                event.preventDefault();
+                globalThis.location.href = bookmark.url;
+            }
+        };
+        globalThis.addEventListener('keydown', handleHotkey);
+        return () => {
+            globalThis.removeEventListener('keydown', handleHotkey);
+        };
+    }, [bookmarksLoading, executeSlashCommand, flattenedSearchItems, keybinds]);
 
     const updateSearchSuggestionsPosition = useCallback(() => {
         const rect =

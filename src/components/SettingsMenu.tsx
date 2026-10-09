@@ -9,6 +9,7 @@ import {
     Bookmark,
     Check,
     ChevronDown,
+    Keyboard,
     Mailbox,
     MapPin,
     MapPinOff,
@@ -56,8 +57,14 @@ import { wallpaperAcceptedContentTypes } from '../../shared/wallpaper';
 import { BookmarkManager } from './BookmarkManager';
 import type { BookmarkManagerHandle } from './BookmarkManager';
 import { FeedSettingsSection } from './FeedSettingsSection';
+import { KeybindSettingsSection } from './KeybindSettingsSection';
 
-type SettingsSectionId = 'appearance' | 'preferences' | 'feeds' | 'content';
+type SettingsSectionId =
+    | 'appearance'
+    | 'preferences'
+    | 'feeds'
+    | 'content'
+    | 'keybinds';
 
 interface SettingsDropdownOption {
     readonly disabled?: boolean;
@@ -608,6 +615,11 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
             label: t.preferences,
         },
         {
+            icon: Keyboard,
+            id: 'keybinds',
+            label: t.keybinds,
+        },
+        {
             icon: Mailbox,
             id: 'feeds',
             label: t.feeds,
@@ -1146,6 +1158,12 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
                                       </div>
                                   </div>
                               </section>
+
+                              {selectedSection === 'keybinds' ? (
+                                  <KeybindSettingsSection
+                                      bookmarkControls={bookmarkControls}
+                                  />
+                              ) : undefined}
 
                               {selectedSection === 'feeds' ? (
                                   <FeedSettingsSection
