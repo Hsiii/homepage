@@ -8,11 +8,16 @@ import { useLocale } from '@/hooks/useLocale';
 import { normalizeHotkey } from '@/utils/keybinds';
 import type { Keybind } from '@/utils/keybinds';
 import { getSearchItems, getSlashCommandResults } from '@/utils/search';
+import { SettingsDropdown } from './SettingsDropdown';
 
 export const KeybindSettingsSection = ({
     bookmarkControls,
+    openDropdownId,
+    onOpenDropdownChange,
 }: {
     bookmarkControls: BookmarkControls;
+    openDropdownId?: string;
+    onOpenDropdownChange: (id: string | undefined) => void;
 }): ReactElement => {
     const { t } = useLocale();
     const { keybinds, saveKeybinds } = useKeybinds();
@@ -46,7 +51,7 @@ export const KeybindSettingsSection = ({
     };
 
     return (
-        <section className='settings-page-section'>
+        <section className='settings-page-section settings-keybinds'>
             <div className='settings-section-heading'>
                 <h2>{t.keybinds}</h2>
                 <p>{t.keybindsDescription}</p>
@@ -69,52 +74,58 @@ export const KeybindSettingsSection = ({
                             className='settings-row settings-keybind-row'
                             key={binding.id}
                         >
-                            <label className='bookmark-workspace-field'>
-                                <span>
+                            <div className='settings-keybind-action'>
+                                <span
+                                    className='settings-row-label'
+                                    id={`keybind-action-${binding.id}-label`}
+                                >
                                     {t.keybindAction} {index + 1}
                                 </span>
-                                <select
+                                <SettingsDropdown
+                                    id={`keybind-action-${binding.id}`}
+                                    labelledBy={`keybind-action-${binding.id}-label`}
                                     value={binding.target}
-                                    onChange={(event) => {
-                                        update(binding.id, {
-                                            target: event.target.value,
-                                        });
+                                    options={[
+                                        {
+                                            value: '',
+                                            label: t.keybindSelectAction,
+                                        },
+                                        ...commands.map((command) => ({
+                                            value: `command:${command.command}`,
+                                            label: command.label,
+                                        })),
+                                        ...bookmarks.map((bookmark) => ({
+                                            value: `bookmark:${bookmark.id}`,
+                                            label: `${bookmark.title} — ${bookmark.pathLabel}`,
+                                            searchText: bookmark.title,
+                                        })),
+                                        ...(missingBookmark
+                                            ? [
+                                                  {
+                                                      value: binding.target,
+                                                      label: t.keybindBookmarkUnavailable,
+                                                      disabled: true,
+                                                  },
+                                              ]
+                                            : []),
+                                    ]}
+                                    isOpen={openDropdownId === binding.id}
+                                    onOpenChange={(isOpen) => {
+                                        onOpenDropdownChange(
+                                            isOpen ? binding.id : undefined
+                                        );
                                     }}
-                                >
-                                    <option value=''>
-                                        {t.keybindSelectAction}
-                                    </option>
-                                    <optgroup label={t.commands}>
-                                        {commands.map((command) => (
-                                            <option
-                                                key={command.command}
-                                                value={`command:${command.command}`}
-                                            >
-                                                {command.label}
-                                            </option>
-                                        ))}
-                                    </optgroup>
-                                    <optgroup label={t.bookmarks}>
-                                        {bookmarks.map((bookmark) => (
-                                            <option
-                                                key={bookmark.id}
-                                                value={`bookmark:${bookmark.id}`}
-                                            >
-                                                {bookmark.title} —{' '}
-                                                {bookmark.pathLabel}
-                                            </option>
-                                        ))}
-                                    </optgroup>
-                                    {missingBookmark ? (
-                                        <option value={binding.target} disabled>
-                                            {t.keybindBookmarkUnavailable}
-                                        </option>
-                                    ) : undefined}
-                                </select>
-                            </label>
-                            <label className='bookmark-workspace-field settings-hotkey-field'>
-                                <span>{t.hotkey}</span>
+                                    onChange={(target) => {
+                                        update(binding.id, { target });
+                                    }}
+                                />
+                            </div>
+                            <label className='settings-hotkey-field'>
+                                <span className='settings-row-label'>
+                                    {t.hotkey}
+                                </span>
                                 <input
+                                    className='settings-select settings-hotkey-input'
                                     type='text'
                                     value={binding.key.toUpperCase()}
                                     maxLength={1}
@@ -163,6 +174,7 @@ export const KeybindSettingsSection = ({
                                 type='button'
                                 aria-label={`${t.removeKeybind} ${index + 1}`}
                                 onClick={() => {
+                                    onOpenDropdownChange(undefined);
                                     save(
                                         keybinds.filter(
                                             (item) => item.id !== binding.id
